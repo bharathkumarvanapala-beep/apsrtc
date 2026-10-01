@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APSRTC SmartTrack — Official Fleet Telemetry & Transit Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/map.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <!-- Government Top Banner -->
+  <aside class="gov-strip">
+    <div class="gov-strip-left">
+      <span class="gov-emblem">🏛️</span>
+      <span class="gov-strip-text">
+        Government of Andhra Pradesh
+        <span class="gov-telugu">ఆంధ్రప్రదేశ్ ప్రభుత్వం</span>
+      </span>
+    </div>
+    <div class="gov-strip-right">
+      <span class="gov-helpline">24x7 Transit Helpline: <strong>1800-200-4545</strong></span>
+      <span>•</span>
+      <span class="gov-helpline">Corridor: <strong>Araku - Visakhapatnam</strong></span>
+    </div>
+  </aside>
+
+  <!-- Official Top Navigation -->
+  <header class="topbar">
+    <a href="#" class="brand">
+      <div class="brand-emblem-wrap">
+        <span class="emblem-code">RTC</span>
+        <span class="emblem-year">EST 1958</span>
+      </div>
+      <div class="brand-titles">
+        <span class="brand-telugu">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ</span>
+        <span class="brand-main">APSRTC SmartTrack</span>
+        <span class="brand-sub">INTELLIGENT TRANSIT & FLEET TELEMETRY PORTAL</span>
+      </div>
+    </a>
+    <nav>
+      <a href="#search">🔍 Journey Finder</a>
+      <a href="#dashboard">📊 Operations Dashboard</a>
+      <a href="#fleet">🗺️ Live Fleet Radar</a>
+      <a href="#complaint">📝 Grievance Desk</a>
+      <button id="officerLoginBtn" class="btn-officer-login" onclick="openLoginModal()">
+        🔐 Officer Login
+      </button>
+    </nav>
+  </header>
+
+  <!-- Live Bulletin / Announcement Marquee -->
+  <div class="announcement-bar" id="announcementBar">
+    <span class="announcement-badge">📢 LIVE BULLETIN</span>
+    <span class="announcement-content" id="announcementText">
+      Ghat Road Operations Normal: All buses running on schedule across Araku - Visakhapatnam corridor.
+    </span>
+  </div>
+
+  <main>
+    <!-- Hero Introduction -->
+    <section class="hero">
+      <div>
+        <span class="eyebrow">
+          <span>●</span> STATE TRANSIT TELEMETRY SYSTEM
+        </span>
+        <h1>Know where your bus is before you step out.</h1>
+        <p>
+          Real-time GPS tracking across the <strong>Araku - Visakhapatnam Corridor</strong>. 
+          Discover live buses, view accurate arrival ETAs, monitor station timelines, and register instant transit grievances.
+        </p>
+        <div class="hero-stats-row">
+          <span class="hero-stat-pill"><span class="dot"></span> 4 Corridor Buses Active</span>
+          <span class="hero-stat-pill">⛰️ Ghat Route Protocol Active</span>
+          <span class="hero-stat-pill">📡 GPS Latency &lt; 3s</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <span class="hero-card-tag">OFFICIAL DEMO PORTAL</span>
+        <strong>Alluri Sitharama Raju - Vizag Corridor</strong>
+        <p>Connected to simulated GPS telemetry nodes transmitting live vehicle coordinates, speed, and heading every 5 seconds.</p>
+        <div class="hero-card-meta">
+          <span>Operational Division: <strong>Visakhapatnam</strong></span>
+          <span>Status: <strong>ONLINE</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPERATIONS KPI DASHBOARD -->
+    <section id="dashboard" class="panel">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">NETWORK OPERATIONS</span>
+          <h2>Corridor Live Performance Dashboard</h2>
+        </div>
+        <span class="live-dot" id="systemHealthBadge">● 100% OPERATIONAL</span>
+      </div>
+
+      <!-- 4 KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card accent-green">
+          <div class="kpi-head">
+            <span class="kpi-title">Active Fleet</span>
+            <span class="kpi-icon">🚌</span>
+          </div>
+          <div class="kpi-value" id="kpiActiveBuses">4 / 4</div>
+          <div class="kpi-sub">100% Corridor Fleet Deployed</div>
+        </div>
+
+        <div class="kpi-card accent-gold">
+          <div class="kpi-head">
+            <span class="kpi-title">On-Time Performance</span>
+            <span class="kpi-icon">⏱️</span>
+          </div>
+          <div class="kpi-value" id="kpiOnTime">97.4%</div>
+          <div class="kpi-sub">Ghat Schedule Adherence</div>
+        </div>
+
+        <div class="kpi-card accent-blue">
+          <div class="kpi-head">
+            <span class="kpi-title">Corridor Velocity</span>
+            <span class="kpi-icon">⚡</span>
+          </div>
+          <div class="kpi-value" id="kpiAvgSpeed">38 km/h</div>
+          <div class="kpi-sub">Safe Hill Speed Limit: 45 km/h</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-head">
+            <span class="kpi-title">Route Coverage</span>
+            <span class="kpi-icon">📍</span>
+          </div>
+          <div class="kpi-value" id="kpiStops">7 Depots</div>
+          <div class="kpi-sub">131.7 km Mountain Highway</div>
+        </div>
+      </div>
+
+      <!-- Corridor Station Radar Timeline -->
+      <div class="radar-panel">
+        <div class="radar-header">
+          <h3>📡 Corridor Station Radar — Live Bus Depots</h3>
+          <span>Araku ➔ Ananthagiri ➔ Paderu ➔ G. Madugula ➔ Chintapalli ➔ Anakapalle ➔ Visakhapatnam</span>
+        </div>
+        <div class="radar-station-strip" id="radarStrip">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </div>
+    </section>
+
+    <!-- JOURNEY SEARCH PANEL -->
+    <section id="search" class="panel">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">PASSENGER TRANSIT FINDER</span>
+          <h2>Where do you want to travel?</h2>
+        </div>
+        <span id="apiStatus" class="status-pill">Checking server...</span>
+      </div>
+
+      <form id="journeyForm" class="search-grid">
+        <label>Boarding Stop (From)
+          <input id="from" value="Paderu" placeholder="e.g. Paderu" required>
+        </label>
+        <label>Destination Stop (To)
+          <input id="to" value="Visakhapatnam" placeholder="e.g. Visakhapatnam or G. Madugula" required>
+        </label>
+        <button type="submit">Find Relevant Buses</button>
+      </form>
+
+      <!-- Quick Preset Buttons -->
+      <div class="quick-routes">
+        <span>Popular Corridor Journeys:</span>
+        <button type="button" class="quick-btn" onclick="setJourneyPreset('Paderu', 'Visakhapatnam')">Paderu ➔ Visakhapatnam</button>
+        <button type="button" class="quick-btn" onclick="setJourneyPreset('Paderu', 'G. Madugula')">Paderu ➔ G. Madugula</button>
+        <button type="button" class="quick-btn" onclick="setJourneyPreset('Araku', 'Paderu')">Araku ➔ Paderu</button>
+        <button type="button" class="quick-btn" onclick="setJourneyPreset('Anakapalle', 'Visakhapatnam')">Anakapalle ➔ Visakhapatnam</button>
+      </div>
+
+      <!-- Journey Results -->
+      <div id="results" class="bus-grid"></div>
+    </section>
+
+    <!-- LIVE FLEET RADAR & MAP -->
+    <section id="fleet" class="panel">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">GIS SATELLITE TRACKING</span>
+          <h2>Corridor Live Fleet Map</h2>
+        </div>
+        <span class="live-dot">● LIVE TELEMETRY</span>
+      </div>
+      <div id="map"></div>
+      <div id="fleetList" class="fleet-list"></div>
+    </section>
+
+    <!-- CITIZEN GRIEVANCE PORTAL -->
+    <section id="complaint" class="panel">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">PASSENGER SERVICES</span>
+          <h2>Citizen Grievance & Incident Reporting</h2>
+        </div>
+      </div>
+      <form id="complaintForm" class="complaint-form">
+        <label>Assigned Bus
+          <select id="complaintBus" required></select>
+        </label>
+        <label>Grievance Category
+          <select id="category" required>
+            <option value="Delay">Schedule Delay / Missed Trip</option>
+            <option value="Overcrowding">Overcrowding & Capacity Issue</option>
+            <option value="Bus did not stop">Bus Did Not Stop at Designated Station</option>
+            <option value="Driver behaviour">Driver / Conductor Behaviour</option>
+            <option value="Safety">Safety / Reckless Driving</option>
+            <option value="Cleanliness">Vehicle Hygiene / Maintenance</option>
+            <option value="Other">Other Operational Concern</option>
+          </select>
+        </label>
+        <label>Passenger Name (Optional)
+          <input id="passengerName" placeholder="Your name for record keeping" value="Citizen Passenger">
+        </label>
+        <label>Incident Details
+          <textarea id="description" rows="4" placeholder="Please describe the incident, stop location, and time..." required></textarea>
+        </label>
+        <button type="submit">Submit Grievance to Control Center</button>
+      </form>
+      <div id="complaintMessage"></div>
+    </section>
+
+    <!-- ADMIN OFFICER CONTROL CENTER (Visible to Officers) -->
+    <section id="adminPortal" class="panel admin-card" style="display: none;">
+      <!-- Officer Banner -->
+      <div class="officer-banner">
+        <div class="officer-info">
+          <h3 id="officerName">Fleet Operations Controller</h3>
+          <p id="officerBadge">Operational Control Center — Alluri Sitharama Raju Division | Session Active</p>
+        </div>
+        <button class="btn-logout" onclick="logoutOfficer()">🚪 Log Out of Control Center</button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="admin-nav-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('fleetMgmt')">🚌 Fleet Controller</button>
+        <button class="admin-tab" onclick="switchAdminTab('complaintMgmt')">📑 Grievance Resolution Desk</button>
+        <button class="admin-tab" onclick="switchAdminTab('broadcastMgmt')">📢 Emergency Broadcast Console</button>
+      </div>
+
+      <!-- TAB 1: FLEET MANAGEMENT -->
+      <div id="tab-fleetMgmt" class="admin-tab-content active">
+        <h4 style="margin-bottom: 12px; font-weight: 800;">Corridor Bus Inventory & Dispatch Control</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Bus #</th>
+                <th>Route Direction</th>
+                <th>Current Station</th>
+                <th>Speed</th>
+                <th>GPS Status</th>
+                <th>Operational Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminBusTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Add Bus Form -->
+        <div class="admin-form-inline">
+          <h4>➕ Dispatch New Bus to Corridor</h4>
+          <form id="addBusForm" onsubmit="handleAddBus(event)" class="admin-form-grid">
+            <label>Bus Number
+              <input id="newBusNumber" placeholder="e.g. 734" required>
+            </label>
+            <label>Initial Station
+              <select id="newBusStation">
+                <option value="Araku">Araku (Depot 0)</option>
+                <option value="Ananthagiri">Ananthagiri (Depot 1)</option>
+                <option value="Paderu" selected>Paderu (Depot 2)</option>
+                <option value="G. Madugula">G. Madugula (Depot 3)</option>
+                <option value="Chintapalli">Chintapalli (Depot 4)</option>
+                <option value="Anakapalle">Anakapalle (Depot 5)</option>
+                <option value="Visakhapatnam">Visakhapatnam (Depot 6)</option>
+              </select>
+            </label>
+            <label>Direction
+              <select id="newBusDirection">
+                <option value="forward">Towards Visakhapatnam (Forward)</option>
+                <option value="reverse">Towards Araku (Reverse)</option>
+              </select>
+            </label>
+            <label>Speed (km/h)
+              <input id="newBusSpeed" type="number" value="38" min="15" max="60">
+            </label>
+            <button type="submit" class="admin-btn-action admin-btn-success">Deploy Bus</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- TAB 2: GRIEVANCE DESK -->
+      <div id="tab-complaintMgmt" class="admin-tab-content">
+        <h4 style="margin-bottom: 12px; font-weight: 800;">Citizen Grievance Resolution Desk</h4>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Bus</th>
+                <th>Category</th>
+                <th>Passenger</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Resolution Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminComplaintTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 3: BROADCAST CONSOLE -->
+      <div id="tab-broadcastMgmt" class="admin-tab-content">
+        <h4 style="margin-bottom: 12px; font-weight: 800;">Corridor Network Broadcast Dispatcher</h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Broadcast messages immediately update the live bulletin ticker across all passenger screens and mobile devices.
+        </p>
+        <form onsubmit="handleBroadcast(event)" style="display: flex; flex-direction: column; gap: 12px; max-width: 600px;">
+          <label>Broadcast Bulletin Text
+            <textarea id="broadcastMessage" rows="3" placeholder="e.g. Heavy fog alert on Araku ghat road — speed restricted to 30 km/h." required></textarea>
+          </label>
+          <label>Severity Type
+            <select id="broadcastType">
+              <option value="info">Information (Standard Green/Blue)</option>
+              <option value="warning" selected>Caution / Weather Alert (Gold/Yellow)</option>
+              <option value="emergency">High Priority / Route Halt (Red)</option>
+            </select>
+          </label>
+          <button type="submit" style="width: max-content;">Transmit Bulletin to Corridor</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- OFFICER LOGIN MODAL -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeLoginModal()">&times;</button>
+      <div class="modal-header">
+        <div class="modal-badge">🛡️</div>
+        <h3>APSRTC Officer Login</h3>
+        <p>Operational Control Center & Fleet Management Access</p>
+      </div>
+
+      <div class="modal-demo-cred">
+        <span>Officer ID: <b>admin</b> | Password: <b>apsrtc@2026</b></span>
+        <button type="button" class="btn-quick-fill" onclick="fillDemoCredentials()">Auto-Fill</button>
+      </div>
+
+      <form id="officerLoginForm" onsubmit="handleOfficerLogin(event)" class="modal-form">
+        <label>Officer Username / ID
+          <input id="loginUsername" placeholder="e.g. admin" required autocomplete="username">
+        </label>
+        <label>Security Password
+          <input id="loginPassword" type="password" placeholder="••••••••" required autocomplete="current-password">
+        </label>
+        <button type="submit">Authenticate & Enter Control Center</button>
+      </form>
+      <div id="loginError" class="modal-error"></div>
+    </div>
+  </div>
+
+  <!-- Official Footer -->
+  <footer>
+    <div class="footer-content">
+      <div>
+        <div class="footer-brand">APSRTC SmartTrack — Government of Andhra Pradesh</div>
+        <p style="margin-top: 4px; font-size: 11px;">Andhra Pradesh State Road Transport Corporation • Public Telemetry Platform</p>
+      </div>
+      <div class="footer-links">
+        <a href="#search">Journey Search</a>
+        <a href="#dashboard">Operations</a>
+        <a href="#fleet">Fleet Map</a>
+        <a href="#complaint">Citizen Grievance</a>
+        <a href="javascript:void(0)" onclick="openLoginModal()">Officer Portal</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>
