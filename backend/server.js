@@ -13,6 +13,7 @@ const journeyRoutes = require("./routes/journey");
 const complaintRoutes = require("./routes/complaints");
 const trackingRoutes = require("./routes/tracking");
 const adminRoutes = require("./routes/admin");
+const emergencyRoutes = require("./routes/emergencies");
 const { registerSocketHandlers } = require("./sockets/socket");
 
 const app = express();
@@ -40,6 +41,8 @@ app.use("/api/v1/journey", journeyRoutes);
 app.use("/api/v1/complaints", complaintRoutes);
 app.use("/api/v1/tracking", trackingRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/emergencies", emergencyRoutes);
+
 
 app.use((err, _req, res, _next) => {
   console.error(err);

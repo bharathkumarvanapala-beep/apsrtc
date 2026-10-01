@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgStudio" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="busEmerald" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="35%" stop-color="#047857"/>
+      <stop offset="70%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Studio Background -->
+  <rect width="800" height="500" fill="url(#bgStudio)"/>
+  
+  <!-- Showcase Platform Light -->
+  <ellipse cx="400" cy="410" rx="360" ry="40" fill="#047857" opacity="0.3"/>
+  <ellipse cx="400" cy="405" rx="320" ry="25" fill="#10b981" opacity="0.2"/>
+
+  <!-- Bus Profile Main -->
+  <g transform="translate(60, 160)">
+    <!-- Shadow -->
+    <ellipse cx="340" cy="225" rx="330" ry="18" fill="#000000" opacity="0.6"/>
+
+    <!-- Main Bus Chassis -->
+    <rect x="20" y="20" width="640" height="180" rx="28" fill="url(#busEmerald)" stroke="#34d399" stroke-width="2"/>
+
+    <!-- White and Saffron RTC Accent Decals -->
+    <path d="M20 120 L660 120 L660 135 L20 135 Z" fill="#ffffff"/>
+    <path d="M20 135 L660 135 L660 145 L20 145 Z" fill="#f59e0b"/>
+    <path d="M40 80 L200 80 L180 120 L20 120 Z" fill="rgba(255,255,255,0.15)"/>
+
+    <!-- Aerodynamic Windshield & Driver Cab -->
+    <path d="M520 30 L640 40 L655 110 L520 110 Z" fill="#0f172a" stroke="#334155" stroke-width="2"/>
+    <polygon points="530,35 630,45 645,100 530,100" fill="#38bdf8" opacity="0.35"/>
+
+    <!-- Passenger Panoramic Windows -->
+    <g fill="#020617" stroke="#334155" stroke-width="2">
+      <rect x="40" y="35" width="70" height="75" rx="6"/>
+      <rect x="120" y="35" width="70" height="75" rx="6"/>
+      <rect x="200" y="35" width="70" height="75" rx="6"/>
+      <rect x="280" y="35" width="70" height="75" rx="6"/>
+      <rect x="360" y="35" width="70" height="75" rx="6"/>
+      <rect x="440" y="35" width="70" height="75" rx="6"/>
+    </g>
+    <!-- Window Tint Reflections -->
+    <g fill="#38bdf8" opacity="0.2">
+      <polygon points="45,40 100,40 80,105 45,105"/>
+      <polygon points="125,40 180,40 160,105 125,105"/>
+      <polygon points="205,40 260,40 240,105 205,105"/>
+      <polygon points="285,40 340,40 320,105 285,105"/>
+      <polygon points="365,40 420,40 400,105 365,105"/>
+      <polygon points="445,40 500,40 480,105 445,105"/>
+    </g>
+
+    <!-- Roof Air Conditioner Pod -->
+    <rect x="220" y="5" width="220" height="15" rx="4" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1"/>
+    <!-- Destination LED Board -->
+    <rect x="540" y="48" width="90" height="20" rx="3" fill="#000000" stroke="#f59e0b" stroke-width="1"/>
+    <text x="585" y="62" font-size="8" fill="#fde047" font-family="sans-serif" font-weight="900" text-anchor="middle" letter-spacing="1">ARAKU - VIZAG</text>
+
+    <!-- APSRTC Official Branding -->
+    <text x="140" y="172" font-size="22" fill="#ffffff" font-family="sans-serif" font-weight="900" letter-spacing="2">APSRTC</text>
+    <text x="250" y="168" font-size="13" fill="#fef08a" font-family="sans-serif" font-weight="800" letter-spacing="1">SUPER LUXURY 2+2 AIR SUSPENSION</text>
+    <text x="250" y="184" font-size="9" fill="#e2e8f0" font-family="sans-serif">BS-VI TRANSIT TELEMETRY ENABLED • GHAT ROAD COMPLIANT</text>
+
+    <!-- Projector Headlamps -->
+    <ellipse cx="655" cy="150" rx="6" ry="12" fill="#fef08a"/>
+    <polygon points="660,140 760,120 760,200 660,165" fill="#fef08a" opacity="0.3"/>
+
+    <!-- Alloy Wheels -->
+    <g transform="translate(130, 200)">
+      <circle cx="0" cy="0" r="38" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+      <circle cx="0" cy="0" r="22" fill="#94a3b8" stroke="#cbd5e1" stroke-width="3"/>
+      <circle cx="0" cy="0" r="8" fill="#475569"/>
+    </g>
+    <g transform="translate(530, 200)">
+      <circle cx="0" cy="0" r="38" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+      <circle cx="0" cy="0" r="22" fill="#94a3b8" stroke="#cbd5e1" stroke-width="3"/>
+      <circle cx="0" cy="0" r="8" fill="#475569"/>
+    </g>
+  </g>
+
+  <!-- Showcase Title -->
+  <rect x="24" y="24" width="410" height="54" rx="8" fill="#072516" opacity="0.9" stroke="#15803d" stroke-width="1.5"/>
+  <text x="40" y="45" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">APSRTC SUPER LUXURY 2+2 FLEET</text>
+  <text x="40" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">Air Suspension • High-Torque Ghat Engine • Real-Time GPS</text>
+</svg>

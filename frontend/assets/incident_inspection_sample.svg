@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="depotFloor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#depotFloor)"/>
+
+  <!-- Maintenance Bay Grid lines -->
+  <line x1="0" y1="250" x2="800" y2="250" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10 10"/>
+  <rect x="150" y="80" width="500" height="340" rx="8" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+
+  <!-- Inspection Target: Bus Door & Air Suspension Check -->
+  <g transform="translate(200, 110)">
+    <rect x="0" y="0" width="400" height="260" rx="10" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
+    <!-- Door Frame -->
+    <rect x="40" y="20" width="120" height="220" rx="4" fill="#020617" stroke="#94a3b8" stroke-width="2"/>
+    <rect x="50" y="30" width="45" height="100" rx="2" fill="#38bdf8" opacity="0.3"/>
+    <rect x="105" y="30" width="45" height="100" rx="2" fill="#38bdf8" opacity="0.3"/>
+
+    <!-- Sensor & Pneumatic Line Marker -->
+    <circle cx="170" cy="180" r="18" fill="none" stroke="#ef4444" stroke-width="3" stroke-dasharray="4 2"/>
+    <text x="200" y="185" font-size="12" fill="#ef4444" font-family="sans-serif" font-weight="bold">INSPECTION FOCUS: PNEUMATIC ACTUATOR</text>
+
+    <!-- Inspection Metadata Stamp -->
+    <rect x="220" y="40" width="160" height="90" rx="4" fill="#000000" opacity="0.8" stroke="#f59e0b" stroke-width="1"/>
+    <text x="230" y="60" font-size="10" fill="#fef08a" font-family="sans-serif" font-weight="bold">OCC TECHNICAL LOG</text>
+    <text x="230" y="76" font-size="9" fill="#ffffff" font-family="sans-serif">Bus ID: 415-APSRTC</text>
+    <text x="230" y="92" font-size="9" fill="#ffffff" font-family="sans-serif">Grievance Ref: #TCK-2026-94</text>
+    <text x="230" y="108" font-size="9" fill="#34d399" font-family="sans-serif">Status: VERIFIED &amp; RESOLVED</text>
+  </g>
+
+  <!-- Showcase Title -->
+  <rect x="24" y="24" width="440" height="54" rx="8" fill="#072516" opacity="0.9" stroke="#15803d" stroke-width="1.5"/>
+  <text x="40" y="45" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">OCC MAINTENANCE INSPECTION EVIDENCE</text>
+  <text x="40" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">Grievance Desk Digital Evidence • High-Resolution Telemetry Attachment</text>
+</svg>

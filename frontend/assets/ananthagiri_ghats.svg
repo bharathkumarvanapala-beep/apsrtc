@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyMisty" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="60%" stop-color="#475569"/>
+      <stop offset="100%" stop-color="#94a3b8"/>
+    </linearGradient>
+    <linearGradient id="rockGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="500" fill="url(#skyMisty)"/>
+
+  <!-- Mountain Peaks & Rock Formations (Borra Caves Ghats) -->
+  <polygon points="0,500 0,180 180,260 340,160 520,280 680,140 800,220 800,500" fill="url(#rockGrad)"/>
+  
+  <!-- Lush Green Ghat Vegetation -->
+  <path d="M0 320 Q180 260 360 300 T720 280 L800 340 L800 500 L0 500 Z" fill="#14532d" opacity="0.85"/>
+
+  <!-- Hairpin Bend Roadway -->
+  <path d="M-20 480 C200 450 350 490 500 420 C650 350 550 280 400 310 C250 340 180 400 -20 480" fill="#475569" stroke="#cbd5e1" stroke-width="2"/>
+  <path d="M-20 480 C200 450 350 490 500 420 C650 350 550 280 400 310 C250 340 180 400 -20 480" stroke="#f59e0b" stroke-width="3" stroke-dasharray="16 14" fill="none"/>
+
+  <!-- Hairpin Caution Sign -->
+  <g transform="translate(620, 260)">
+    <polygon points="40,0 80,70 0,70" fill="#f59e0b" stroke="#000" stroke-width="3"/>
+    <path d="M30 55 L30 35 Q40 25 50 35 L50 45" stroke="#000" stroke-width="4" fill="none"/>
+    <text x="40" y="85" font-size="10" font-family="sans-serif" font-weight="900" fill="#ffffff" text-anchor="middle">HAIRPIN BEND</text>
+    <rect x="37" y="90" width="6" height="50" fill="#64748b"/>
+  </g>
+
+  <!-- Bus navigating the hairpin curve -->
+  <g transform="translate(320, 310) rotate(-12)">
+    <rect x="0" y="0" width="180" height="65" rx="8" fill="#15803d" stroke="#fde047" stroke-width="1.5"/>
+    <rect x="0" y="36" width="180" height="5" fill="#ffffff"/>
+    <rect x="0" y="42" width="180" height="4" fill="#f59e0b"/>
+    <!-- Windows -->
+    <rect x="10" y="8" width="26" height="22" rx="2" fill="#0f172a"/>
+    <rect x="42" y="8" width="26" height="22" rx="2" fill="#0f172a"/>
+    <rect x="74" y="8" width="26" height="22" rx="2" fill="#0f172a"/>
+    <rect x="106" y="8" width="26" height="22" rx="2" fill="#0f172a"/>
+    <polygon points="138,8 168,8 172,30 138,30" fill="#0f172a"/>
+    <!-- Wheels -->
+    <circle cx="35" cy="65" r="12" fill="#0f172a"/>
+    <circle cx="145" cy="65" r="12" fill="#0f172a"/>
+    <!-- Headlight Cone -->
+    <polygon points="175,45 280,30 280,85 175,55" fill="#fef08a" opacity="0.3"/>
+    <text x="50" y="52" font-size="8" fill="#fff" font-family="sans-serif" font-weight="bold">APSRTC ULTRA DELUXE</text>
+  </g>
+
+  <!-- Overlay Banner -->
+  <rect x="24" y="24" width="370" height="54" rx="8" fill="#072516" opacity="0.9" stroke="#15803d" stroke-width="1.5"/>
+  <text x="40" y="45" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">ANANTHAGIRI HILLS &amp; BORRA PASS</text>
+  <text x="40" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">Scenic Mountain Hairpins • Station Elevation: 680m</text>
+</svg>

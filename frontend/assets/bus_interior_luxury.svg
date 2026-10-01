@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cabinGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#072516"/>
+    </linearGradient>
+    <linearGradient id="seatFabric" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cabin Interior Perspective -->
+  <rect width="800" height="500" fill="url(#cabinGrad)"/>
+
+  <!-- Ceiling with Ambient LED Strip Lights -->
+  <polygon points="0,0 800,0 600,100 200,100" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+  <!-- Ambient LED Strips -->
+  <line x1="220" y1="90" x2="580" y2="90" stroke="#38bdf8" stroke-width="4" opacity="0.8"/>
+  <line x1="260" y1="40" x2="540" y2="40" stroke="#fef08a" stroke-width="3" opacity="0.6"/>
+
+  <!-- Passenger Digital Display Screen -->
+  <rect x="330" y="50" width="140" height="40" rx="4" fill="#020617" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="400" y="66" font-size="9" fill="#fde047" font-family="sans-serif" font-weight="900" text-anchor="middle">NEXT STOP: PADERU</text>
+  <text x="400" y="80" font-size="8" fill="#38bdf8" font-family="sans-serif" font-weight="bold" text-anchor="middle">ETA 12 MIN • SPEED 42 KM/H</text>
+
+  <!-- AC Vents on Ceiling -->
+  <rect x="250" y="70" width="40" height="15" rx="2" fill="#334155"/>
+  <rect x="510" y="70" width="40" height="15" rx="2" fill="#334155"/>
+
+  <!-- Center Aisle Carpet -->
+  <polygon points="340,500 460,500 420,180 380,180" fill="#14532d" stroke="#f59e0b" stroke-width="2"/>
+
+  <!-- Reclining Pushback Seats (Left Row) -->
+  <g transform="translate(60, 180)">
+    <!-- Seat Row 1 -->
+    <rect x="20" y="100" width="120" height="180" rx="14" fill="url(#seatFabric)" stroke="#34d399" stroke-width="2"/>
+    <rect x="30" y="110" width="100" height="50" rx="8" fill="#0f172a" opacity="0.4"/>
+    <rect x="35" y="120" width="90" height="20" rx="4" fill="#ffffff" opacity="0.9"/>
+    <text x="80" y="134" font-size="8" fill="#072516" font-family="sans-serif" font-weight="bold" text-anchor="middle">APSRTC</text>
+    <!-- Armrest -->
+    <rect x="135" y="160" width="15" height="90" rx="6" fill="#0f172a"/>
+  </g>
+
+  <!-- Reclining Pushback Seats (Right Row) -->
+  <g transform="translate(500, 180)">
+    <!-- Seat Row 1 -->
+    <rect x="60" y="100" width="120" height="180" rx="14" fill="url(#seatFabric)" stroke="#34d399" stroke-width="2"/>
+    <rect x="70" y="110" width="100" height="50" rx="8" fill="#0f172a" opacity="0.4"/>
+    <rect x="75" y="120" width="90" height="20" rx="4" fill="#ffffff" opacity="0.9"/>
+    <text x="120" y="134" font-size="8" fill="#072516" font-family="sans-serif" font-weight="bold" text-anchor="middle">APSRTC</text>
+    <!-- Armrest -->
+    <rect x="45" y="160" width="15" height="90" rx="6" fill="#0f172a"/>
+  </g>
+
+  <!-- Side Windows with Mountain Views -->
+  <polygon points="0,100 180,140 180,360 0,420" fill="#0284c7" opacity="0.4" stroke="#475569" stroke-width="2"/>
+  <polygon points="800,100 620,140 620,360 800,420" fill="#0284c7" opacity="0.4" stroke="#475569" stroke-width="2"/>
+
+  <!-- Showcase Title -->
+  <rect x="24" y="24" width="410" height="54" rx="8" fill="#072516" opacity="0.9" stroke="#15803d" stroke-width="1.5"/>
+  <text x="40" y="45" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">PASSENGER CABIN &amp; AMENITIES</text>
+  <text x="40" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">Ergonomic Pushback 2+2 Seats • AC • Live Passenger Info Screen</text>
+</svg>

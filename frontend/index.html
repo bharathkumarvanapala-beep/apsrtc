@@ -3,13 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APSRTC SmartTrack — Official Fleet Telemetry & Transit Portal</title>
+  <title>APSRTC SmartTrack — 3D Fleet Telemetry & Official Transit Portal</title>
+  
+  <!-- Modern Google Fonts: Outfit, Plus Jakarta Sans, Noto Sans Telugu -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+  <!-- Viewer.js CSS (Vanilla JS Image Viewer) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.css">
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/map.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 </head>
 <body>
-  <!-- Government Top Banner -->
+  <!-- Government Top Strip -->
   <aside class="gov-strip">
     <div class="gov-strip-left">
       <span class="gov-emblem">🏛️</span>
@@ -22,6 +34,10 @@
       <span class="gov-helpline">24x7 Transit Helpline: <strong>1800-200-4545</strong></span>
       <span>•</span>
       <span class="gov-helpline">Corridor: <strong>Araku - Visakhapatnam</strong></span>
+      <span>•</span>
+      <button id="themeToggleBtn" class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+        🌙 Dark Mode
+      </button>
     </div>
   </aside>
 
@@ -35,14 +51,19 @@
       <div class="brand-titles">
         <span class="brand-telugu">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ</span>
         <span class="brand-main">APSRTC SmartTrack</span>
-        <span class="brand-sub">INTELLIGENT TRANSIT & FLEET TELEMETRY PORTAL</span>
+        <span class="brand-sub">INTELLIGENT 3D TRANSIT &amp; FLEET TELEMETRY PORTAL</span>
       </div>
     </a>
     <nav>
-      <a href="#search">🔍 Journey Finder</a>
-      <a href="#dashboard">📊 Operations Dashboard</a>
-      <a href="#fleet">🗺️ Live Fleet Radar</a>
+      <a href="#search">🔍 Journey</a>
+      <a href="#dashboard">📊 Operations</a>
+      <a href="#digitalTwin3D" class="nav-highlight-3d">🛰️ 3D Digital Twin</a>
+      <a href="#fleet">🗺️ Live Fleet Map</a>
+      <a href="#gallery">📸 Gallery</a>
       <a href="#complaint">📝 Grievance Desk</a>
+      <button id="staffLoginBtn" class="btn-staff-login" onclick="openStaffModal()">
+        🚨 Crew SOS Login
+      </button>
       <button id="officerLoginBtn" class="btn-officer-login" onclick="openLoginModal()">
         🔐 Officer Login
       </button>
@@ -60,28 +81,115 @@
   <main>
     <!-- Hero Introduction -->
     <section class="hero">
-      <div>
+      <div class="hero-left">
         <span class="eyebrow">
-          <span>●</span> STATE TRANSIT TELEMETRY SYSTEM
+          <span class="pulse-dot"></span> STATE 3D TRANSIT TELEMETRY SYSTEM
         </span>
-        <h1>Know where your bus is before you step out.</h1>
+        <h1>Know where your bus is in real time &amp; 3D.</h1>
         <p>
-          Real-time GPS tracking across the <strong>Araku - Visakhapatnam Corridor</strong>. 
-          Discover live buses, view accurate arrival ETAs, monitor station timelines, and register instant transit grievances.
+          Next-generation satellite fleet tracking across the <strong>Araku - Visakhapatnam Corridor</strong>. 
+          Experience full 3D interactive bus simulation, monitor live ghat elevation, browse high-res depot galleries, and report transit grievances.
         </p>
+        <div class="hero-actions-row">
+          <a href="#digitalTwin3D" class="btn-hero-primary">🛰️ Launch 3D Digital Twin</a>
+          <a href="#fleet" class="btn-hero-secondary">🗺️ View Satellite Radar</a>
+          <button class="btn-hero-sos" onclick="openStaffModal()">🚨 Crew Breakdown / SOS</button>
+          <button class="btn-hero-demo" onclick="quickDemoLogin()">⚡ 1-Click Officer Access</button>
+        </div>
+
         <div class="hero-stats-row">
           <span class="hero-stat-pill"><span class="dot"></span> 4 Corridor Buses Active</span>
-          <span class="hero-stat-pill">⛰️ Ghat Route Protocol Active</span>
-          <span class="hero-stat-pill">📡 GPS Latency &lt; 3s</span>
+          <span class="hero-stat-pill">⛰️ Ghat Elevation: 15m – 912m MSL</span>
+          <span class="hero-stat-pill">📡 GPS Telemetry Latency &lt; 3s</span>
         </div>
       </div>
       <div class="hero-card">
-        <span class="hero-card-tag">OFFICIAL DEMO PORTAL</span>
+        <span class="hero-card-tag">OFFICIAL 3D TELEMETRY</span>
         <strong>Alluri Sitharama Raju - Vizag Corridor</strong>
-        <p>Connected to simulated GPS telemetry nodes transmitting live vehicle coordinates, speed, and heading every 5 seconds.</p>
+        <p>Connected to 3D spatial GPS nodes transmitting live coordinates, altitude, elevation inclination, and speed every 3 seconds.</p>
         <div class="hero-card-meta">
-          <span>Operational Division: <strong>Visakhapatnam</strong></span>
-          <span>Status: <strong>ONLINE</strong></span>
+          <span>Operational Division: <strong>Visakhapatnam OCC</strong></span>
+          <span>Status: <strong class="text-online">● ONLINE &amp; SYNCHRONIZED</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3D DIGITAL TWIN SECTION -->
+    <section id="digitalTwin3D" class="panel panel-3d-showcase">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">VANILLA JS &amp; THREE.JS 3D ENGINE</span>
+          <h2>Corridor 3D Digital Twin &amp; Cockpit Simulator</h2>
+        </div>
+        <div class="twin-badges">
+          <span class="live-dot">● 3D REAL-TIME SYNCHRONIZED</span>
+          <span class="badge-3d-tech">WebGL 3D Topography</span>
+        </div>
+      </div>
+
+      <!-- 3D Controls Bar -->
+      <div class="twin-controls-bar">
+        <div class="cam-modes-group">
+          <span class="ctrl-label">Camera Perspective:</span>
+          <button id="btnCamOrbit" class="btn-3d-cam active" onclick="APSRTC_3D.setCameraMode('orbit')">
+            🛰️ Corridor 3D Orbit
+          </button>
+          <button id="btnCamDrone" class="btn-3d-cam" onclick="APSRTC_3D.setCameraMode('drone')">
+            🚁 Drone Chase Bus
+          </button>
+          <button id="btnCamDriver" class="btn-3d-cam" onclick="APSRTC_3D.setCameraMode('driver')">
+            🚍 Driver Cockpit 3D
+          </button>
+        </div>
+
+        <div class="cam-options-group">
+          <label class="bus-sel-label">Track Vehicle:
+            <select id="select3dBus" onchange="APSRTC_3D.focusBus(this.value)">
+              <option value="">Select Corridor Bus...</option>
+            </select>
+          </label>
+          <button id="btnToggleNight" class="btn-3d-tool" onclick="APSRTC_3D.toggleNight()">
+            🌙 Night Radar
+          </button>
+          <button id="btnToggleFog" class="btn-3d-tool" onclick="APSRTC_3D.toggleFog()">
+            🌫️ Mountain Mist
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Canvas Viewport Container -->
+      <div class="viewport-3d-wrapper">
+        <div id="corridor3dContainer" class="corridor-3d-viewport"></div>
+
+        <!-- 3D Telemetry HUD Overlay -->
+        <div class="hud-3d-overlay">
+          <div class="hud-title">
+            <span class="hud-pulse"></span>
+            <b>3D TELEMETRY TELEGRAPH</b>
+          </div>
+          <div class="hud-grid">
+            <div class="hud-cell">
+              <small>ACTIVE VEHICLE</small>
+              <b id="hud3dBusNum">Bus 415</b>
+            </div>
+            <div class="hud-cell">
+              <small>CURRENT SPEED</small>
+              <b id="hud3dSpeed">42 km/h</b>
+            </div>
+            <div class="hud-cell">
+              <small>ALTITUDE</small>
+              <b id="hud3dAltitude">680m MSL</b>
+            </div>
+            <div class="hud-cell">
+              <small>STATION VICINITY</small>
+              <b id="hud3dLocation">Ananthagiri Ghat</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Interaction Hints -->
+        <div class="viewport-3d-hint">
+          <span>🖱️ Left-Click &amp; Drag to Rotate 360° • Scroll to Zoom • Right-Click to Pan</span>
         </div>
       </div>
     </section>
@@ -91,7 +199,7 @@
       <div class="section-title">
         <div>
           <span class="eyebrow">NETWORK OPERATIONS</span>
-          <h2>Corridor Live Performance Dashboard</h2>
+          <h2>Corridor Live Performance &amp; Elevation Dashboard</h2>
         </div>
         <span class="live-dot" id="systemHealthBadge">● 100% OPERATIONAL</span>
       </div>
@@ -135,6 +243,48 @@
         </div>
       </div>
 
+      <!-- Mountain Elevation & Gradient Profile Section -->
+      <div class="elevation-panel">
+        <div class="elevation-header">
+          <div>
+            <h3>⛰️ Corridor Mountain Elevation Profile &amp; Real-Time Bus Altitude</h3>
+            <p>Cross-section of the Eastern Ghats descent: Araku (912m) ➔ Visakhapatnam Coast (15m)</p>
+          </div>
+          <span class="elevation-badge">Live Topography Cross-Section</span>
+        </div>
+        <div id="elevationChartWrapper" class="elevation-chart-container">
+          <!-- Populated dynamically by app.js -->
+        </div>
+      </div>
+
+      <!-- Ghat Road Weather & Telemetry Strip -->
+      <div class="ghat-safety-grid">
+        <div class="ghat-safety-card">
+          <div class="ghat-icon">🌫️</div>
+          <div>
+            <strong>Ghat Visibility Index</strong>
+            <p>Moderate morning mist at Ananthagiri Hairpins; headlights mandatory.</p>
+          </div>
+          <span class="safety-tag safety-caution">VISIBILITY: 85%</span>
+        </div>
+        <div class="ghat-safety-card">
+          <div class="ghat-icon">🛣️</div>
+          <div>
+            <strong>Road Surface Condition</strong>
+            <p>Dry asphalt, regular friction coefficient, no landslides reported.</p>
+          </div>
+          <span class="safety-tag safety-normal">ROAD NORMAL</span>
+        </div>
+        <div class="ghat-safety-card">
+          <div class="ghat-icon">⚠️</div>
+          <div>
+            <strong>Ghat Advisory Speed</strong>
+            <p>Strict 45 km/h limit on hairpins; automated speed governors active.</p>
+          </div>
+          <span class="safety-tag safety-limit">LIMIT: 45 KM/H</span>
+        </div>
+      </div>
+
       <!-- Corridor Station Radar Timeline -->
       <div class="radar-panel">
         <div class="radar-header">
@@ -143,6 +293,31 @@
         </div>
         <div class="radar-station-strip" id="radarStrip">
           <!-- Populated dynamically by app.js -->
+        </div>
+      </div>
+
+      <!-- Live Depot Timetable -->
+      <div class="timetable-panel">
+        <div class="timetable-head">
+          <h3>🕒 Live Corridor Depots Departure Timetable</h3>
+          <span>Synchronized with Central OCC Scheduling System</span>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Station / Depot</th>
+                <th>Bay #</th>
+                <th>Assigned Vehicle</th>
+                <th>Arrival / Departure Status</th>
+                <th>Direction</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="timetableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -180,17 +355,316 @@
       <div id="results" class="bus-grid"></div>
     </section>
 
-    <!-- LIVE FLEET RADAR & MAP -->
+    <!-- LIVE FLEET RADAR & MAP (LEAFLET + SATELLITE + 3D TILT) -->
     <section id="fleet" class="panel">
       <div class="section-title">
         <div>
-          <span class="eyebrow">GIS SATELLITE TRACKING</span>
+          <span class="eyebrow">GIS SATELLITE TRACKING &amp; 3D PERSPECTIVE</span>
           <h2>Corridor Live Fleet Map</h2>
         </div>
-        <span class="live-dot">● LIVE TELEMETRY</span>
+        <span class="live-dot">● LIVE SATELLITE TELEMETRY</span>
       </div>
-      <div id="map"></div>
+
+      <div class="map-container-frame">
+        <div id="map"></div>
+      </div>
+
       <div id="fleetList" class="fleet-list"></div>
+    </section>
+
+    <!-- CORRIDOR SCENIC STATIONS & FLEET PHOTO GALLERY (POWERED BY VIEWER.JS) -->
+    <section id="gallery" class="panel">
+      <div class="section-title">
+        <div>
+          <span class="eyebrow">VIEWER.JS INTERACTIVE VISUAL ENGINE</span>
+          <h2>Corridor Scenic Stations &amp; Fleet Visual Gallery</h2>
+        </div>
+        <span class="badge-viewer-tag">🔍 Click Any Photo for Fullscreen Zoom &amp; 360° Inspection</span>
+      </div>
+      <p class="gallery-desc">
+        Explore high-resolution visual documentation of APSRTC depots, ghat road passes, luxury bus interiors, and terminal facilities along the Araku - Visakhapatnam route. Powered by <strong>Viewer.js</strong> with smooth zoom, rotate, slideshow, and flip controls.
+      </p>
+
+      <!-- Gallery Grid: Clickable for Viewer.js -->
+      <div class="gallery-grid" id="corridorGallery">
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/araku_valley_depot.svg" alt="Araku Valley Terminal & Depot - Elevation 912m" data-original="assets/araku_valley_depot.svg">
+            <span class="gallery-badge">DEPOT 01</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Araku Valley Terminal</h4>
+            <span class="gallery-tel">అరకు లోయ డిపో • 912m MSL</span>
+            <p>Gateway to Eastern Ghats coffee valleys with scenic morning departures.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/ananthagiri_ghats.svg" alt="Ananthagiri Hills & Borra Caves Hairpin Bend" data-original="assets/ananthagiri_ghats.svg">
+            <span class="gallery-badge">GHAT PASS</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Ananthagiri Hills &amp; Borra</h4>
+            <span class="gallery-tel">అనంతగిరి ఘాట్ రోడ్ • 680m</span>
+            <p>Challenging hairpin bends with mountain rock cuts and waterfalls.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/paderu_terminal.svg" alt="Paderu Divisional Bus Station - District HQ" data-original="assets/paderu_terminal.svg">
+            <span class="gallery-badge">CENTRAL HUB</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Paderu Divisional Terminal</h4>
+            <span class="gallery-tel">పాడేరు బస్ స్టేషన్ • 900m MSL</span>
+            <p>Alluri Sitharama Raju District administrative and transit headquarters.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/chintapalli_lambasingi.svg" alt="Chintapalli & Lambasingi Pass - Kashmir of AP" data-original="assets/chintapalli_lambasingi.svg">
+            <span class="gallery-badge">MIST PASS</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Chintapalli &amp; Lambasingi</h4>
+            <span class="gallery-tel">చింతపల్లి లంబసింగి • 830m</span>
+            <p>Known as "Andhra's Kashmir" featuring winter sub-zero mist corridors.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/visakhapatnam_complex.svg" alt="Dwaraka RTC Bus Station Visakhapatnam" data-original="assets/visakhapatnam_complex.svg">
+            <span class="gallery-badge">MEGA TERMINAL</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Visakhapatnam RTC Complex</h4>
+            <span class="gallery-tel">ద్వారకా బస్ కాంప్లెక్స్ • 15m Coastal</span>
+            <p>Ultra-modern multi-bay super terminal connecting all Andhra corridors.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/apsrtc_super_luxury.svg" alt="APSRTC Super Luxury 2+2 Air Suspension Fleet" data-original="assets/apsrtc_super_luxury.svg">
+            <span class="gallery-badge">FLEET SPEC</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Super Luxury Fleet</h4>
+            <span class="gallery-tel">సూపర్ లగ్జరీ ఎయిర్ సస్పెన్షన్</span>
+            <p>High-torque hill climbing engines and automated GPS telemetry beacon.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/bus_interior_luxury.svg" alt="APSRTC Passenger Cabin Amenities & Reclining Seats" data-original="assets/bus_interior_luxury.svg">
+            <span class="gallery-badge">CABIN VIEW</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Passenger Interior Amenities</h4>
+            <span class="gallery-tel">లగ్జరీ ఇంటీరియర్ &amp; సీట్లు</span>
+            <p>Ergonomic pushback seating, personal AC vents, and live digital stops display.</p>
+          </div>
+        </div>
+
+        <div class="gallery-card">
+          <div class="gallery-img-wrap">
+            <img src="assets/incident_inspection_sample.svg" alt="OCC Technical Maintenance Inspection Evidence" data-original="assets/incident_inspection_sample.svg">
+            <span class="gallery-badge">MAINTENANCE</span>
+          </div>
+          <div class="gallery-info">
+            <h4>Depot Inspection Protocol</h4>
+            <span class="gallery-tel">డిపో సాంకేతిక తనిఖీ</span>
+            <p>Grievance resolution evidence and rigorous pre-ghat brake inspection.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden container for Grievance & SOS Emergency evidence Viewer.js inspection -->
+      <div id="evidenceGallery" style="display: none;">
+        <img id="sampleProofImg" src="assets/incident_inspection_sample.svg" alt="OCC Grievance Inspection Evidence">
+        <img src="assets/emergency_breakdown_repair.svg" alt="Ghat Hairpin Dual Flat Tire Field Repair Evidence">
+        <img src="assets/emergency_rescue_van.svg" alt="APSRTC Heavy Breakdown Mobile Recovery Van">
+      </div>
+    </section>
+
+
+    <!-- ON-DUTY STAFF & CREW EMERGENCY SOS & BREAKDOWN PORTAL -->
+    <section id="staffPortal" class="panel panel-staff-emergency" style="display: none;">
+      <!-- Active Crew Session Strip -->
+      <div class="staff-session-bar">
+        <div class="staff-session-info">
+          <div class="staff-avatar">👮‍♂️</div>
+          <div>
+            <h3 id="staffDriverName">S. Apparao (Driver Badge: D-4091)</h3>
+            <p id="staffBusInfo">Assigned Bus: <b>Bus 415 (Super Luxury)</b> • Status: <span class="badge-status badge-active">ON-DUTY ACTIVE</span></p>
+          </div>
+        </div>
+        <div class="staff-session-actions">
+          <button class="btn-staff-refresh" onclick="refreshStaffNearestDepot()">🔄 Re-Check GPS Depot</button>
+          <button class="btn-logout" onclick="logoutStaff()">🚪 Exit Crew Portal</button>
+        </div>
+      </div>
+
+      <!-- Nearest Depot Live Radar & Recovery Van Standby Card -->
+      <div class="nearest-depot-card" id="nearestDepotCard">
+        <div class="nearest-depot-head">
+          <span class="nearest-depot-badge">🎯 RECOMMENDED NEAREST OPERATIONAL DEPOT</span>
+          <span class="nearest-depot-dist" id="depotDistanceText">8.5 km away • Hill ETA: ~14 mins</span>
+        </div>
+        <div class="nearest-depot-body">
+          <div class="depot-icon-wrap">🏛️</div>
+          <div class="depot-meta-details">
+            <h3 id="depotNameText">Paderu Divisional Depot (PDR-03)</h3>
+            <p id="depotManagerText">Depot Control Officer: <b>Shri M. Satyanarayana</b> • Division: Alluri Sitharama Raju</p>
+            <div class="depot-facilities">
+              <span class="facility-pill">🛞 2 Mobile Tire Vans Ready</span>
+              <span class="facility-pill">🚌 1 Relief Passenger Shuttle Ready</span>
+              <span class="facility-pill">🚜 1 Heavy Winch / Tow Crane</span>
+              <span class="facility-pill">🚑 Trauma Paramedics On-Duty</span>
+            </div>
+          </div>
+          <div class="depot-call-action">
+            <a href="tel:08935250333" id="depotCallBtn" class="btn-depot-call">
+              📞 Direct Call Depot Control<br>
+              <b id="depotPhoneText">08935-250333</b>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1-Click Fast SOS Dispatcher Buttons -->
+      <div class="quick-sos-container">
+        <div class="quick-sos-title">
+          <span>⚡ 1-Click Fast Emergency Incident Presets</span>
+          <small>Click to auto-fill rescue parameters for immediate transmission to nearest depot</small>
+        </div>
+        <div class="quick-sos-grid">
+          <button type="button" class="quick-sos-card sos-tire" onclick="triggerQuickSos('Tire Flat')">
+            <span class="sos-icon">🛞</span>
+            <div class="sos-text">
+              <strong>Flat Tire / Puncture</strong>
+              <small>Hydraulic jack &amp; mobile replacement tire unit</small>
+            </div>
+            <span class="sos-badge">HIGH PRIORITY</span>
+          </button>
+
+          <button type="button" class="quick-sos-card sos-accident" onclick="triggerQuickSos('Accident')">
+            <span class="sos-icon">💥</span>
+            <div class="sos-text">
+              <strong>Accident / Collision</strong>
+              <small>Police liaison, ambulance, recovery tow &amp; relief bus</small>
+            </div>
+            <span class="sos-badge sos-critical">CRITICAL SOS</span>
+          </button>
+
+          <button type="button" class="quick-sos-card sos-engine" onclick="triggerQuickSos('Breakdown')">
+            <span class="sos-icon">⚙️</span>
+            <div class="sos-text">
+              <strong>Engine / Mechanical Failure</strong>
+              <small>Clutch, brake, overheating or tow crane request</small>
+            </div>
+            <span class="sos-badge">DISPATCH MECHANIC</span>
+          </button>
+
+          <button type="button" class="quick-sos-card sos-medical" onclick="triggerQuickSos('Medical')">
+            <span class="sos-icon">🩺</span>
+            <div class="sos-text">
+              <strong>Passenger Medical Emergency</strong>
+              <small>Paramedics &amp; rapid ambulance rendezvous point</small>
+            </div>
+            <span class="sos-badge sos-urgent">URGENT MEDICAL</span>
+          </button>
+
+          <button type="button" class="quick-sos-card sos-landslide" onclick="triggerQuickSos('Road Block')">
+            <span class="sos-icon">⛰️</span>
+            <div class="sos-text">
+              <strong>Ghat Landslide / Tree Fall</strong>
+              <small>Highway road clearance squad &amp; traffic diversion</small>
+            </div>
+            <span class="sos-badge">HIGHWAY RESCUE</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Detailed Incident Transmission Form -->
+      <div class="sos-form-wrap">
+        <div class="sos-form-head">
+          <h4>🚨 Transmit Incident SOS to Nearest Depot Dispatch</h4>
+          <p>Transmits priority telemetry alert directly to the nearest depot control desk and Central OCC console.</p>
+        </div>
+        <form id="emergencySosForm" onsubmit="submitEmergencySos(event)" class="sos-form-grid">
+          <label>Incident Emergency Category
+            <select id="sosCategory" required>
+              <option value="Tire Flat">🛞 Flat Tire / Dual Puncture on Incline</option>
+              <option value="Accident">💥 Accident / Collision / Ditch Hazard</option>
+              <option value="Breakdown">⚙️ Engine / Brake / Transmission Breakdown</option>
+              <option value="Medical">🩺 Passenger Serious Medical Emergency</option>
+              <option value="Road Block">⛰️ Ghat Road Landslide / Fallen Tree Obstruction</option>
+              <option value="Other">⚠️ Other Critical Vehicle / Passenger Emergency</option>
+            </select>
+          </label>
+
+          <label>Assigned Vehicle Number
+            <input id="sosBusNumber" value="415" placeholder="e.g. 415" required>
+          </label>
+
+          <label>Ghat Road Exact Location / Km Stone
+            <input id="sosLocationDesc" value="Km 34.2, Ananthagiri Ghat hairpins between Depot 01 and 02" placeholder="e.g. Km 34.2, near hairpin curve #4" required>
+          </label>
+
+          <label>Passenger Headcount on Board
+            <input id="sosPassengerCount" type="number" value="42" min="1" max="65" required>
+          </label>
+
+          <label>Relief / Replacement Passenger Shuttle Bus Required?
+            <select id="sosReliefBus">
+              <option value="true" selected>Yes — Dispatch Relief Passenger Shuttle</option>
+              <option value="false">No — Only Mechanical / Tire Repair Unit Required</option>
+            </select>
+          </label>
+
+          <label>Passenger Physical Safety Status
+            <select id="sosPassengerStatus">
+              <option value="safe" selected>All Passengers Safe on Board / Road Shoulder</option>
+              <option value="minor">Minor Shaken / Non-Critical</option>
+              <option value="urgent">Medical Attention Requested Immediately</option>
+            </select>
+          </label>
+
+          <label style="grid-column: 1 / -1;">Emergency Situation Description &amp; Driver Notes
+            <textarea id="sosDescription" rows="3" placeholder="State precise nature of breakdown (e.g. left rear dual tire blowout, need hydraulic heavy jack and replacement wheel)..." required></textarea>
+          </label>
+
+          <div style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 6px;">
+            <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+              <span>📸 Inspection Evidence:</span>
+              <button type="button" class="btn-evidence-badge" onclick="openEvidenceViewer()">
+                Inspect Photo Sample (Viewer.js)
+              </button>
+            </div>
+            <button type="submit" class="btn-transmit-sos">
+              🚨 TRANSMIT EMERGENCY SOS TO NEAREST DEPOT
+            </button>
+          </div>
+        </form>
+        <div id="sosAlertMessage"></div>
+      </div>
+
+      <!-- Live SOS Incidents & Relief Vehicle Pipeline Tracker -->
+      <div class="sos-pipeline-wrap">
+        <div class="sos-pipeline-head">
+          <h4>🛰️ Live Rescue &amp; Support Vehicle Pipeline Tracker</h4>
+          <span>Real-time tracking of breakdown recovery and rescue units dispatched from nearby depots</span>
+        </div>
+        <div id="staffEmergenciesList" class="staff-emergency-cards">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
     </section>
 
     <!-- CITIZEN GRIEVANCE PORTAL -->
@@ -198,9 +672,10 @@
       <div class="section-title">
         <div>
           <span class="eyebrow">PASSENGER SERVICES</span>
-          <h2>Citizen Grievance & Incident Reporting</h2>
+          <h2>Citizen Grievance &amp; Incident Reporting</h2>
         </div>
       </div>
+
       <form id="complaintForm" class="complaint-form">
         <label>Assigned Bus
           <select id="complaintBus" required></select>
@@ -208,7 +683,7 @@
         <label>Grievance Category
           <select id="category" required>
             <option value="Delay">Schedule Delay / Missed Trip</option>
-            <option value="Overcrowding">Overcrowding & Capacity Issue</option>
+            <option value="Overcrowding">Overcrowding &amp; Capacity Issue</option>
             <option value="Bus did not stop">Bus Did Not Stop at Designated Station</option>
             <option value="Driver behaviour">Driver / Conductor Behaviour</option>
             <option value="Safety">Safety / Reckless Driving</option>
@@ -227,7 +702,7 @@
       <div id="complaintMessage"></div>
     </section>
 
-    <!-- ADMIN OFFICER CONTROL CENTER (Visible to Officers) -->
+    <!-- ADMIN OFFICER CONTROL CENTER (Visible to Officers or via Demo Login) -->
     <section id="adminPortal" class="panel admin-card" style="display: none;">
       <!-- Officer Banner -->
       <div class="officer-banner">
@@ -235,7 +710,15 @@
           <h3 id="officerName">Fleet Operations Controller</h3>
           <p id="officerBadge">Operational Control Center — Alluri Sitharama Raju Division | Session Active</p>
         </div>
-        <button class="btn-logout" onclick="logoutOfficer()">🚪 Log Out of Control Center</button>
+        <div class="officer-actions">
+          <button class="btn-sim-action" id="btnSimStep" onclick="triggerSimulateStep()" title="Advance active buses by 1 route stop">
+            🎮 Advance 1 GPS Step
+          </button>
+          <button class="btn-sim-action" id="btnAutoSim" onclick="toggleAutoSim()" title="Automatically advance GPS nodes every 5 seconds">
+            ▶️ Start Auto-Advance (5s)
+          </button>
+          <button class="btn-logout" onclick="logoutOfficer()">🚪 Log Out</button>
+        </div>
       </div>
 
       <!-- Navigation Tabs -->
@@ -243,11 +726,13 @@
         <button class="admin-tab active" onclick="switchAdminTab('fleetMgmt')">🚌 Fleet Controller</button>
         <button class="admin-tab" onclick="switchAdminTab('complaintMgmt')">📑 Grievance Resolution Desk</button>
         <button class="admin-tab" onclick="switchAdminTab('broadcastMgmt')">📢 Emergency Broadcast Console</button>
+        <button class="admin-tab" onclick="switchAdminTab('emergencyMgmt')">🚨 Crew SOS Dispatch (<span id="activeSosCountBadge">1</span>)</button>
       </div>
+
 
       <!-- TAB 1: FLEET MANAGEMENT -->
       <div id="tab-fleetMgmt" class="admin-tab-content active">
-        <h4 style="margin-bottom: 12px; font-weight: 800;">Corridor Bus Inventory & Dispatch Control</h4>
+        <h4 style="margin-bottom: 12px; font-weight: 800;">Corridor Bus Inventory &amp; Dispatch Control</h4>
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
@@ -276,13 +761,13 @@
             </label>
             <label>Initial Station
               <select id="newBusStation">
-                <option value="Araku">Araku (Depot 0)</option>
-                <option value="Ananthagiri">Ananthagiri (Depot 1)</option>
-                <option value="Paderu" selected>Paderu (Depot 2)</option>
-                <option value="G. Madugula">G. Madugula (Depot 3)</option>
-                <option value="Chintapalli">Chintapalli (Depot 4)</option>
-                <option value="Anakapalle">Anakapalle (Depot 5)</option>
-                <option value="Visakhapatnam">Visakhapatnam (Depot 6)</option>
+                <option value="Araku">Araku (Depot 01)</option>
+                <option value="Ananthagiri">Ananthagiri (Depot 02)</option>
+                <option value="Paderu" selected>Paderu (Depot 03)</option>
+                <option value="G. Madugula">G. Madugula (Depot 04)</option>
+                <option value="Chintapalli">Chintapalli (Depot 05)</option>
+                <option value="Anakapalle">Anakapalle (Depot 06)</option>
+                <option value="Visakhapatnam">Visakhapatnam (Depot 07)</option>
               </select>
             </label>
             <label>Direction
@@ -311,6 +796,7 @@
                 <th>Category</th>
                 <th>Passenger</th>
                 <th>Description</th>
+                <th>Evidence Photo</th>
                 <th>Status</th>
                 <th>Resolution Action</th>
               </tr>
@@ -342,8 +828,67 @@
           <button type="submit" style="width: max-content;">Transmit Bulletin to Corridor</button>
         </form>
       </div>
+
+      <!-- TAB 4: CREW SOS DISPATCH -->
+      <div id="tab-emergencyMgmt" class="admin-tab-content">
+        <h4 style="margin-bottom: 12px; font-weight: 800;">Corridor On-Way Emergency &amp; Breakdown Command Desk</h4>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Live distress calls transmitted by bus drivers and conductors on the road. Immediate dispatch from nearest depot available.
+        </p>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>SOS ID</th>
+                <th>Bus #</th>
+                <th>Incident Type</th>
+                <th>Driver / Crew</th>
+                <th>Ghat Location</th>
+                <th>Nearest Depot &amp; ETA</th>
+                <th>Relief Status</th>
+                <th>Rescue Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminEmergencyTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
   </main>
+
+  <!-- STAFF / CREW LOGIN MODAL -->
+  <div class="modal-overlay" id="staffLoginModal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeStaffModal()">&times;</button>
+      <div class="modal-header">
+        <div class="modal-badge">🚨</div>
+        <h3>APSRTC Crew &amp; Driver SOS Portal</h3>
+        <p>Road Breakdown Emergency &amp; Nearby Depot Support Assistance</p>
+      </div>
+
+      <div class="modal-demo-cred">
+        <span>Driver Badge: <b>driver415</b> | Pass: <b>crew@2026</b></span>
+        <button type="button" class="btn-quick-fill" onclick="fillStaffDemoCredentials()">Auto-Fill</button>
+        <button type="button" class="btn-quick-instant" onclick="quickStaffLogin()">⚡ 1-Click Crew Access</button>
+      </div>
+
+      <form id="staffLoginForm" onsubmit="handleStaffLogin(event)" class="modal-form">
+        <label>Staff / Driver Badge ID
+          <input id="staffLoginId" placeholder="e.g. driver415 or D-4091" value="driver415" required>
+        </label>
+        <label>Assigned Corridor Bus #
+          <input id="staffBusNumberInput" placeholder="e.g. 415" value="415" required>
+        </label>
+        <label>Security Password / PIN
+          <input id="staffLoginPass" type="password" placeholder="••••••••" value="crew@2026" required>
+        </label>
+        <button type="submit" class="btn-staff-auth">Enter Driver SOS Portal</button>
+      </form>
+      <div id="staffLoginError" class="modal-error"></div>
+    </div>
+  </div>
 
   <!-- OFFICER LOGIN MODAL -->
   <div class="modal-overlay" id="loginModal">
@@ -352,12 +897,13 @@
       <div class="modal-header">
         <div class="modal-badge">🛡️</div>
         <h3>APSRTC Officer Login</h3>
-        <p>Operational Control Center & Fleet Management Access</p>
+        <p>Operational Control Center &amp; Fleet Management Access</p>
       </div>
 
       <div class="modal-demo-cred">
         <span>Officer ID: <b>admin</b> | Password: <b>apsrtc@2026</b></span>
         <button type="button" class="btn-quick-fill" onclick="fillDemoCredentials()">Auto-Fill</button>
+        <button type="button" class="btn-quick-instant" onclick="quickDemoLogin()">⚡ 1-Click Access</button>
       </div>
 
       <form id="officerLoginForm" onsubmit="handleOfficerLogin(event)" class="modal-form">
@@ -367,32 +913,51 @@
         <label>Security Password
           <input id="loginPassword" type="password" placeholder="••••••••" required autocomplete="current-password">
         </label>
-        <button type="submit">Authenticate & Enter Control Center</button>
+        <button type="submit">Authenticate &amp; Enter Control Center</button>
       </form>
       <div id="loginError" class="modal-error"></div>
     </div>
   </div>
+
 
   <!-- Official Footer -->
   <footer>
     <div class="footer-content">
       <div>
         <div class="footer-brand">APSRTC SmartTrack — Government of Andhra Pradesh</div>
-        <p style="margin-top: 4px; font-size: 11px;">Andhra Pradesh State Road Transport Corporation • Public Telemetry Platform</p>
+        <p style="margin-top: 4px; font-size: 11px;">Andhra Pradesh State Road Transport Corporation • Public 3D Telemetry Platform</p>
       </div>
       <div class="footer-links">
         <a href="#search">Journey Search</a>
+        <a href="#digitalTwin3D">3D Digital Twin</a>
         <a href="#dashboard">Operations</a>
         <a href="#fleet">Fleet Map</a>
+        <a href="#gallery">Photo Gallery</a>
         <a href="#complaint">Citizen Grievance</a>
+        <a href="javascript:void(0)" onclick="openStaffModal()">Crew SOS Portal</a>
         <a href="javascript:void(0)" onclick="openLoginModal()">Officer Portal</a>
       </div>
     </div>
   </footer>
 
+
+  <!-- Scripts -->
+  <!-- 1. Leaflet GIS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- 2. Three.js & OrbitControls (for Vanilla JS 3D Location & Bus Digital Twin) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- 3. Viewer.js (Vanilla JS Image Viewer for Pictures) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.11.6/viewer.min.js"></script>
+
+  <!-- 4. Socket.io -->
   <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-  <script src="js/app.js"></script>
+
+  <!-- 5. App Modules -->
+  <script src="js/three-corridor.js"></script>
   <script src="js/map.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

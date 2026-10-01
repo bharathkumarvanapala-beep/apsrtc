@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="mistySky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#334155"/>
+      <stop offset="50%" stop-color="#64748b"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky & Dense Mountain Mist -->
+  <rect width="800" height="500" fill="url(#mistySky)"/>
+
+  <!-- Ghostly Pine Forest Silhouette (Lambasingi) -->
+  <g fill="#1e293b" opacity="0.4">
+    <polygon points="100,320 110,220 120,320"/>
+    <polygon points="130,330 140,200 150,330"/>
+    <polygon points="160,310 170,180 180,310"/>
+    <polygon points="220,340 230,210 240,340"/>
+    <polygon points="580,320 590,190 600,320"/>
+    <polygon points="620,330 630,210 640,330"/>
+    <polygon points="680,310 690,170 700,310"/>
+  </g>
+
+  <!-- Rolling Fog Layer 1 -->
+  <ellipse cx="300" cy="300" rx="400" ry="80" fill="#f8fafc" opacity="0.35"/>
+  <ellipse cx="550" cy="280" rx="350" ry="70" fill="#f8fafc" opacity="0.4"/>
+
+  <!-- Pine Forest Foreground -->
+  <g fill="#0f172a" opacity="0.75">
+    <polygon points="60,390 75,250 90,390"/>
+    <polygon points="100,400 115,260 130,400"/>
+    <polygon points="660,390 675,240 690,390"/>
+    <polygon points="720,410 735,260 750,410"/>
+  </g>
+
+  <!-- Misty Ghat Road -->
+  <path d="M0 450 Q300 400 500 420 T800 430 L800 500 L0 500 Z" fill="#334155"/>
+  <path d="M0 450 Q300 400 500 420 T800 430" stroke="#fde047" stroke-width="4" stroke-dasharray="20 16" fill="none"/>
+
+  <!-- Bus Lights cutting through dense Lambasingi Fog -->
+  <g transform="translate(300, 310)">
+    <!-- High-Beam Fog Beams -->
+    <polygon points="160,40 380,0 380,100 160,55" fill="#fef08a" opacity="0.45"/>
+    <polygon points="160,40 480,-20 480,120 160,55" fill="#fef08a" opacity="0.2"/>
+
+    <!-- Bus Outline in Mist -->
+    <rect x="0" y="0" width="160" height="70" rx="10" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="0" y="42" width="160" height="4" fill="#ffffff"/>
+    <rect x="0" y="46" width="160" height="4" fill="#f59e0b"/>
+    <!-- Headlight orbs -->
+    <circle cx="160" cy="45" r="7" fill="#ffffff"/>
+    <circle cx="160" cy="45" r="14" fill="#fef08a" opacity="0.6"/>
+    <!-- Fog Lamp Yellow -->
+    <circle cx="155" cy="60" r="5" fill="#f59e0b"/>
+    
+    <text x="60" y="32" font-size="9" fill="#ffffff" font-family="sans-serif" font-weight="bold">CHINTAPALLI EXP</text>
+  </g>
+
+  <!-- Rolling Low Mist Front -->
+  <ellipse cx="400" cy="480" rx="500" ry="50" fill="#f8fafc" opacity="0.25"/>
+
+  <!-- Showcase Title -->
+  <rect x="24" y="24" width="410" height="54" rx="8" fill="#072516" opacity="0.9" stroke="#15803d" stroke-width="1.5"/>
+  <text x="40" y="45" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">CHINTAPALLI &amp; LAMBASINGI PASS</text>
+  <text x="40" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">"Kashmir of Andhra Pradesh" • Winter Fog Corridor • 830m</text>
+</svg>

@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="nightGhatSky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="60%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="hazardPattern" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="50%" stop-color="#000000"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mountain Ghat Night Sky -->
+  <rect width="800" height="500" fill="url(#nightGhatSky)"/>
+
+  <!-- Mountain Silhouette -->
+  <polygon points="0,320 180,240 360,290 540,210 720,280 800,230 800,500 0,500" fill="#064e3b" opacity="0.3"/>
+
+  <!-- Roadway & Shoulder -->
+  <rect x="0" y="380" width="800" height="120" fill="#334155"/>
+  <line x1="0" y1="380" x2="800" y2="380" stroke="#f59e0b" stroke-width="4"/>
+  <line x1="0" y1="440" x2="800" y2="440" stroke="#ffffff" stroke-width="3" stroke-dasharray="20 16"/>
+
+  <!-- Warning Hazard Cones on Road -->
+  <g transform="translate(140, 410)">
+    <polygon points="12,0 24,35 0,35" fill="#f97316"/>
+    <rect x="5" y="14" width="14" height="6" fill="#ffffff"/>
+    <rect x="0" y="35" width="24" height="4" fill="#000000"/>
+  </g>
+  <g transform="translate(220, 420)">
+    <polygon points="12,0 24,35 0,35" fill="#f97316"/>
+    <rect x="5" y="14" width="14" height="6" fill="#ffffff"/>
+    <rect x="0" y="35" width="24" height="4" fill="#000000"/>
+  </g>
+
+  <!-- APSRTC Bus (Safely Parked on Shoulder) -->
+  <g transform="translate(320, 240)">
+    <!-- Hazard Flasher Glow Left & Right -->
+    <circle cx="20" cy="115" r="16" fill="#f59e0b" opacity="0.6"/>
+    <circle cx="260" cy="115" r="16" fill="#f59e0b" opacity="0.6"/>
+
+    <!-- Bus Body -->
+    <rect x="20" y="20" width="240" height="90" rx="10" fill="#064e3b" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="20" y="70" width="240" height="5" fill="#ffffff"/>
+    <rect x="20" y="75" width="240" height="4" fill="#f59e0b"/>
+
+    <!-- Windows -->
+    <g fill="#020617">
+      <rect x="30" y="28" width="35" height="32" rx="2"/>
+      <rect x="72" y="28" width="35" height="32" rx="2"/>
+      <rect x="114" y="28" width="35" height="32" rx="2"/>
+      <rect x="156" y="28" width="35" height="32" rx="2"/>
+      <polygon points="198,28 245,28 250,60 198,60"/>
+    </g>
+
+    <text x="80" y="94" font-size="12" fill="#ffffff" font-family="sans-serif" font-weight="900">APSRTC BUS 415</text>
+    <text x="195" y="93" font-size="8" fill="#fde68a" font-family="sans-serif" font-weight="bold">GHAT SOS</text>
+
+    <!-- Wheels -->
+    <circle cx="65" cy="110" r="16" fill="#0f172a"/>
+    <!-- Jack under tire -->
+    <rect x="58" y="118" width="14" height="22" fill="#ef4444"/>
+    <circle cx="215" cy="110" r="16" fill="#0f172a"/>
+  </g>
+
+  <!-- Depot Emergency Recovery Van -->
+  <g transform="translate(60, 290)">
+    <!-- Flashing Amber Light Beacon on Roof -->
+    <polygon points="50,-10 90,-40 90,20 50,0" fill="#f59e0b" opacity="0.4"/>
+    <circle cx="50" cy="-6" r="8" fill="#f59e0b"/>
+    <circle cx="50" cy="-6" r="16" fill="#fef08a" opacity="0.6"/>
+
+    <!-- Recovery Van Body -->
+    <rect x="0" y="0" width="170" height="75" rx="6" fill="#f8fafc" stroke="#dc2626" stroke-width="2"/>
+    <rect x="0" y="38" width="170" height="12" fill="#dc2626"/>
+    
+    <!-- Text -->
+    <text x="85" y="47" font-size="8" fill="#ffffff" font-family="sans-serif" font-weight="900" text-anchor="middle">PADERU DEPOT RECOVERY UNIT</text>
+    <text x="85" y="62" font-size="7" fill="#072516" font-family="sans-serif" font-weight="bold" text-anchor="middle">MOBILE TIRE &amp; HYDRAULIC SQUAD</text>
+
+    <!-- Cab Window -->
+    <polygon points="120,8 160,8 165,30 120,30" fill="#0284c7" opacity="0.8"/>
+
+    <!-- Wheels -->
+    <circle cx="35" cy="75" r="14" fill="#0f172a"/>
+    <circle cx="135" cy="75" r="14" fill="#0f172a"/>
+
+    <!-- Mechanic Working on Replacement Tire -->
+    <circle cx="200" cy="50" r="14" fill="#1e293b"/>
+    <circle cx="200" cy="50" r="6" fill="#94a3b8"/>
+  </g>
+
+  <!-- Header Banner -->
+  <rect x="24" y="24" width="460" height="56" rx="8" fill="#072516" opacity="0.92" stroke="#ef4444" stroke-width="2"/>
+  <circle cx="50" cy="52" r="12" fill="#ef4444"/>
+  <text x="50" y="56" font-size="12" fill="#fff" font-weight="bold" text-anchor="middle">SOS</text>
+  <text x="75" y="44" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">RAPID BREAKDOWN &amp; RESCUE RESPONSE</text>
+  <text x="75" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">Nearest Depot: Paderu Divisional Depot (8.5 km • ETA 14 mins)</text>
+</svg>

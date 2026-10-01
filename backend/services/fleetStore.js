@@ -520,6 +520,43 @@ function getAnnouncements() {
   return announcements;
 }
 
+function simulateStep() {
+  const allBuses = all();
+  allBuses.forEach(bus => {
+    if (bus.status !== "ACTIVE") return;
+    let nextIndex = (typeof bus.routeIndex === "number") ? bus.routeIndex : 0;
+    let directionCode = bus.directionCode || "forward";
+
+    if (directionCode === "forward") {
+      nextIndex++;
+      if (nextIndex >= routeStops.length) {
+        nextIndex = routeStops.length - 2;
+        directionCode = "reverse";
+      }
+    } else {
+      nextIndex--;
+      if (nextIndex < 0) {
+        nextIndex = 1;
+        directionCode = "forward";
+      }
+    }
+
+    const nextStop = routeStops[nextIndex];
+    if (nextStop) {
+      bus.routeIndex = nextIndex;
+      bus.directionCode = directionCode;
+      bus.direction = directionCode === "forward" ? "towards Visakhapatnam" : "towards Araku";
+      bus.lat = nextStop.lat;
+      bus.lng = nextStop.lng;
+      bus.locationName = nextStop.name;
+      bus.speedKph = Math.floor(32 + Math.random() * 16);
+      bus.updatedAt = new Date().toISOString();
+      buses.set(String(bus.id), bus);
+    }
+  });
+  return all();
+}
+
 // ------------------------------------------------------------
 // EXPORTS
 // ------------------------------------------------------------
@@ -536,5 +573,6 @@ module.exports = {
   removeBus,
   getStats,
   addAnnouncement,
-  getAnnouncements
+  getAnnouncements,
+  simulateStep
 };

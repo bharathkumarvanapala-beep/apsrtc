@@ -141,3 +141,13 @@ exports.getAnnouncements = (_req, res) => {
     announcements: store.getAnnouncements()
   });
 };
+
+exports.simulateStep = (_req, res) => {
+  const updatedBuses = store.simulateStep();
+  res.json({
+    success: true,
+    message: "Simulation step executed",
+    buses: updatedBuses
+  });
+};
+

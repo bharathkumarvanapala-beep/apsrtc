@@ -16,5 +16,7 @@ router.put("/bus/:id/status", controller.updateBusStatus);
 router.delete("/bus/:id", controller.deleteBus);
 router.put("/complaints/:id/status", controller.updateComplaint);
 router.post("/broadcast", controller.broadcast);
+router.post("/simulate-step", controller.simulateStep);
 
 module.exports = router;
+

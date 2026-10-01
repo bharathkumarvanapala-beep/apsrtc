@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="hillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#14532d"/>
+      <stop offset="100%" stop-color="#052e16"/>
+    </linearGradient>
+    <linearGradient id="vanGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="50%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#fb923c"/>
+    </linearGradient>
+    <linearGradient id="stripeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#fef08a"/>
+    </linearGradient>
+    <filter id="beaconGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Night Ghat Background -->
+  <rect width="800" height="500" fill="url(#skyGrad)"/>
+  
+  <!-- Mountain Silhouettes -->
+  <path d="M0 320 Q 180 200, 360 260 T 720 220 L 800 270 L 800 500 L 0 500 Z" fill="url(#hillGrad)" opacity="0.6"/>
+  <path d="M0 370 Q 240 280, 500 330 T 800 310 L 800 500 L 0 500 Z" fill="url(#hillGrad)" opacity="0.8"/>
+
+  <!-- Road & Shoulder -->
+  <polygon points="0,410 800,380 800,500 0,500" fill="#1e293b"/>
+  <polygon points="0,415 800,385 800,430 0,465" fill="#334155"/>
+  <!-- Road White Dash Markings -->
+  <line x1="80" y1="440" x2="180" y2="435" stroke="#fde047" stroke-width="4" stroke-dasharray="24 16"/>
+  <line x1="280" y1="430" x2="420" y2="423" stroke="#fde047" stroke-width="4" stroke-dasharray="24 16"/>
+  <line x1="520" y1="418" x2="720" y2="408" stroke="#fde047" stroke-width="4" stroke-dasharray="24 16"/>
+
+  <!-- Caution Traffic Cones -->
+  <polygon points="120,440 128,405 136,440" fill="#ef4444"/>
+  <rect x="122" y="420" width="12" height="5" fill="#ffffff"/>
+  <polygon points="170,436 178,402 186,436" fill="#ef4444"/>
+  <rect x="172" y="416" width="12" height="5" fill="#ffffff"/>
+
+  <!-- APSRTC Breakdown Recovery Van (Heavy Support Unit) -->
+  <g transform="translate(230, 200)">
+    <!-- Flashing Amber & Red Strobe Beacons -->
+    <circle cx="140" cy="58" r="16" fill="#ef4444" opacity="0.4" filter="url(#beaconGlow)"/>
+    <circle cx="140" cy="58" r="8" fill="#f87171"/>
+    <circle cx="280" cy="58" r="16" fill="#f59e0b" opacity="0.4" filter="url(#beaconGlow)"/>
+    <circle cx="280" cy="58" r="8" fill="#fde047"/>
+
+    <!-- Recovery Winch Crane Arm on Roof / Bed -->
+    <path d="M60 85 L110 20 L220 20 L160 85 Z" fill="#475569"/>
+    <line x1="220" y1="20" x2="260" y2="90" stroke="#f59e0b" stroke-width="5"/>
+    <circle cx="260" cy="90" r="6" fill="#334155"/>
+    <line x1="260" y1="90" x2="260" y2="140" stroke="#94a3b8" stroke-width="3"/>
+    <!-- Winch Heavy Hook -->
+    <path d="M256 140 C 256 152, 268 152, 268 144" fill="none" stroke="#fde047" stroke-width="4"/>
+
+    <!-- Van Cabin & Heavy Workshop Body -->
+    <path d="M40 90 L340 90 Q380 90 400 130 L430 180 Q440 195 440 215 L440 240 L30 240 Q20 240 20 220 L20 110 Q20 90 40 90 Z" fill="url(#vanGrad)"/>
+
+    <!-- High-Visibility Reflective Chevron Stripes -->
+    <rect x="25" y="160" width="405" height="18" fill="url(#stripeGrad)"/>
+    <path d="M30 160 L45 178 L35 178 L20 160 Z" fill="#dc2626"/>
+    <path d="M60 160 L75 178 L65 178 L50 160 Z" fill="#dc2626"/>
+    <path d="M90 160 L105 178 L95 178 L80 160 Z" fill="#dc2626"/>
+    <path d="M120 160 L135 178 L125 178 L110 160 Z" fill="#dc2626"/>
+    <path d="M150 160 L165 178 L155 178 L140 160 Z" fill="#dc2626"/>
+    <path d="M180 160 L195 178 L185 178 L170 160 Z" fill="#dc2626"/>
+    <path d="M210 160 L225 178 L215 178 L200 160 Z" fill="#dc2626"/>
+    <path d="M240 160 L255 178 L245 178 L230 160 Z" fill="#dc2626"/>
+    <path d="M270 160 L285 178 L275 178 L260 160 Z" fill="#dc2626"/>
+    <path d="M300 160 L315 178 L305 178 L290 160 Z" fill="#dc2626"/>
+    <path d="M330 160 L345 178 L335 178 L320 160 Z" fill="#dc2626"/>
+    <path d="M360 160 L375 178 L365 178 L350 160 Z" fill="#dc2626"/>
+    <path d="M390 160 L405 178 L395 178 L380 160 Z" fill="#dc2626"/>
+
+    <!-- Cab Windshield & Windows -->
+    <polygon points="340,105 385,105 415,160 340,160" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+    <rect x="250" y="105" width="75" height="55" rx="4" fill="#0f172a" stroke="#cbd5e1" stroke-width="2"/>
+
+    <!-- Tool Locker Roller Shutters on Van Side -->
+    <rect x="40" y="110" width="85" height="48" rx="3" fill="#334155" stroke="#64748b" stroke-width="2"/>
+    <line x1="40" y1="122" x2="125" y2="122" stroke="#475569" stroke-width="2"/>
+    <line x1="40" y1="134" x2="125" y2="134" stroke="#475569" stroke-width="2"/>
+    <line x1="40" y1="146" x2="125" y2="146" stroke="#475569" stroke-width="2"/>
+
+    <rect x="140" y="110" width="95" height="48" rx="3" fill="#334155" stroke="#64748b" stroke-width="2"/>
+    <line x1="140" y1="122" x2="235" y2="122" stroke="#475569" stroke-width="2"/>
+    <line x1="140" y1="134" x2="235" y2="134" stroke="#475569" stroke-width="2"/>
+    <line x1="140" y1="146" x2="235" y2="146" stroke="#475569" stroke-width="2"/>
+
+    <!-- Official Branding Text -->
+    <text x="35" y="202" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="900" font-size="14" letter-spacing="1">APSRTC EMERGENCY MOBILE RECOVERY UNIT</text>
+    <text x="35" y="222" fill="#fef08a" font-family="system-ui, sans-serif" font-weight="800" font-size="11">PADERU DIVISIONAL WORKSHOP • 24x7 HIGHWAY ASSISTANCE</text>
+
+    <!-- Headlight & Foglamps -->
+    <polygon points="432,185 442,192 442,210 430,210" fill="#fef08a"/>
+    <polygon points="442,190 560,170 560,250 442,215" fill="#fef08a" opacity="0.25"/>
+
+    <!-- Heavy Wheels & Dual Tire Assemblies -->
+    <g transform="translate(100, 240)">
+      <circle cx="0" cy="0" r="38" fill="#0f172a" stroke="#334155" stroke-width="6"/>
+      <circle cx="0" cy="0" r="22" fill="#64748b"/>
+      <circle cx="0" cy="0" r="8" fill="#1e293b"/>
+    </g>
+    <g transform="translate(350, 240)">
+      <circle cx="0" cy="0" r="38" fill="#0f172a" stroke="#334155" stroke-width="6"/>
+      <circle cx="0" cy="0" r="22" fill="#64748b"/>
+      <circle cx="0" cy="0" r="8" fill="#1e293b"/>
+    </g>
+  </g>
+
+  <!-- Technical Overlay HUD Badge -->
+  <g transform="translate(40, 40)">
+    <rect width="280" height="70" rx="8" fill="rgba(15, 23, 42, 0.85)" stroke="#f97316" stroke-width="1.5"/>
+    <text x="16" y="26" fill="#fb923c" font-family="system-ui, sans-serif" font-weight="900" font-size="12">APSRTC HIGHWAY RESCUE FLEET</text>
+    <text x="16" y="46" fill="#ffffff" font-family="system-ui, sans-serif" font-weight="800" font-size="14">Unit: Paderu Recovery Van #RV-03</text>
+    <text x="16" y="60" fill="#94a3b8" font-family="system-ui, sans-serif" font-weight="600" font-size="11">Hydraulic Heavy Crane • Tire Press • 20t Winch</text>
+  </g>
+</svg>

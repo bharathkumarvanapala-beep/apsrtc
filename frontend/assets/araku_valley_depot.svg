@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f2b48"/>
+      <stop offset="45%" stop-color="#1e4e79"/>
+      <stop offset="75%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fef3c7"/>
+    </linearGradient>
+    <linearGradient id="hillGrad1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#14532d"/>
+      <stop offset="100%" stop-color="#052e16"/>
+    </linearGradient>
+    <linearGradient id="hillGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#166534"/>
+      <stop offset="100%" stop-color="#0f3d1f"/>
+    </linearGradient>
+    <linearGradient id="busBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#072516"/>
+      <stop offset="50%" stop-color="#15803d"/>
+      <stop offset="100%" stop-color="#16a34a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="500" fill="url(#skyGrad)"/>
+
+  <!-- Morning Sun -->
+  <circle cx="580" cy="220" r="45" fill="#fde047" opacity="0.85"/>
+  <circle cx="580" cy="220" r="75" fill="#fef08a" opacity="0.3"/>
+
+  <!-- Distant Eastern Ghats Hills -->
+  <path d="M0 320 Q120 210 280 270 T600 240 Q700 210 800 260 L800 500 L0 500 Z" fill="#1b4332" opacity="0.6"/>
+  <path d="M0 350 Q180 260 380 310 Q580 270 800 330 L800 500 L0 500 Z" fill="url(#hillGrad1)"/>
+  
+  <!-- Valley Coffee Plantations & Trees -->
+  <g fill="#14532d">
+    <polygon points="120,380 130,340 140,380"/>
+    <polygon points="135,385 145,345 155,385"/>
+    <polygon points="150,380 160,335 170,380"/>
+    <polygon points="210,390 220,350 230,390"/>
+    <polygon points="650,370 660,330 670,370"/>
+    <polygon points="670,375 680,335 690,375"/>
+    <polygon points="710,365 720,325 730,365"/>
+  </g>
+
+  <!-- Ghat Road Curve -->
+  <path d="M0 450 Q250 420 450 440 T800 420 L800 500 L0 500 Z" fill="#334155"/>
+  <path d="M0 450 Q250 420 450 440 T800 420" stroke="#f1f5f9" stroke-width="4" fill="none" stroke-dasharray="14 12"/>
+  <!-- Safety Guardrail -->
+  <path d="M0 445 Q250 415 450 435 T800 415" stroke="#cbd5e1" stroke-width="2" fill="none"/>
+
+  <!-- APSRTC Super Luxury Bus (Front-Side View) -->
+  <g transform="translate(320, 310)">
+    <!-- Bus Shadow -->
+    <ellipse cx="140" cy="115" rx="145" ry="12" fill="#0f172a" opacity="0.4"/>
+    
+    <!-- Bus Body -->
+    <rect x="20" y="20" width="240" height="85" rx="12" fill="url(#busBody)" stroke="#fef08a" stroke-width="1.5"/>
+    <!-- White Saffron RTC Livery Stripes -->
+    <rect x="20" y="65" width="240" height="6" fill="#f8fafc"/>
+    <rect x="20" y="72" width="240" height="4" fill="#f59e0b"/>
+    
+    <!-- Windows -->
+    <rect x="30" y="28" width="35" height="30" rx="3" fill="#0f172a" opacity="0.85"/>
+    <rect x="70" y="28" width="35" height="30" rx="3" fill="#0f172a" opacity="0.85"/>
+    <rect x="110" y="28" width="35" height="30" rx="3" fill="#0f172a" opacity="0.85"/>
+    <rect x="150" y="28" width="35" height="30" rx="3" fill="#0f172a" opacity="0.85"/>
+    <rect x="190" y="28" width="35" height="30" rx="3" fill="#0f172a" opacity="0.85"/>
+    <polygon points="230,28 250,28 255,58 230,58" fill="#0f172a" opacity="0.85"/>
+    
+    <!-- Roof AC Unit -->
+    <rect x="90" y="12" width="90" height="8" rx="2" fill="#f1f5f9"/>
+    
+    <!-- Destination Board -->
+    <rect x="232" y="32" width="20" height="8" rx="1" fill="#000"/>
+    <text x="234" y="38" font-size="5" fill="#fef08a" font-family="sans-serif" font-weight="bold">ARAKU</text>
+    
+    <!-- APSRTC Emblem & Typography -->
+    <text x="75" y="85" font-size="10" fill="#ffffff" font-family="sans-serif" font-weight="900" letter-spacing="1">APSRTC</text>
+    <text x="145" y="84" font-size="7" fill="#fde68a" font-family="sans-serif" font-weight="600">SUPER LUXURY</text>
+
+    <!-- Wheels -->
+    <circle cx="65" cy="105" r="16" fill="#1e293b"/>
+    <circle cx="65" cy="105" r="8" fill="#94a3b8"/>
+    <circle cx="215" cy="105" r="16" fill="#1e293b"/>
+    <circle cx="215" cy="105" r="8" fill="#94a3b8"/>
+
+    <!-- Glowing Headlight Beam -->
+    <polygon points="260,80 340,65 340,115 260,95" fill="#fef08a" opacity="0.25"/>
+  </g>
+
+  <!-- Station Signboard -->
+  <g transform="translate(60, 310)">
+    <rect x="0" y="0" width="130" height="50" rx="6" fill="#072516" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="0" y="0" width="130" height="14" fill="#f59e0b"/>
+    <text x="65" y="11" font-size="8" fill="#072516" font-family="sans-serif" font-weight="900" text-anchor="middle">APSRTC DEPOT 01</text>
+    <text x="65" y="28" font-size="13" fill="#ffffff" font-family="sans-serif" font-weight="800" text-anchor="middle">ARAKU VALLEY</text>
+    <text x="65" y="42" font-size="9" fill="#fde68a" font-family="sans-serif" font-weight="bold" text-anchor="middle">అరకు లోయ • Alt: 912m</text>
+    <!-- Post -->
+    <rect x="62" y="50" width="6" height="70" fill="#475569"/>
+  </g>
+
+  <!-- Title Badge Overlay -->
+  <rect x="24" y="24" width="340" height="54" rx="8" fill="#072516" opacity="0.88" stroke="#15803d" stroke-width="1.5"/>
+  <text x="40" y="45" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">ARAKU VALLEY TERMINAL &amp; DEPOT</text>
+  <text x="40" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">Eastern Ghats Coffee Corridors • Elevation: 912m MSL</text>
+</svg>

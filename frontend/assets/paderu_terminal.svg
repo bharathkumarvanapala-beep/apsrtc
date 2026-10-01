@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+  <defs>
+    <linearGradient id="skyNoon" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="60%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#bae6fd"/>
+    </linearGradient>
+    <linearGradient id="terminalGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#072516"/>
+      <stop offset="100%" stop-color="#14532d"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky -->
+  <rect width="800" height="500" fill="url(#skyNoon)"/>
+
+  <!-- Distant Hill Crests -->
+  <polygon points="0,300 120,240 260,280 440,210 620,260 760,230 800,270 800,500 0,500" fill="#15803d" opacity="0.5"/>
+
+  <!-- Paderu Bus Terminal Canopy Structure -->
+  <g transform="translate(80, 200)">
+    <!-- Terminal Pillars -->
+    <rect x="40" y="80" width="16" height="140" fill="#cbd5e1"/>
+    <rect x="220" y="80" width="16" height="140" fill="#cbd5e1"/>
+    <rect x="400" y="80" width="16" height="140" fill="#cbd5e1"/>
+    <rect x="580" y="80" width="16" height="140" fill="#cbd5e1"/>
+
+    <!-- Terminal Cantilever Roof -->
+    <polygon points="0,80 640,80 620,40 20,40" fill="url(#terminalGrad)" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="20" y="40" width="600" height="8" fill="#f59e0b"/>
+
+    <!-- Terminal Sign -->
+    <rect x="180" y="48" width="280" height="26" rx="4" fill="#072516" stroke="#fef08a" stroke-width="1.5"/>
+    <text x="320" y="66" font-size="12" fill="#ffffff" font-family="sans-serif" font-weight="900" text-anchor="middle" letter-spacing="1">PADERU BUS STATION • పాడేరు</text>
+
+    <!-- Platform Numbers -->
+    <g fill="#072516">
+      <rect x="80" y="100" width="40" height="20" rx="3" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+      <text x="100" y="114" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle">BAY 1</text>
+      
+      <rect x="260" y="100" width="40" height="20" rx="3" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+      <text x="280" y="114" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle">BAY 2</text>
+      
+      <rect x="440" y="100" width="40" height="20" rx="3" fill="#fef3c7" stroke="#d97706" stroke-width="1"/>
+      <text x="460" y="114" font-size="9" font-family="sans-serif" font-weight="bold" text-anchor="middle">BAY 3</text>
+    </g>
+  </g>
+
+  <!-- Terminal Apron Ground -->
+  <rect x="0" y="380" width="800" height="120" fill="#334155"/>
+  <line x1="0" y1="380" x2="800" y2="380" stroke="#f59e0b" stroke-width="4"/>
+
+  <!-- Docked Buses -->
+  <g transform="translate(120, 310)">
+    <rect x="0" y="0" width="140" height="70" rx="6" fill="#14532d"/>
+    <rect x="0" y="42" width="140" height="5" fill="#f8fafc"/>
+    <circle cx="28" cy="70" r="10" fill="#0f172a"/>
+    <circle cx="112" cy="70" r="10" fill="#0f172a"/>
+    <text x="70" y="55" font-size="8" fill="#fef08a" font-family="sans-serif" font-weight="bold" text-anchor="middle">BUS 415</text>
+  </g>
+
+  <g transform="translate(300, 300)">
+    <rect x="0" y="0" width="150" height="75" rx="6" fill="#0e4429"/>
+    <rect x="0" y="45" width="150" height="5" fill="#f59e0b"/>
+    <circle cx="30" cy="75" r="11" fill="#0f172a"/>
+    <circle cx="120" cy="75" r="11" fill="#0f172a"/>
+    <text x="75" y="60" font-size="9" fill="#fff" font-family="sans-serif" font-weight="bold" text-anchor="middle">BUS 734</text>
+  </g>
+
+  <!-- Overlay Banner -->
+  <rect x="24" y="24" width="370" height="54" rx="8" fill="#072516" opacity="0.9" stroke="#15803d" stroke-width="1.5"/>
+  <text x="40" y="45" font-size="14" fill="#ffffff" font-family="sans-serif" font-weight="800">PADERU DIVISIONAL BUS COMPLEX</text>
+  <text x="40" y="63" font-size="10" fill="#fde68a" font-family="sans-serif">Alluri Sitharama Raju District HQ • Elevation: 900m</text>
+</svg>

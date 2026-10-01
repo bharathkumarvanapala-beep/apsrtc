@@ -1,14 +1,105 @@
-/* frontend/css/map.css */
+/* frontend/css/map.css - APSRTC SmartTrack Advanced GIS & 3D Map Styling */
+
+.map-container-frame {
+  perspective: 1200px;
+  border-radius: 18px;
+  padding: 4px;
+  background: linear-gradient(135deg, rgba(22, 101, 52, 0.2) 0%, rgba(15, 23, 42, 0.2) 100%);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
 
 #map {
-  height: 500px;
+  height: 520px;
   width: 100%;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--line);
-  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   position: relative;
   z-index: 1;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
+  transform-origin: center bottom;
+}
+
+/* 3D Perspective Tilt Mode */
+#map.map-3d-perspective-active {
+  transform: rotateX(44deg) rotateZ(-2deg) scale(1.05);
+  box-shadow: 0 35px 70px rgba(0, 0, 0, 0.4);
+  border-color: #22c55e;
+}
+
+/* Custom Basemap & 3D Controls in Top Right */
+.map-custom-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.map-ctrl-group {
+  display: flex;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(8px);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  gap: 3px;
+}
+
+.map-basemap-btn {
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 9px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.map-basemap-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.map-basemap-btn.active {
+  background: #15803d;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(21, 128, 61, 0.4);
+}
+
+.map-3d-tilt-btn {
+  background: linear-gradient(135deg, #072516 0%, #166534 100%);
+  color: #fef08a;
+  border: 1px solid #f59e0b;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 7px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(7, 37, 22, 0.4);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.map-3d-tilt-btn:hover {
+  background: #14532d;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.map-3d-tilt-btn.active {
+  background: #f59e0b;
+  color: #072516;
+  border-color: #fef08a;
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.6);
 }
 
 /* Custom Bus Marker */
@@ -28,40 +119,50 @@
 }
 
 .bus-marker-wrapper:hover {
-  transform: translate(-50%, -105%) scale(1.08);
+  transform: translate(-50%, -110%) scale(1.1);
   z-index: 1000 !important;
+}
+
+.bus-marker-shadow {
+  position: absolute;
+  bottom: -4px;
+  width: 24px;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 50%;
+  filter: blur(2px);
 }
 
 .bus-marker-pulse {
   position: absolute;
   top: 10px;
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
-  background: rgba(22, 163, 74, 0.45);
-  animation: busPulse 2s infinite ease-out;
+  background: rgba(34, 197, 94, 0.4);
+  animation: busPulse 2.2s infinite ease-out;
   pointer-events: none;
 }
 
 @keyframes busPulse {
-  0% { transform: scale(0.6); opacity: 0.9; }
-  70% { transform: scale(1.6); opacity: 0; }
-  100% { transform: scale(0.6); opacity: 0; }
+  0% { transform: scale(0.5); opacity: 0.9; }
+  70% { transform: scale(1.8); opacity: 0; }
+  100% { transform: scale(0.5); opacity: 0; }
 }
 
 .bus-marker-pill {
   position: relative;
-  background: linear-gradient(135deg, #14532d 0%, #15803d 100%);
+  background: linear-gradient(135deg, #072516 0%, #15803d 100%);
   color: #ffffff;
-  padding: 4px 9px;
+  padding: 4px 10px;
   border-radius: 20px;
   border: 2px solid #ffffff;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   font-weight: 800;
   font-size: 12px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   white-space: nowrap;
 }
 
@@ -71,6 +172,15 @@
 
 .bus-marker-num {
   letter-spacing: 0.5px;
+}
+
+.bus-marker-speed {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fde047;
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 10px;
+  font-weight: 700;
 }
 
 .bus-marker-pin {
@@ -93,17 +203,17 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  transform: translate(-7px, -7px);
+  transform: translate(-8px, -8px);
   cursor: pointer;
 }
 
 .stop-circle {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: #ffffff;
-  border: 3px solid #2563eb;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  border: 3.5px solid #2563eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   flex-shrink: 0;
   transition: transform 0.15s ease, background 0.15s ease;
 }
@@ -114,16 +224,25 @@
 }
 
 .stop-label {
-  background: rgba(15, 23, 42, 0.88);
+  background: rgba(15, 23, 42, 0.9);
   color: #ffffff;
-  padding: 3px 8px;
+  padding: 4px 9px;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
   pointer-events: auto;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stop-tel {
+  color: #fde68a;
+  font-size: 10px;
+  font-weight: normal;
 }
 
 .stop-marker-wrapper:hover .stop-label {
@@ -133,13 +252,15 @@
 
 /* Popups */
 .custom-map-popup .leaflet-popup-content-wrapper {
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.3);
   padding: 4px;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .map-bus-popup {
-  padding: 6px 4px;
+  padding: 8px 6px;
   font-size: 13px;
   color: #1e293b;
 }
@@ -149,26 +270,34 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 6px;
+  padding-bottom: 8px;
   margin-bottom: 8px;
 }
 
 .map-bus-popup-head strong {
-  font-size: 15px;
+  font-size: 16px;
   color: #0f172a;
 }
 
-.map-bus-popup-head .pill {
+.bus-model-sub {
+  display: block;
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.pill-active {
   font-size: 10px;
   font-weight: 800;
   background: #ecfdf5;
   color: #15803d;
-  padding: 2px 6px;
+  padding: 3px 8px;
   border-radius: 999px;
+  border: 1px solid #bbf7d0;
 }
 
 .map-popup-row {
-  margin: 4px 0;
+  margin: 5px 0;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -179,32 +308,108 @@
   color: #64748b;
 }
 
+.map-popup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-3d-jump {
+  background: linear-gradient(135deg, #072516 0%, #15803d 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 7px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(7, 37, 22, 0.2);
+}
+
+.btn-3d-jump:hover {
+  background: #14532d;
+  transform: translateY(-1px);
+}
+
+.btn-popup-gallery {
+  background: #f8fafc;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.btn-popup-gallery:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
 .map-stop-popup {
   padding: 6px 4px;
-  min-width: 170px;
+  min-width: 190px;
+}
+
+.map-stop-popup-head {
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 8px;
+}
+
+.depot-tag {
+  font-size: 9px;
+  font-weight: 900;
+  background: #fef3c7;
+  color: #b45309;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 3px;
 }
 
 .map-stop-popup strong {
   display: block;
   font-size: 15px;
   color: #0f172a;
-  margin-bottom: 8px;
+}
+
+.tel-inline {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: normal;
+}
+
+.alt-badge {
+  display: block;
+  font-size: 11px;
+  color: #15803d;
+  font-weight: 700;
+  margin-top: 2px;
 }
 
 .stop-popup-btn-group {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
 }
 
 .stop-popup-btn {
   border: 1px solid #cbd5e1;
   background: #f8fafc;
   color: #1e293b;
-  padding: 5px 9px;
+  padding: 6px 10px;
   font-size: 11px;
   font-weight: 700;
-  border-radius: 6px;
+  border-radius: 7px;
   cursor: pointer;
   text-align: left;
   transition: all 0.15s ease;
@@ -216,58 +421,135 @@
   border-color: #14532d;
 }
 
-/* Map legend control */
+.stop-popup-btn-photo {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  color: #1d4ed8;
+}
+
+.stop-popup-btn-photo:hover {
+  background: #1e40af;
+  color: #ffffff;
+}
+
+/* Map Legend */
 .map-legend-control {
   background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(6px);
-  padding: 8px 12px;
+  backdrop-filter: blur(8px);
+  padding: 8px 14px;
   border-radius: 10px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14);
   border: 1px solid rgba(226, 232, 240, 0.8);
   font-size: 11px;
   font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   color: #334155;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .legend-dot-bus {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #16a34a;
+  box-shadow: 0 0 6px rgba(22, 163, 74, 0.6);
 }
 
 .legend-dot-stop {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #2563eb;
 }
 
 .legend-line-route {
-  width: 18px;
+  width: 20px;
   height: 4px;
   border-radius: 2px;
   background: #16a34a;
 }
 
-/* Fleet list clickable items */
+/* Fleet List */
+.fleet-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
 .fleet-item {
+  background: var(--card-bg);
+  border: 1px solid var(--line);
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .fleet-item:hover {
   transform: translateY(-2px);
-  border-color: #166534;
-  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
-  background: #fcfdfc;
+  border-color: var(--primary-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.fleet-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fleet-bus-badge {
+  background: #ecfdf5;
+  color: #15803d;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+.fleet-dir {
+  display: block;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.fleet-item-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fleet-speed {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.btn-fleet-3d {
+  background: #072516;
+  color: #fef08a;
+  border: 1px solid #166534;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-fleet-3d:hover {
+  background: #166534;
+  color: #ffffff;
 }
