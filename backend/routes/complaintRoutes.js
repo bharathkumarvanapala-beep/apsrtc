@@ -9,6 +9,7 @@ const { validateComplaint } = require('../middleware/validationMiddleware');
 
 router.post('/', validateComplaint, complaintController.createComplaint);
 router.get('/', complaintController.getComplaints);
+router.get('/track/:ref', complaintController.trackComplaintByRef);
 router.patch('/:id/status', complaintController.updateComplaintStatus);
 
 module.exports = router;

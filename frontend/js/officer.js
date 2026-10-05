@@ -183,13 +183,27 @@ function renderComplaintsTable(complaints) {
     return;
   }
 
-  tbody.innerHTML = complaints.map(c => `
+  tbody.innerHTML = complaints.map(c => {
+    let targetBadge = '';
+    if (c.target_type === 'STAFF') {
+      targetBadge = `<span style="display: inline-block; background: #fee2e2; color: #991b1b; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; margin-bottom: 2px;">👨‍✈️ Staff Misconduct</span>`;
+    } else if (c.target_type === 'BUS_CONDITION') {
+      targetBadge = `<span style="display: inline-block; background: #fef3c7; color: #92400e; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; margin-bottom: 2px;">🚌 Bus Defect</span>`;
+    } else {
+      targetBadge = `<span style="display: inline-block; background: #e0f2fe; color: #0369a1; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; margin-bottom: 2px;">⏱️ Service</span>`;
+    }
+
+    return `
     <tr>
       <td><strong>${c.complaint_ref}</strong></td>
-      <td><span class="bus-num-pill" style="font-size: 0.85rem; padding: 2px 6px;">Bus ${c.bus_number}</span></td>
+      <td>
+        ${targetBadge}<br>
+        <span class="bus-num-pill" style="font-size: 0.85rem; padding: 2px 6px;">Bus ${c.bus_number}</span>
+      </td>
       <td><strong>${c.category}</strong></td>
       <td style="max-width: 250px;">
-        <div style="font-size: 0.8rem;">${c.description}</div>
+        <div style="font-size: 0.8rem; font-weight: 600;">${c.description}</div>
+        ${c.location ? `<div style="font-size: 0.72rem; color: #006045;">📍 ${c.location}</div>` : ''}
         <span style="font-size: 0.72rem; color: #64748b;">By: ${c.passenger_name} (${c.passenger_phone || 'No phone'})</span>
       </td>
       <td>
@@ -201,12 +215,23 @@ function renderComplaintsTable(complaints) {
           <option value="NEW" ${c.status === 'NEW' ? 'selected' : ''}>NEW</option>
           <option value="ACKNOWLEDGED" ${c.status === 'ACKNOWLEDGED' ? 'selected' : ''}>ACKNOWLEDGED</option>
           <option value="INVESTIGATING" ${c.status === 'INVESTIGATING' ? 'selected' : ''}>INVESTIGATING</option>
+          <option value="ACTION_TAKEN" ${c.status === 'ACTION_TAKEN' ? 'selected' : ''}>ACTION TAKEN</option>
           <option value="RESOLVED" ${c.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
           <option value="CLOSED" ${c.status === 'CLOSED' ? 'selected' : ''}>CLOSED</option>
         </select>
       </td>
     </tr>
-  `).join('');
+    `;
+  }).join('');
+}
+
+function applyGrievanceFilter(targetType) {
+  if (!targetType) {
+    renderComplaintsTable(complaintsData);
+  } else {
+    const filtered = complaintsData.filter(c => c.target_type === targetType);
+    renderComplaintsTable(filtered);
+  }
 }
 
 async function updateStatus(id, newStatus) {
@@ -237,5 +262,6 @@ window.officerApp = {
   init: initOfficer,
   loadFleetOverview,
   handleFailoverTest,
-  updateStatus
+  updateStatus,
+  applyGrievanceFilter
 };

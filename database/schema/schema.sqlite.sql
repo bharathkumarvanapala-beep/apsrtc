@@ -177,27 +177,21 @@ CREATE TABLE IF NOT EXISTS current_bus_locations (
     FOREIGN KEY (route_id) REFERENCES routes(id) ON DELETE SET NULL
 );
 
--- 12. Complaints Table
+-- 12. Complaints Table (Supports Staff Conduct, Bus Condition, and Service Issues)
 CREATE TABLE IF NOT EXISTS complaints (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     complaint_ref TEXT UNIQUE NOT NULL,
     bus_number TEXT NOT NULL,
     trip_id TEXT,
-    category TEXT CHECK(category IN (
-        'Bus did not stop',
-        'Overcrowding',
-        'Delay',
-        'Driver behaviour',
-        'Conductor issue',
-        'Safety',
-        'Cleanliness',
-        'Other'
-    )) NOT NULL,
+    target_type TEXT CHECK(target_type IN ('STAFF', 'BUS_CONDITION', 'SERVICE', 'GENERAL')) DEFAULT 'GENERAL',
+    category TEXT NOT NULL,
+    sub_category TEXT,
     description TEXT NOT NULL,
     passenger_name TEXT,
     passenger_phone TEXT,
     location TEXT,
-    status TEXT CHECK(status IN ('NEW', 'ACKNOWLEDGED', 'INVESTIGATING', 'RESOLVED', 'CLOSED')) DEFAULT 'NEW',
+    photo_url TEXT,
+    status TEXT CHECK(status IN ('NEW', 'ACKNOWLEDGED', 'INVESTIGATING', 'ACTION_TAKEN', 'RESOLVED', 'CLOSED')) DEFAULT 'NEW',
     officer_notes TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

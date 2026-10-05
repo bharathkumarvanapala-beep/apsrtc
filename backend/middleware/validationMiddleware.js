@@ -90,28 +90,17 @@ function validateComplaint(req, res, next) {
     });
   }
 
-  const validCategories = [
-    'Bus did not stop',
-    'Overcrowding',
-    'Delay',
-    'Driver behaviour',
-    'Conductor issue',
-    'Safety',
-    'Cleanliness',
-    'Other'
-  ];
-
-  if (!category || !validCategories.includes(category)) {
+  if (!category || typeof category !== 'string' || category.trim().length < 2) {
     return res.status(400).json({
       success: false,
-      error: `Invalid category. Must be one of: ${validCategories.join(', ')}`
+      error: 'Category is required. Please select a valid grievance category (Staff Conduct, Bus Condition, or Service).'
     });
   }
 
   if (!description || description.trim().length < 5) {
     return res.status(400).json({
       success: false,
-      error: 'Description must be at least 5 characters long.'
+      error: 'Description must be at least 5 characters long explaining the issue.'
     });
   }
 

@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APSRTC SmartTrack - Real-Time Fleet & Corridor Tracking Prototype</title>
-  <meta name="description" content="APSRTC SmartTrack real-time bus tracking and journey matching system. Know where your bus is before you wait.">
+  <title>APSRTC SmartTrack - Official Corridor Tracking & Passenger Grievance Portal</title>
+  <meta name="description" content="Official APSRTC SmartTrack real-time bus tracking and journey matching system. Real-time Google Maps telemetry, passenger grievance lodging against staff and bus condition.">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Leaflet Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -15,7 +20,31 @@
 </head>
 <body>
 
-  <!-- Official Government Header -->
+  <!-- ========================================== -->
+  <!-- 1. AP GOVERNMENT OFFICIAL TOP BAR          -->
+  <!-- ========================================== -->
+  <div class="gov-top-bar">
+    <div class="gov-top-bar-inner">
+      <div class="gov-brand-cell">
+        <span class="gov-flag-icon">🇮🇳</span>
+        <span class="gov-title">Government of Andhra Pradesh • ఆంధ్రప్రదేశ్ ప్రభుత్వం</span>
+        <span class="gov-badge-official">Official Transport Portal</span>
+      </div>
+      <div class="gov-contact-cell">
+        <span class="gov-phone">📞 24x7 Helpline: <strong>149</strong> / <strong>0866-2570005</strong></span>
+        <button type="button" class="gov-link-btn" onclick="passengerApp.openComplaintModal('', '', 'STAFF')">
+          🚨 Lodge Complaint
+        </button>
+        <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal()">
+          📋 Track Status
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. APSRTC OFFICIAL BRAND HEADER            -->
+  <!-- ========================================== -->
   <header class="official-header">
     <div class="header-inner">
       <div class="brand-wrapper">
@@ -24,7 +53,7 @@
           <h1>APSRTC SmartTrack</h1>
           <div class="telugu-sub">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ • Corridor GPS Live</div>
         </div>
-        <span class="brand-badge">Official Prototype</span>
+        <span class="brand-badge">Official Portal</span>
       </div>
 
       <nav class="nav-tabs">
@@ -48,15 +77,27 @@
     </div>
   </header>
 
-  <!-- Prototype Advisory Banner -->
-  <div class="demo-banner">
-    <span>⚠️ <strong>PROTOTYPE DEMONSTRATION SYSTEM:</strong> Displays multi-source GPS failover architecture (Hardware Tracker, Crew Mobile GPS, ETM, and Demo). Real operational deployment requires authorized APSRTC enterprise access.</span>
+  <!-- ========================================== -->
+  <!-- 3. OFFICIAL NEWS & ADVISORY TICKER         -->
+  <!-- ========================================== -->
+  <div class="news-ticker-bar">
+    <div class="ticker-label">
+      <span>📢</span> LATEST ALERTS
+    </div>
+    <div class="ticker-content">
+      <div class="ticker-track">
+        <span>🟢 <strong>LIVE CORRIDOR TELEMETRY:</strong> High-resolution GPS tracking active across Araku – Ananthagiri – Paderu – G. Madugula – Chintapalli – Anakapalle – Visakhapatnam ghat routes.</span>
+        <span>⚡ <strong>MULTI-SOURCE FAILOVER:</strong> Bus locations continuously verified through onboard hardware trackers, crew GPS & ticketing terminals.</span>
+        <span>⚠️ <strong>CITIZEN GRIEVANCE SYSTEM:</strong> Passengers can lodge official complaints regarding Staff Conduct (Driver/Conductor) and Bus Condition directly via the portal.</span>
+        <span>📞 <strong>24/7 HELPLINE:</strong> Call 149 (Toll Free) or 0866-2570005 for immediate transport assistance.</span>
+      </div>
+    </div>
   </div>
 
   <main class="main-wrapper">
 
     <!-- ========================================== -->
-    <!-- 1. PASSENGER VIEW                         -->
+    <!-- 4. PASSENGER VIEW                         -->
     <!-- ========================================== -->
     <section id="view-passenger" class="view-section active">
       <div class="passenger-grid">
@@ -67,14 +108,17 @@
           <!-- Search Form Card -->
           <div class="card" style="margin-bottom: 1.25rem;">
             <div class="card-header">
-              <h2 class="card-title">🔍 Search Corridor Buses</h2>
-              <span style="font-size: 0.75rem; font-weight: 700; color: #00695c;">Eastern Ghats Corridor</span>
+              <div>
+                <h2 class="card-title">🔍 Search Corridor Buses</h2>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">రూట్ బస్సులను శోధించండి &bull; Eastern Ghats Corridor</div>
+              </div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #006045; background: #e6f6f0; padding: 4px 8px; border-radius: 6px;">Live GPS Matching</span>
             </div>
             <div class="card-body">
               <form id="journeySearchForm">
                 
                 <div class="search-form-group">
-                  <label class="search-label" for="searchFrom">From (Boarding Stop)</label>
+                  <label class="search-label" for="searchFrom">From (Boarding Stop / బయలుదేరు ప్రదేశం)</label>
                   <div class="input-with-icon">
                     <span class="input-icon">🟢</span>
                     <select id="searchFrom" class="search-select" required>
@@ -90,7 +134,7 @@
                 </div>
 
                 <div class="search-form-group">
-                  <label class="search-label" for="searchTo">To (Destination Stop)</label>
+                  <label class="search-label" for="searchTo">To (Destination Stop / గమ్యస్థానం)</label>
                   <div class="input-with-icon">
                     <span class="input-icon">🔴</span>
                     <select id="searchTo" class="search-select" required>
@@ -106,23 +150,36 @@
 
               <!-- Quick Corridor Chips -->
               <div class="quick-chips">
-                <div class="quick-chips-title">Frequent Corridor Routes:</div>
+                <div class="quick-chips-title">Frequent Corridor Routes (ప్రధాన మార్గాలు):</div>
                 <div class="chips-list">
                   <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Paderu', 'Visakhapatnam')">Paderu ➔ Visakhapatnam</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Araku', 'Paderu')">Araku ➔ Paderu</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Visakhapatnam', 'Araku')">Visakhapatnam ➔ Araku (Up)</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('G. Madugula', 'Chintapalli')">G. Madugula ➔ Chintapalli</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chintapalli', 'Anakapalle')">Chintapalli ➔ Anakapalle</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Araku', 'Visakhapatnam')">Araku ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('G. Madugula', 'Visakhapatnam')">G. Madugula ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chintapalli', 'Visakhapatnam')">Chintapalli ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Visakhapatnam', 'Paderu')">Visakhapatnam ➔ Paderu (Return)</button>
                 </div>
               </div>
 
               <!-- Bus Number Direct Lookup -->
               <div class="bus-number-search">
-                <label class="search-label" for="busNumberInput">Direct Bus Number Lookup:</label>
+                <label class="search-label" for="busNumberInput">Direct Bus Number Lookup (ప్రత్యక్ష బస్సు నంబర్):</label>
                 <div class="bus-search-bar">
                   <input type="text" id="busNumberInput" class="search-input" style="padding-left: 0.85rem;" placeholder="e.g. 415, 302, 518...">
                   <button type="button" id="busNumberSearchBtn" class="btn-secondary">Track</button>
                 </div>
+              </div>
+
+              <!-- Quick Action Grievance Bar -->
+              <div class="quick-grievance-bar">
+                <button type="button" class="quick-grievance-btn staff-btn" onclick="passengerApp.openComplaintModal('', '', 'STAFF')">
+                  👨‍✈️ Lodge Complaint Against Staff
+                </button>
+                <button type="button" class="quick-grievance-btn bus-btn" onclick="passengerApp.openComplaintModal('', '', 'BUS_CONDITION')">
+                  🚌 Report Bus Condition / AC / Defect
+                </button>
+                <button type="button" class="quick-grievance-btn track-btn" onclick="passengerApp.trackComplaintModal()">
+                  🔍 Track Grievance Status
+                </button>
               </div>
 
             </div>
@@ -144,15 +201,22 @@
         <div class="passenger-map-column">
           <div class="card map-card-wrapper">
             <div class="card-header">
-              <h2 class="card-title">🗺️ Live GPS Corridor Map</h2>
-              <span style="font-size: 0.75rem; color: #64748b;">Real-time Telemetry Updates</span>
+              <div>
+                <h2 class="card-title">🗺️ Live Google Maps Fleet Corridor</h2>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Google Roadmap &bull; Real-time GPS Telemetry Updates</div>
+              </div>
+              <div class="map-layer-selector">
+                <button type="button" class="map-layer-btn active" id="btnLayerRoadmap" onclick="fleetMap.setBaseLayer('roadmap')">Roadmap</button>
+                <button type="button" class="map-layer-btn" id="btnLayerSatellite" onclick="fleetMap.setBaseLayer('satellite')">Satellite</button>
+                <button type="button" class="map-layer-btn" id="btnLayerTerrain" onclick="fleetMap.setBaseLayer('terrain')">Terrain</button>
+              </div>
             </div>
             
             <div id="fleetMap"></div>
 
             <div class="map-controls-bar">
               <div class="legend-items">
-                <span style="font-weight: 800; color: #334155;">Freshness:</span>
+                <span style="font-weight: 800; color: #334155;">Signal Freshness:</span>
                 <div class="legend-item"><span class="legend-swatch" style="background: var(--status-live);"></span> Live (&le;10s)</div>
                 <div class="legend-item"><span class="legend-swatch" style="background: var(--status-recent);"></span> Recent (&le;60s)</div>
                 <div class="legend-item"><span class="legend-swatch" style="background: var(--status-stale);"></span> Stale (&le;5m)</div>
@@ -160,11 +224,11 @@
               </div>
 
               <div class="legend-items">
-                <span style="font-weight: 800; color: #334155;">Sources:</span>
-                <span class="source-pill HARDWARE_TRACKER">Tracker</span>
-                <span class="source-pill CREW_PHONE">Crew</span>
+                <span style="font-weight: 800; color: #334155;">Telemetry Sources:</span>
+                <span class="source-pill HARDWARE_TRACKER">GPS Tracker</span>
+                <span class="source-pill CREW_PHONE">Crew Phone</span>
                 <span class="source-pill ETM">ETM</span>
-                <span class="source-pill DEMO">Demo</span>
+                <span class="source-pill DEMO">Demo Fleet</span>
               </div>
             </div>
           </div>
@@ -174,7 +238,7 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- 2. CREW MOBILE PORTAL                     -->
+    <!-- 5. CREW MOBILE PORTAL                     -->
     <!-- ========================================== -->
     <section id="view-crew" class="view-section">
       <div class="crew-layout">
@@ -283,7 +347,7 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- 3. OFFICER OPERATIONS DASHBOARD           -->
+    <!-- 6. OFFICER OPERATIONS DASHBOARD           -->
     <!-- ========================================== -->
     <section id="view-officer" class="view-section">
       
@@ -430,8 +494,18 @@
       <!-- Passenger Grievances & Complaints Table -->
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">📋 Passenger Grievance Resolution Desk</h3>
-          <span style="font-size: 0.75rem; color: #64748b;">Grievance Workflow: NEW ➔ ACKNOWLEDGED ➔ INVESTIGATING ➔ RESOLVED ➔ CLOSED</span>
+          <div>
+            <h3 class="card-title">📋 Passenger Grievance Resolution Desk (సిబ్బంది & బస్సు ఫిర్యాదులు)</h3>
+            <span style="font-size: 0.75rem; color: #64748b;">Target: Staff Conduct | Bus Condition & Defects | Service Delays</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <select id="officerGrievanceFilter" onchange="officerApp.applyGrievanceFilter(this.value)" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem;">
+              <option value="">All Targets</option>
+              <option value="STAFF">Staff Misconduct</option>
+              <option value="BUS_CONDITION">Bus Condition & Defect</option>
+              <option value="SERVICE">Service & Route</option>
+            </select>
+          </div>
         </div>
 
         <div class="table-container">
@@ -439,9 +513,9 @@
             <thead>
               <tr>
                 <th>Ref ID</th>
-                <th>Bus</th>
+                <th>Target & Bus</th>
                 <th>Category</th>
-                <th>Description</th>
+                <th>Description & Location</th>
                 <th>Current Status</th>
                 <th>Filed At</th>
                 <th>Update Status</th>
@@ -457,7 +531,7 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- 4. SIMULATOR & FAILOVER LAB               -->
+    <!-- 7. SIMULATOR & FAILOVER LAB               -->
     <!-- ========================================== -->
     <section id="view-simulator" class="view-section">
       <div class="card" style="max-width: 800px; margin: 0 auto;">
@@ -501,68 +575,85 @@
   </main>
 
   <!-- ========================================== -->
-  <!-- MODAL: PASSENGER COMPLAINT FORM           -->
+  <!-- 8. MODAL: PASSENGER COMPLAINT FORM        -->
   <!-- ========================================== -->
   <div class="modal-backdrop" id="complaintModal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3>⚠️ Report Issue / Passenger Grievance</h3>
+        <div>
+          <h3>⚠️ APSRTC Passenger Grievance Redressal Portal</h3>
+          <div style="font-size: 0.75rem; color: rgba(255,255,255,0.85); font-weight: 500;">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ &bull; ప్రయాణీకుల ఫిర్యాదుల విభాగం</div>
+        </div>
         <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('complaintModal')">&times;</button>
       </div>
       <form id="complaintForm">
         <div class="modal-body">
-          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 1rem;">
-            Your report is routed directly to the APSRTC Depot Operations Control Center. An official reference ID will be generated.
+          <p style="font-size: 0.8rem; color: #475569; margin-bottom: 1rem; line-height: 1.5; background: #f8fafc; padding: 0.6rem 0.85rem; border-left: 3px solid #006045; border-radius: 4px;">
+            Grievances filed here are automatically assigned to the Regional Depot Manager & Vigilance Officer under the <strong>APSRTC Citizen Charter</strong>. An SMS confirmation reference ID will be generated.
           </p>
 
+          <!-- Grievance Target Selection Tabs -->
+          <label class="search-label">Grievance Category / ఫిర్యాదు రకం</label>
+          <div class="complaint-target-tabs">
+            <button type="button" class="target-tab-btn staff-active active" id="tabStaffGrievance" onclick="passengerApp.selectComplaintTarget('STAFF')">
+              👨‍✈️ Staff Misconduct (సిబ్బంది)
+            </button>
+            <button type="button" class="target-tab-btn" id="tabBusCondition" onclick="passengerApp.selectComplaintTarget('BUS_CONDITION')">
+              🚌 Bus Condition & Defect (బస్సు పరిస్థితి)
+            </button>
+            <button type="button" class="target-tab-btn" id="tabServiceIssue" onclick="passengerApp.selectComplaintTarget('SERVICE')">
+              ⏱️ Route / Delays (సేవలు)
+            </button>
+          </div>
+
+          <input type="hidden" id="complaintTargetType" value="STAFF">
           <input type="hidden" id="complaintTripId">
 
-          <div class="search-form-group">
-            <label class="search-label" for="complaintBusNumber">Bus Number</label>
-            <input type="text" id="complaintBusNumber" class="search-input" style="padding-left: 0.85rem;" readonly>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="search-form-group">
+              <label class="search-label" for="complaintBusNumber">Bus Number (బస్సు నంబర్)</label>
+              <input type="text" id="complaintBusNumber" class="search-input" style="padding-left: 0.85rem;" placeholder="e.g. 415, 302, 518..." required>
+            </div>
+            <div class="search-form-group">
+              <label class="search-label" for="complaintLocation">Location / Bus Stop (ప్రదేశం)</label>
+              <input type="text" id="complaintLocation" class="search-input" style="padding-left: 0.85rem;" placeholder="e.g. Paderu Stand, Bowdara">
+            </div>
           </div>
 
           <div class="search-form-group">
-            <label class="search-label" for="complaintCategory">Issue Category</label>
+            <label class="search-label" for="complaintCategory">Specific Grievance Reason</label>
             <select id="complaintCategory" class="search-select" style="padding-left: 0.85rem;" required>
-              <option value="Bus did not stop">Bus did not stop at designated stand</option>
-              <option value="Overcrowding">Severe Overcrowding / Seat Unavailability</option>
-              <option value="Delay">Unscheduled Delay / Breakdown</option>
-              <option value="Driver behaviour">Driver Rash Driving / Behaviour</option>
-              <option value="Conductor issue">Conductor Issue / Overcharging</option>
-              <option value="Safety">Safety & Mechanical Issue</option>
-              <option value="Cleanliness">Cleanliness & Hygiene</option>
-              <option value="Other">Other Operational Concern</option>
+              <!-- Populated dynamically based on Target Tab -->
             </select>
           </div>
 
           <div class="search-form-group">
-            <label class="search-label" for="complaintDescription">Description of Incident</label>
-            <textarea id="complaintDescription" rows="3" class="search-input" style="padding-left: 0.85rem; height: auto;" placeholder="Please describe what happened..." required></textarea>
+            <label class="search-label" for="complaintDescription">Detailed Incident Description (వివరణ)</label>
+            <textarea id="complaintDescription" rows="3" class="search-input" style="padding-left: 0.85rem; height: auto;" placeholder="Please give specific details regarding the incident, driver/conductor behaviour or damaged bus condition..." required></textarea>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
             <div class="search-form-group">
-              <label class="search-label" for="complaintName">Your Name (Optional)</label>
-              <input type="text" id="complaintName" class="search-input" style="padding-left: 0.85rem;" placeholder="Passenger Name">
+              <label class="search-label" for="complaintName">Passenger Name (పేరు)</label>
+              <input type="text" id="complaintName" class="search-input" style="padding-left: 0.85rem;" placeholder="Your Name" required>
             </div>
             <div class="search-form-group">
-              <label class="search-label" for="complaintPhone">Phone (Optional)</label>
-              <input type="tel" id="complaintPhone" class="search-input" style="padding-left: 0.85rem;" placeholder="Mobile Number">
+              <label class="search-label" for="complaintPhone">Mobile Number (మొబైల్ నంబర్)</label>
+              <input type="tel" id="complaintPhone" class="search-input" style="padding-left: 0.85rem;" placeholder="10-digit mobile number" required pattern="[0-9]{10}">
             </div>
           </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('complaintModal')">Cancel</button>
-          <button type="submit" class="btn-primary" style="background: #c62828;">Submit Grievance</button>
+          <button type="submit" class="btn-primary" style="background: #b91c1c;">🚨 Submit Grievance / ఫిర్యాదు సమర్పించండి</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- ========================================== -->
-  <!-- MODAL: BUS DETAILS                        -->
+  <!-- 9. MODAL: BUS DETAILS PROFILE              -->
   <!-- ========================================== -->
   <div class="modal-backdrop" id="busDetailsModal">
     <div class="modal-dialog">
@@ -579,15 +670,17 @@
     </div>
   </div>
 
-  <!-- Official Footer -->
+  <!-- ========================================== -->
+  <!-- 10. OFFICIAL FOOTER                        -->
+  <!-- ========================================== -->
   <footer class="official-footer">
     <div class="footer-inner">
       <div>
         <strong>Andhra Pradesh State Road Transport Corporation (APSRTC)</strong><br>
-        <span style="font-size: 0.75rem; color: #94a3b8;">SmartTrack Multi-Source Fleet Telemetry & Passenger Information Prototype</span>
+        <span style="font-size: 0.75rem; color: #94a3b8;">RTC House, PNBS, Vijayawada - 520013, Andhra Pradesh, India</span>
       </div>
       <div style="font-size: 0.75rem; color: #94a3b8; text-align: right;">
-        Demonstration Prototype | Designed for scalable production integration<br>
+        Citizen Services Portal &bull; Real-Time Corridor GPS Telemetry &bull; Passenger Grievance Redressal<br>
         Corridor: Araku &ndash; Ananthagiri &ndash; Paderu &ndash; G. Madugula &ndash; Chintapalli &ndash; Anakapalle &ndash; Visakhapatnam
       </div>
     </div>
