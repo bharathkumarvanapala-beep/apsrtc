@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APSRTC Operations & Fleet Management Dashboard</title>
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏢</text></svg>">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .admin-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .metric-card-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--navy-500);
+      letter-spacing: 0.04em;
+    }
+
+    .metric-card-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--navy-900);
+    }
+
+    .metric-card-sub {
+      font-size: 0.75rem;
+      color: var(--navy-500);
+    }
+
+    .admin-tables-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1024px) {
+      .admin-tables-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .table-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1.5px solid #e2e8f0;
+      box-shadow: var(--shadow-sm);
+      padding: 1.25rem;
+      overflow-x: auto;
+    }
+
+    .table-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      padding: 0.75rem 0.9rem;
+      font-weight: 700;
+      color: var(--navy-700);
+      border-bottom: 1.5px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 0.75rem 0.9rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: var(--navy-900);
+    }
+
+    .data-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .priority-pill-tag {
+      background: var(--slate-100);
+      border: 1px solid #cbd5e1;
+      padding: 0.35rem 0.75rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-right: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gov-ribbon"></div>
+
+  <header class="official-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo-badge">RTC</div>
+        <div class="brand-titles">
+          <h1>APSRTC <span class="track-tag">OPERATIONS</span></h1>
+          <p>Fleet Command & Depot Telemetry Center</p>
+        </div>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="index.html" class="nav-pill">🚌 Passenger Portal</a>
+        <a href="crew.html" class="nav-pill">📱 Crew App</a>
+        <a href="admin.html" class="nav-pill active">🏢 Operations Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-layout">
+
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h2>APSRTC Agency Fleet Telemetry Overview</h2>
+        <p style="color:var(--navy-500); font-size:0.9rem;">
+          Corridor monitoring: Alluri Sitharama Raju Agency & Visakhapatnam Coastal Sector
+        </p>
+      </div>
+
+      <button type="button" class="btn-card-map" onclick="refreshAdminData()">
+        🔄 Refresh Data
+      </button>
+    </div>
+
+    <!-- METRICS CARDS -->
+    <div class="admin-metrics-grid">
+      <div class="metric-card">
+        <span class="metric-card-title">Total Active Fleet</span>
+        <div id="m-total-buses" class="metric-card-value">5</div>
+        <span class="metric-card-sub">Registered corridor services</span>
+      </div>
+
+      <div class="metric-card" style="border-left: 4px solid var(--status-live);">
+        <span class="metric-card-title">Live GPS Stream</span>
+        <div id="m-live-buses" class="metric-card-value" style="color: var(--status-live);">4</div>
+        <span class="metric-card-sub">Transmitting within 60s tolerance</span>
+      </div>
+
+      <div class="metric-card" style="border-left: 4px solid var(--status-stale);">
+        <span class="metric-card-title">Stale Heartbeat</span>
+        <div id="m-stale-buses" class="metric-card-value" style="color: var(--status-stale);">0</div>
+        <span class="metric-card-sub">Awaiting fresh coordinate ping</span>
+      </div>
+
+      <div class="metric-card" style="border-left: 4px solid var(--status-offline);">
+        <span class="metric-card-title">Offline / Depot</span>
+        <div id="m-offline-buses" class="metric-card-value" style="color: var(--navy-500);">1</div>
+        <span class="metric-card-sub">No recent telemetry</span>
+      </div>
+
+      <div class="metric-card" style="border-left: 4px solid #ef4444;">
+        <span class="metric-card-title">Passenger Grievances</span>
+        <div id="m-total-complaints" class="metric-card-value" style="color: #b91c1c;">0</div>
+        <span class="metric-card-sub">Lodge against corridor buses</span>
+      </div>
+    </div>
+
+    <!-- SOURCE DISTRIBUTION & PRIORITY CONFIG -->
+    <div class="table-card" style="margin-bottom: 1.5rem;">
+      <div class="table-title-row">
+        <h3>Location Ingestion Priority Ladder (Section 3)</h3>
+        <span style="font-size:0.78rem; color:var(--navy-500);">Configurable Fallback Engine</span>
+      </div>
+
+      <p style="font-size:0.85rem; color:var(--navy-600); margin-bottom: 0.75rem;">
+        When a primary tracker goes offline or encounters a tunnel/ghat road blindspot, the system automatically descends to the next available valid source:
+      </p>
+
+      <div id="priority-ladder-display">
+        <span class="priority-pill-tag">1. 📡 BUS GPS TRACKER</span>
+        <span class="priority-pill-tag">2. 🎫 ETM TICKETING MACHINE</span>
+        <span class="priority-pill-tag">3. 📱 CREW PHONE GPS</span>
+        <span class="priority-pill-tag">4. 🧪 DEMO SIMULATOR</span>
+      </div>
+    </div>
+
+    <!-- LOWER GRIDS: HARDWARE INVENTORY & PASSENGER COMPLAINTS -->
+    <div class="admin-tables-grid">
+
+      <!-- Hardware Devices Table -->
+      <div class="table-card">
+        <div class="table-title-row">
+          <h3>Hardware Device Registry & Assignments</h3>
+          <span class="bus-count-badge" id="devices-badge">5 Devices</span>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Device ID</th>
+              <th>Type</th>
+              <th>Assigned Bus</th>
+              <th>Status</th>
+              <th>Battery</th>
+              <th>Signal</th>
+            </tr>
+          </thead>
+          <tbody id="devices-table-body">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Grievance Table -->
+      <div class="table-card">
+        <div class="table-title-row">
+          <h3>Recent Complaints</h3>
+          <span class="bus-count-badge" id="complaints-badge">0 Pending</span>
+        </div>
+
+        <div id="complaints-list" style="display:flex; flex-direction:column; gap:0.6rem; max-height:420px; overflow-y:auto;">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    async function refreshAdminData() {
+      try {
+        const metricsRes = await api.getAdminDashboard();
+        if (metricsRes.success) {
+          const m = metricsRes.metrics;
+          document.getElementById('m-total-buses').textContent = m.fleetSummary.totalBuses;
+          document.getElementById('m-live-buses').textContent = m.fleetSummary.liveBuses;
+          document.getElementById('m-stale-buses').textContent = m.fleetSummary.staleBuses;
+          document.getElementById('m-offline-buses').textContent = m.fleetSummary.offlineBuses;
+          document.getElementById('m-total-complaints').textContent = m.operations.totalComplaints;
+        }
+
+        // Load devices
+        const devRes = await api.getAdminDevices();
+        if (devRes.success) {
+          const tbody = document.getElementById('devices-table-body');
+          tbody.innerHTML = '';
+          devRes.devices.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><b>${d.deviceId}</b></td>
+              <td>${d.deviceType}</td>
+              <td><span style="font-weight:700; color:var(--apsrtc-green-dark);">${d.assignedBusNumber ? 'BUS ' + d.assignedBusNumber : 'Unassigned'}</span></td>
+              <td><span class="freshness-pill live">${d.status}</span></td>
+              <td>${d.battery}%</td>
+              <td>${d.signal}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+          document.getElementById('devices-badge').textContent = `${devRes.devices.length} Devices`;
+        }
+
+        // Load complaints
+        const compRes = await api.getAllComplaints();
+        if (compRes.success) {
+          const cList = document.getElementById('complaints-list');
+          cList.innerHTML = '';
+          if (compRes.complaints.length === 0) {
+            cList.innerHTML = '<div style="color:var(--navy-500); font-size:0.85rem; padding:1rem; text-align:center;">No complaints registered yet.</div>';
+          } else {
+            compRes.complaints.forEach(c => {
+              const item = document.createElement('div');
+              item.style.padding = '0.75rem';
+              item.style.background = '#f8fafc';
+              item.style.borderRadius = 'var(--radius-md)';
+              item.style.border = '1px solid #e2e8f0';
+              item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                  <strong style="color:var(--apsrtc-green-dark);">${c.referenceId}</strong>
+                  <span class="freshness-pill stale">${c.status}</span>
+                </div>
+                <div style="font-size:0.8rem; font-weight:700;">Bus ${c.busNumber} • ${c.category}</div>
+                <div style="font-size:0.75rem; color:var(--navy-600); margin:0.25rem 0;">"${c.description}"</div>
+                <div style="font-size:0.7rem; color:var(--navy-500);">📍 ${c.busLocationSnapshot ? c.busLocationSnapshot.locationName : 'Location captured'}</div>
+              `;
+              cList.appendChild(item);
+            });
+          }
+          document.getElementById('complaints-badge').textContent = `${compRes.complaints.length} Lodged`;
+        }
+      } catch (err) {
+        console.error('Error refreshing admin portal:', err);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', refreshAdminData);
+  </script>
+</body>
+</html>

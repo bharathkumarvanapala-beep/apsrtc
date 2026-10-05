@@ -205,6 +205,43 @@ const api = {
       body: JSON.stringify(payload)
     });
     return res.json();
+  },
+
+  // Admin Fleet Controls
+  createBus: async (payload) => {
+    const res = await fetch(`${API_BASE}/api/v1/buses`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to register bus');
+    return json;
+  },
+
+  updateBusStatus: async (busId, status) => {
+    const res = await fetch(`${API_BASE}/api/v1/buses/${busId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to update bus status');
+    return json;
+  },
+
+  getDeviceRegistry: async () => {
+    const res = await fetch(`${API_BASE}/api/v1/operations/devices`);
+    return res.json();
+  },
+
+  broadcastAnnouncement: async (message, severity = 'INFO') => {
+    const res = await fetch(`${API_BASE}/api/v1/operations/broadcast`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message, severity })
+    });
+    return res.json();
   }
 };
 

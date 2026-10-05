@@ -263,17 +263,16 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* 4. Passenger Grid Layout */
+/* 4. Passenger Layout - Bus Corridors Up, Live Maps Down */
 .passenger-grid {
-  display: grid;
-  grid-template-columns: 440px 1fr;
-  gap: 1.25rem;
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 @media (max-width: 1024px) {
   .passenger-grid {
-    grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 }
 
@@ -447,9 +446,9 @@ body {
 
 /* Bus Cards & Route Progress Visualization */
 .buses-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1.25rem;
 }
 
 .bus-card {
@@ -703,8 +702,7 @@ body {
 
 /* 5. Google Map Container */
 .map-card-wrapper {
-  position: sticky;
-  top: 90px;
+  position: relative;
 }
 
 #fleetMap {

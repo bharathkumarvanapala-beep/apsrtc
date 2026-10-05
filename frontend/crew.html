@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APSRTC Crew Tracking | Driver & Conductor Portal</title>
+  <meta name="description" content="Mobile-optimized driver and conductor GPS tracking interface for APSRTC SmartTrack.">
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📱</text></svg>">
+
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+
+  <style>
+    .crew-phone-frame {
+      max-width: 520px;
+      margin: 1.5rem auto;
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-xl);
+      border: 2px solid #e2e8f0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .crew-header {
+      background: linear-gradient(135deg, var(--apsrtc-green-dark) 0%, var(--navy-900) 100%);
+      color: var(--white);
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .crew-app-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .crew-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .consent-banner {
+      background: #eff6ff;
+      border: 1.5px solid #bfdbfe;
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      font-size: 0.82rem;
+      color: #1e40af;
+      line-height: 1.5;
+    }
+
+    .consent-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      font-weight: 700;
+    }
+
+    .speedometer-card {
+      background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem 1rem;
+      text-align: center;
+      color: var(--white);
+      box-shadow: var(--shadow-md);
+      border: 1px solid #334155;
+    }
+
+    .speed-number {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: #34d399;
+      line-height: 1;
+      margin: 0.5rem 0;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 0.75rem;
+    }
+
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      color: #94a3b8;
+    }
+
+    .stat-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    .crew-btn-large {
+      padding: 1rem;
+      border-radius: var(--radius-md);
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all var(--transition-fast);
+      width: 100%;
+    }
+
+    .btn-start {
+      background: linear-gradient(135deg, var(--apsrtc-green) 0%, var(--apsrtc-green-dark) 100%);
+      color: var(--white);
+      box-shadow: 0 4px 12px rgba(4, 120, 87, 0.3);
+    }
+
+    .btn-pause {
+      background: #f59e0b;
+      color: var(--white);
+    }
+
+    .btn-end {
+      background: #ef4444;
+      color: var(--white);
+    }
+
+    .btn-power-off {
+      background: #475569;
+      color: var(--white);
+      font-size: 0.85rem;
+      padding: 0.65rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gov-ribbon"></div>
+
+  <!-- Header -->
+  <header class="official-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo-badge">RTC</div>
+        <div class="brand-titles">
+          <h1>APSRTC <span class="track-tag">CREW TRACK</span></h1>
+          <p>Driver & Conductor Telemetry Service</p>
+        </div>
+      </div>
+
+      <nav class="nav-actions">
+        <a href="index.html" class="nav-pill">🚌 Passenger Portal</a>
+        <a href="crew.html" class="nav-pill active">📱 Crew App</a>
+        <a href="admin.html" class="nav-pill">🏢 Operations Dashboard</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: 1rem auto; padding: 0 1rem;">
+
+    <div class="crew-phone-frame">
+      <div class="crew-header">
+        <div>
+          <div class="crew-app-title">APSRTC Driver / Conductor Portal</div>
+          <small style="opacity: 0.8;">Shift Telemetry & Trip Assignment</small>
+        </div>
+        <span id="crew-status-badge" class="freshness-pill offline">⚪ OFF-DUTY</span>
+      </div>
+
+      <div class="crew-body">
+
+        <!-- TRIP SETUP FORM (Visible before shift starts) -->
+        <div id="crew-setup-card">
+          <!-- Explicit Consent Warning (Section 5 Requirement) -->
+          <div class="consent-banner">
+            <strong>📍 Location Tracking Consent Notice:</strong>
+            <p style="margin-top: 0.25rem;">
+              By starting this shift, your smartphone GPS will securely stream periodic location pings to APSRTC SmartTrack to keep waiting passengers informed. The system does NOT track you once your shift ends.
+            </p>
+            <label class="consent-checkbox-row">
+              <input type="checkbox" id="gps-consent-checkbox" checked>
+              <span>I grant permission and authorize GPS transmission</span>
+            </label>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:0.9rem; margin-top: 1rem;">
+            <div class="form-group">
+              <label for="crew-id-select">Staff Crew Member (Badge ID) *</label>
+              <select id="crew-id-select"></select>
+            </div>
+
+            <div class="form-group">
+              <label for="crew-bus-input">Bus Number *</label>
+              <input type="text" id="crew-bus-input" value="415" placeholder="e.g. 415 or 302" required>
+            </div>
+
+            <div class="form-group">
+              <label for="crew-from-select">Starting Location</label>
+              <select id="crew-from-select"></select>
+            </div>
+
+            <div class="form-group">
+              <label for="crew-to-select">Destination</label>
+              <select id="crew-to-select"></select>
+            </div>
+
+            <button type="button" id="btn-start-trip" class="crew-btn-large btn-start" onclick="handleStartTrip()">
+              🚀 START TRIP & ACTIVATE GPS
+            </button>
+          </div>
+        </div>
+
+        <!-- ACTIVE SHIFT DASHBOARD (Visible during transit) -->
+        <div id="crew-active-dashboard" style="display: none;">
+          <div style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span id="dash-bus-number" style="font-family:'Outfit',sans-serif; font-size:1.3rem; font-weight:800; color:var(--navy-900);">BUS 415</span>
+              <span id="dash-trip-id" style="font-size:0.75rem; color:var(--navy-500); font-weight:700;">TRIP-415-001</span>
+            </div>
+            <div id="dash-corridor" style="font-size:0.85rem; font-weight:600; color:var(--apsrtc-green-dark); margin-top:0.2rem;">
+              Paderu ➔ Visakhapatnam
+            </div>
+          </div>
+
+          <!-- Speedometer & Telemetry Meters -->
+          <div class="speedometer-card">
+            <div style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: #94a3b8;">
+              Live Vehicle Speed
+            </div>
+            <div id="crew-speed-display" class="speed-number">40 km/h</div>
+
+            <div class="stats-row">
+              <div class="stat-box">
+                <span class="stat-label">Heartbeats</span>
+                <span id="crew-ping-counter" class="stat-val">0</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Accuracy</span>
+                <span id="crew-accuracy-display" class="stat-val">±10 m</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label">Coordinates</span>
+                <span id="crew-last-latlng" class="stat-val" style="font-size:0.75rem;">18.08, 82.66</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons (Section 5) -->
+          <div style="display:flex; flex-direction:column; gap:0.6rem; margin-top: 1.25rem;">
+            <button type="button" class="crew-btn-large btn-pause" onclick="handlePauseGps()">
+              ⏸️ PAUSE GPS STREAM
+            </button>
+            <button type="button" class="crew-btn-large btn-end" onclick="handleEndTrip()">
+              🛑 END TRIP & SIGN OFF
+            </button>
+            <button type="button" class="crew-btn-large btn-power-off" onclick="simulatePowerOff()" title="Simulates phone battery death or sudden signal loss">
+              ⚡ Test Stale Detection: Simulate Sudden Phone Power-Off
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/crew.js"></script>
+</body>
+</html>

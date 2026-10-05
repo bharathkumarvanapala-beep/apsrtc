@@ -248,6 +248,11 @@ function focusBus(busNumber) {
     const marker = busMarkers.get(key);
     mapInstance.setView(marker.getLatLng(), 14, { animate: true });
     marker.openPopup();
+
+    const mapEl = document.getElementById('fleetMap');
+    if (mapEl) {
+      mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 }
 

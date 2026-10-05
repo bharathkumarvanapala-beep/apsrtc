@@ -3,7 +3,7 @@
  * Handles bus directory, single bus lookup, and location queries.
  */
 
-const { queryAll, queryOne } = require('../config/db');
+const { queryAll, queryOne, run } = require('../config/db');
 const { resolveActiveSourceForBus } = require('../services/locationResolverService');
 
 function getAllBuses(req, res, next) {
@@ -152,8 +152,69 @@ function getBusLocation(req, res, next) {
   }
 }
 
+function createBus(req, res, next) {
+  try {
+    const { busNumber, registrationNumber, depot, serviceType, totalSeats } = req.body;
+    if (!busNumber || !registrationNumber) {
+      return res.status(400).json({ success: false, error: 'Bus Number and Registration Number are required.' });
+    }
+
+    const existing = queryOne('SELECT id FROM buses WHERE bus_number = ?', [busNumber]);
+    if (existing) {
+      return res.status(400).json({ success: false, error: `Bus Number ${busNumber} is already registered.` });
+    }
+
+    const result = run(`
+      INSERT INTO buses (bus_number, registration_number, depot, service_type, total_seats, status)
+      VALUES (?, ?, ?, ?, ?, 'ACTIVE')
+    `, [
+      busNumber.trim(),
+      registrationNumber.trim().toUpperCase(),
+      depot || 'Paderu',
+      serviceType || 'EXPRESS',
+      Number(totalSeats) || 45
+    ]);
+
+    const newBusId = result.lastInsertRowid;
+    run(`
+      INSERT INTO current_bus_locations (bus_id, bus_number, active_source, latitude, longitude, speed_kph, accuracy_meters, location_name, status, confidence)
+      VALUES (?, ?, 'DEMO', 18.0816, 82.6700, 0, 10, ?, 'RECENT', 'GOOD')
+    `, [newBusId, busNumber.trim(), (depot || 'Paderu') + ' RTC Bus Station']);
+
+    res.status(201).json({
+      success: true,
+      message: `Bus ${busNumber} registered successfully in APSRTC fleet database.`,
+      busId: newBusId
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+function updateBusStatus(req, res, next) {
+  try {
+    const { busId } = req.params;
+    const { status } = req.body;
+
+    if (!['ACTIVE', 'MAINTENANCE', 'STANDBY', 'DECOMMISSIONED'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid status value.' });
+    }
+
+    run('UPDATE buses SET status = ? WHERE bus_number = ? OR id = ?', [status, busId, Number(busId) || 0]);
+
+    res.json({
+      success: true,
+      message: `Bus ${busId} status updated to ${status}.`
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getAllBuses,
   getBusById,
-  getBusLocation
+  getBusLocation,
+  createBus,
+  updateBusStatus
 };

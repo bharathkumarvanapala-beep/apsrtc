@@ -26,14 +26,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (window.officerApp) {
     window.officerApp.init();
   }
+  if (window.adminApp) {
+    window.adminApp.init();
+  }
 
   // 4. Setup Global Tab Switching
   setupTabNavigation();
 
-  // Handle URL query parameter ?tab=crew / ?tab=officer / ?tab=simulator
+  // Handle URL query parameter ?tab=crew / ?tab=officer / ?tab=admin / ?tab=simulator
   const urlParams = new URLSearchParams(window.location.search);
   const tabParam = urlParams.get('tab');
-  if (tabParam && ['passenger', 'crew', 'officer', 'simulator'].includes(tabParam)) {
+  if (tabParam && ['passenger', 'crew', 'officer', 'admin', 'simulator'].includes(tabParam)) {
     switchTab(tabParam);
   }
 
@@ -75,6 +78,11 @@ function switchTab(tabId) {
   // Refresh officer table if switching to officer tab
   if (tabId === 'officer' && window.officerApp) {
     window.officerApp.loadFleetOverview();
+  }
+
+  // Refresh admin table if switching to admin tab
+  if (tabId === 'admin' && window.adminApp) {
+    window.adminApp.loadFleetAssets();
   }
 }
 

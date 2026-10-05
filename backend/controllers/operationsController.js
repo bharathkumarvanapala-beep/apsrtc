@@ -199,8 +199,74 @@ function triggerSosAlert(req, res, next) {
   }
 }
 
+function getDeviceRegistry(req, res, next) {
+  try {
+    const trackers = queryAll(`
+      SELECT 
+        g.id,
+        g.device_id,
+        g.imei,
+        g.firmware_version,
+        g.status,
+        g.last_heartbeat,
+        b.bus_number,
+        b.depot,
+        b.service_type
+      FROM gps_devices g
+      LEFT JOIN buses b ON b.id = g.bus_id
+      ORDER BY g.id ASC
+    `);
+
+    const etms = queryAll(`
+      SELECT 
+        e.id,
+        e.etm_id,
+        e.depot,
+        e.status,
+        e.last_heartbeat,
+        b.bus_number
+      FROM etm_devices e
+      LEFT JOIN buses b ON b.id = e.bus_id
+      ORDER BY e.id ASC
+    `);
+
+    res.json({
+      success: true,
+      trackers,
+      etms
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+function broadcastAnnouncement(req, res, next) {
+  try {
+    const { message, severity = 'INFO', category = 'ANNOUNCEMENT' } = req.body;
+    if (!message) {
+      return res.status(400).json({ success: false, error: 'Broadcast message text is required.' });
+    }
+
+    broadcastAlert({
+      alert_type: category,
+      severity,
+      message,
+      timestamp: new Date().toISOString()
+    });
+
+    res.json({
+      success: true,
+      message: 'Announcement broadcasted live across all passenger and crew dashboards.'
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   getFleetOverview,
   getAlerts,
-  triggerSosAlert
+  triggerSosAlert,
+  getDeviceRegistry,
+  broadcastAnnouncement
 };
