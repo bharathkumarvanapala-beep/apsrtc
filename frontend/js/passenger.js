@@ -522,16 +522,16 @@ async function handleComplaintSubmit(e) {
     });
 
     closeModal('complaintModal');
-
-    // Show custom official modal or alert with reference number
-    alert(`✅ APSRTC GRIEVANCE REGISTERED SUCCESSFULLY!\n\n` +
-          `Official Reference ID: ${res.referenceId}\n` +
-          `Target: ${targetType.replace('_', ' ')}\n` +
-          `Bus Number: ${busNumber}\n` +
-          `Category: ${category}\n\n` +
-          `Your complaint has been forwarded to the Depot Operations Controller & Maintenance Supervisor for immediate inquiry.`);
+    if (res.referenceId) {
+      localStorage.setItem('apsrtc_last_complaint', res.referenceId);
+    }
 
     document.getElementById('complaintForm').reset();
+
+    // Directly open the status dossier for the new grievance
+    setTimeout(() => {
+      trackComplaintModal(res.referenceId);
+    }, 250);
   } catch (err) {
     alert(`Submission Error: ${err.message}`);
   }
@@ -573,24 +573,336 @@ async function openBusDetailsModal(busNumber) {
   }
 }
 
-async function trackComplaintModal() {
-  const ref = prompt('Enter your APSRTC Grievance Reference ID (e.g. APSRTC-G-2026-1049):');
-  if (!ref || !ref.trim()) return;
+let currentTrackingComplaint = null;
+
+async function trackComplaintModal(refId = null) {
+  const modal = document.getElementById('complaintStatusModal');
+  const input = document.getElementById('trackComplaintInput');
+  if (!modal) return;
+
+  modal.classList.add('open');
+
+  const targetRef = (refId || (input ? input.value : '') || localStorage.getItem('apsrtc_last_complaint') || 'APSRTC-G-2026-9083').trim();
+  if (input) {
+    input.value = targetRef;
+  }
+
+  await loadAndRenderComplaintStatus(targetRef);
+}
+
+async function handleTrackSubmit(e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById('trackComplaintInput');
+  if (!input || !input.value.trim()) return;
+  await loadAndRenderComplaintStatus(input.value.trim());
+}
+
+async function loadAndRenderComplaintStatus(ref) {
+  const resultContainer = document.getElementById('complaintStatusResult');
+  if (!resultContainer) return;
+
+  resultContainer.innerHTML = `
+    <div style="text-align: center; padding: 2.5rem 1rem; color: #004230;">
+      <div class="pulse-dot" style="width: 14px; height: 14px; background: #006045; margin-bottom: 0.75rem;"></div>
+      <div style="font-weight: 700; font-size: 0.95rem;">Retrieving APSRTC Official Grievance Dossier...</div>
+      <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">Connecting to Regional Depot Grievance Redressal Cell</div>
+    </div>
+  `;
 
   try {
-    const res = await api.trackComplaint(ref.trim());
-    const c = res.complaint;
-    alert(`📋 APSRTC GRIEVANCE STATUS\n\n` +
-          `Reference ID: ${c.complaint_ref}\n` +
-          `Target: ${c.target_type}\n` +
-          `Bus Number: ${c.bus_number}\n` +
-          `Category: ${c.category}\n` +
-          `Status: ${c.status}\n` +
-          `Officer Action Notes: ${c.officer_notes || 'Under review by Depot Supervisor'}\n` +
-          `Filed Date: ${new Date(c.created_at).toLocaleString()}`);
+    const res = await api.trackComplaint(ref);
+    currentTrackingComplaint = res;
+    renderComplaintStatusModal(res.complaint, res.history);
   } catch (err) {
-    alert(`Grievance Not Found: ${err.message}`);
+    resultContainer.innerHTML = `
+      <div style="background: #fef2f2; border: 1.5px solid #f87171; border-radius: 8px; padding: 1.5rem; text-align: center; color: #991b1b;">
+        <span style="font-size: 2rem;">⚠️</span>
+        <h4 style="margin: 0.5rem 0 0.25rem;">Grievance Record Not Found</h4>
+        <p style="font-size: 0.82rem; color: #7f1d1d; margin-bottom: 1rem;">
+          No grievance record matches reference ID "<strong>${ref}</strong>". Please verify your SMS receipt code.
+        </p>
+        <div style="font-size: 0.75rem; color: #64748b;">
+          Try active sample complaints:
+          <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-9083')" style="color: #0369a1; background: #e0f2fe; padding: 2px 8px; margin: 2px;">Bus 518 (Broken Seats)</button>
+          <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-1011')" style="color: #991b1b; background: #fee2e2; padding: 2px 8px; margin: 2px;">Bus 415 (Rash Driving)</button>
+          <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-1049')" style="color: #166534; background: #dcfce7; padding: 2px 8px; margin: 2px;">Bus 415 (Delay)</button>
+        </div>
+      </div>
+    `;
   }
+}
+
+function renderComplaintStatusModal(complaint, history = []) {
+  const container = document.getElementById('complaintStatusResult');
+  if (!container) return;
+
+  const status = complaint.status || 'NEW';
+  
+  // Progress lifecycle steps calculation
+  const steps = [
+    { key: 'NEW', label: '1. Lodged', sub: 'Citizen Report Logged', icon: '📝' },
+    { key: 'ACKNOWLEDGED', label: '2. Depot Assigned', sub: 'Depot Manager Assigned', icon: '🏢' },
+    { key: 'INVESTIGATING', label: '3. Investigation', sub: 'Technical / Vigilance Review', icon: '🔍' },
+    { key: 'ACTION_TAKEN', label: '4. Action Taken', sub: 'Corrective Action Done', icon: '🛠️' },
+    { key: 'RESOLVED', label: '5. Resolved', sub: 'Quality Verified & Closed', icon: '✅' }
+  ];
+
+  const statusOrder = ['NEW', 'ACKNOWLEDGED', 'INVESTIGATING', 'ACTION_TAKEN', 'RESOLVED', 'CLOSED'];
+  const currentIndex = statusOrder.indexOf(status);
+
+  // Status color badges
+  let statusLabel = 'REGISTERED';
+  let statusBg = '#fee2e2';
+  let statusColor = '#991b1b';
+
+  if (status === 'ACKNOWLEDGED') {
+    statusLabel = 'ACKNOWLEDGED BY DEPOT';
+    statusBg = '#e0f2fe';
+    statusColor = '#0369a1';
+  } else if (status === 'INVESTIGATING') {
+    statusLabel = 'INQUIRY & INSPECTION IN PROGRESS';
+    statusBg = '#fef3c7';
+    statusColor = '#92400e';
+  } else if (status === 'ACTION_TAKEN') {
+    statusLabel = 'OFFICIAL ACTION TAKEN';
+    statusBg = '#dcfce7';
+    statusColor = '#166534';
+  } else if (status === 'RESOLVED' || status === 'CLOSED') {
+    statusLabel = 'RESOLVED & VERIFIED';
+    statusBg = '#bbf7d0';
+    statusColor = '#14532d';
+  }
+
+  // Target badge
+  let targetIcon = '⚠️';
+  let targetLabel = 'General Service Issue';
+  if (complaint.target_type === 'STAFF') {
+    targetIcon = '👨‍✈️';
+    targetLabel = 'Staff Misconduct (సిబ్బంది ప్రవర్తన)';
+  } else if (complaint.target_type === 'BUS_CONDITION') {
+    targetIcon = '🚌';
+    targetLabel = 'Bus Condition & Defect (బస్సు పరిస్థితి)';
+  } else if (complaint.target_type === 'SERVICE') {
+    targetIcon = '⏱️';
+    targetLabel = 'Route Schedule / Delay Issue (రవాణా సేవలు)';
+  }
+
+  // Build the timeline HTML
+  const timelineHtml = steps.map((step, idx) => {
+    const isCompleted = currentIndex >= idx;
+    const isCurrent = (currentIndex === idx) || (status === 'CLOSED' && idx === 4);
+    const circleBg = isCurrent ? '#006045' : (isCompleted ? '#16a34a' : '#e2e8f0');
+    const textColor = isCurrent ? '#004230' : (isCompleted ? '#15803d' : '#94a3b8');
+    const borderStyle = isCurrent ? '2px solid #ffb703' : 'none';
+
+    return `
+      <div style="flex: 1; text-align: center; position: relative; padding: 0 4px;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: ${circleBg}; color: #ffffff; display: flex; align-items: center; justify-content: center; margin: 0 auto 6px; font-size: 1rem; box-shadow: 0 2px 6px rgba(0,0,0,0.15); border: ${borderStyle};">
+          ${isCompleted ? (isCurrent ? step.icon : '✓') : step.icon}
+        </div>
+        <div style="font-size: 0.76rem; font-weight: 800; color: ${textColor}; line-height: 1.2;">${step.label}</div>
+        <div style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">${step.sub}</div>
+      </div>
+    `;
+  }).join('');
+
+  // Build Action Taken Card
+  const hasActionTaken = Boolean(complaint.officer_notes);
+  const actionBanner = `
+    <div style="background: ${hasActionTaken ? '#f0fdf4' : '#fffbeb'}; border: 2px solid ${hasActionTaken ? '#22c55e' : '#f59e0b'}; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.4rem;">${hasActionTaken ? '🛡️' : '⏳'}</span>
+          <h4 style="margin: 0; color: ${hasActionTaken ? '#14532d' : '#92400e'}; font-size: 1rem; font-weight: 800;">
+            ${hasActionTaken ? 'APSRTC OFFICIAL ACTION TAKEN & REMEDIAL MEASURE' : 'CURRENT STATUS: UNDER ACTIVE INQUIRY'}
+          </h4>
+        </div>
+        <span style="background: ${statusBg}; color: ${statusColor}; font-weight: 800; font-size: 0.75rem; padding: 4px 10px; border-radius: 20px; text-transform: uppercase;">
+          ${statusLabel}
+        </span>
+      </div>
+
+      <div style="background: #ffffff; border: 1px solid ${hasActionTaken ? '#bbf7d0' : '#fde68a'}; border-radius: 8px; padding: 0.85rem 1rem; font-size: 0.9rem; line-height: 1.6; color: #1e293b; margin-bottom: 0.75rem;">
+        <strong style="color: #004230; font-size: 0.82rem; text-transform: uppercase;">Action Taken Summary / అధికారులు చేపట్టిన చర్య:</strong><br>
+        <span style="color: ${hasActionTaken ? '#065f46' : '#64748b'}; font-weight: ${hasActionTaken ? '600' : '400'}; display: block; margin-top: 4px;">
+          ${complaint.officer_notes || 'The assigned Regional Depot Vigilance Officer & Depot Manager are currently reviewing this incident report. Necessary vehicle inspection or crew inquiry is in progress under APSRTC Citizen Service Standards.'}
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; font-size: 0.75rem; color: #475569;">
+        <div>
+          <strong>Responsible Authority:</strong><br>
+          <span style="color: #004230; font-weight: 700;">🏢 ${complaint.depot || 'Paderu'} RTC Depot & Vigilance Cell</span>
+        </div>
+        <div>
+          <strong>Last Action Recorded:</strong><br>
+          <span>📅 ${new Date(complaint.updated_at || complaint.created_at).toLocaleString()}</span>
+        </div>
+        <div>
+          <strong>APSRTC Citizen Charter:</strong><br>
+          <span style="color: #166534; font-weight: 700;">⚡ 24-Hour Redressal SLA Active</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Build Incident Dossier (What Happened)
+  const incidentCard = `
+    <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h4 style="margin: 0; color: #004230; font-weight: 800; font-size: 0.95rem;">
+          📋 INCIDENT REPORT DOSSIER (ఏమి జరిగింది / పూర్తి వివరాలు)
+        </h4>
+        <span style="font-family: monospace; font-weight: 800; color: #006045; background: #e0f2fe; padding: 3px 8px; border-radius: 4px; font-size: 0.85rem;">
+          Ref: ${complaint.complaint_ref}
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 0.85rem; font-size: 0.82rem;">
+        <div>
+          <span style="color: #64748b; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Target Type</span><br>
+          <strong>${targetIcon} ${targetLabel}</strong>
+        </div>
+        <div>
+          <span style="color: #64748b; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Bus Involved</span><br>
+          <strong style="color: #006045; font-size: 0.95rem;">Bus ${complaint.bus_number}</strong>
+          <span style="color: #64748b; font-size: 0.75rem;">(${complaint.registration_number || 'AP-39-Z-' + complaint.bus_number})</span>
+        </div>
+        <div>
+          <span style="color: #64748b; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Service & Depot</span><br>
+          <strong>${(complaint.service_type || 'EXPRESS').replace('_', ' ')} • ${complaint.depot || 'Paderu'} Depot</strong>
+        </div>
+        <div>
+          <span style="color: #64748b; font-size: 0.72rem; text-transform: uppercase; font-weight: 700;">Incident Location</span><br>
+          <strong>📍 ${complaint.location || 'Eastern Ghats Corridor Route'}</strong>
+        </div>
+      </div>
+
+      <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 0.85rem; margin-bottom: 0.75rem;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; margin-bottom: 0.2rem; text-transform: uppercase;">Specific Grievance Reason:</div>
+        <div style="font-weight: 800; color: #b91c1c; font-size: 0.9rem; margin-bottom: 0.6rem;">${complaint.category}</div>
+        <div style="font-size: 0.72rem; font-weight: 700; color: #64748b; margin-bottom: 0.2rem; text-transform: uppercase;">Complainant Statement / సంఘటన వివరణ:</div>
+        <div style="font-size: 0.85rem; line-height: 1.5; color: #1e293b; background: #f8fafc; padding: 0.6rem 0.8rem; border-radius: 4px; border-left: 3px solid #b91c1c;">
+          "${complaint.description}"
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; flex-wrap: wrap; gap: 0.5rem;">
+        <div>Complainant: <strong>${complaint.passenger_name || 'Passenger'}</strong> ${complaint.passenger_phone ? `(${complaint.passenger_phone})` : ''}</div>
+        <div>Lodged Date: <strong>${new Date(complaint.created_at).toLocaleString()}</strong></div>
+      </div>
+    </div>
+  `;
+
+  // Build History / Investigation Trail
+  let historyCard = '';
+  if (history && history.length > 0) {
+    const historyRows = history.map(h => `
+      <div style="display: flex; gap: 0.85rem; padding: 0.65rem 0; border-bottom: 1px dashed #e2e8f0;">
+        <div style="min-width: 140px; font-size: 0.72rem; color: #64748b;">
+          <strong>${new Date(h.created_at).toLocaleString()}</strong>
+        </div>
+        <div style="flex: 1;">
+          <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem; flex-wrap: wrap;">
+            <span style="font-size: 0.7rem; font-weight: 800; background: #e2e8f0; color: #1e293b; padding: 1px 6px; border-radius: 3px;">${h.old_status || 'INIT'}</span>
+            <span style="font-size: 0.7rem; color: #64748b;">➔</span>
+            <span style="font-size: 0.7rem; font-weight: 800; background: #dcfce7; color: #166534; padding: 1px 6px; border-radius: 3px;">${h.new_status}</span>
+            <span style="font-size: 0.72rem; font-weight: 700; color: #004230; margin-left: 0.3rem;">By: ${h.changed_by}</span>
+          </div>
+          <div style="font-size: 0.8rem; color: #334155; line-height: 1.4;">${h.notes || 'Status updated'}</div>
+        </div>
+      </div>
+    `).join('');
+
+    historyCard = `
+      <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 1.25rem;">
+        <h4 style="margin: 0 0 0.75rem 0; color: #004230; font-weight: 800; font-size: 0.95rem;">
+          📜 OFFICIAL INVESTIGATION AUDIT TRAIL (కాలక్రమ విచారణ & చర్యల రికార్డు)
+        </h4>
+        <div>${historyRows}</div>
+      </div>
+    `;
+  }
+
+  // Put it all together
+  container.innerHTML = `
+    <!-- Top Stepper -->
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 1.25rem 0.5rem; margin-bottom: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; position: relative;">
+        ${timelineHtml}
+      </div>
+    </div>
+
+    <!-- Official Action Taken Highlight -->
+    ${actionBanner}
+
+    <!-- Incident Dossier -->
+    ${incidentCard}
+
+    <!-- Historical Audit Trail -->
+    ${historyCard}
+  `;
+}
+
+function printGrievanceReceipt() {
+  if (!currentTrackingComplaint || !currentTrackingComplaint.complaint) {
+    alert('Please track a grievance first to print receipt.');
+    return;
+  }
+  const c = currentTrackingComplaint.complaint;
+  const printWindow = window.open('', '_blank', 'width=720,height=620');
+  if (!printWindow) {
+    window.print();
+    return;
+  }
+  printWindow.document.write(`
+    <html>
+      <head>
+        <title>APSRTC Grievance Slip - ${c.complaint_ref}</title>
+        <style>
+          body { font-family: 'Segoe UI', Arial, sans-serif; padding: 24px; color: #1e293b; line-height: 1.5; }
+          .header { border-bottom: 3px solid #006045; padding-bottom: 12px; margin-bottom: 16px; }
+          .badge { display: inline-block; padding: 4px 8px; background: #006045; color: #fff; font-weight: bold; border-radius: 4px; }
+          .box { border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; margin: 12px 0; background: #f8fafc; }
+          table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+          td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
+          td.label { font-weight: bold; width: 35%; color: #475569; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h2 style="color: #004230; margin: 0;">Andhra Pradesh State Road Transport Corporation</h2>
+          <div style="font-size: 12px; color: #64748b;">Official Citizen Passenger Grievance Acknowledgement & Action Taken Slip</div>
+        </div>
+        <div><strong>Reference ID:</strong> <span class="badge">${c.complaint_ref}</span></div>
+        <table>
+          <tr><td class="label">Current Status:</td><td><strong>${c.status}</strong></td></tr>
+          <tr><td class="label">Target Category:</td><td>${c.target_type}</td></tr>
+          <tr><td class="label">Bus Number:</td><td>Bus ${c.bus_number} (${c.registration_number || 'APSRTC'})</td></tr>
+          <tr><td class="label">Operating Depot:</td><td>${c.depot || 'Paderu'} Depot</td></tr>
+          <tr><td class="label">Grievance Reason:</td><td>${c.category}</td></tr>
+          <tr><td class="label">Complainant Statement:</td><td>"${c.description}"</td></tr>
+          <tr><td class="label">Reported Location:</td><td>${c.location || 'Corridor Route'}</td></tr>
+          <tr><td class="label">Complainant Name:</td><td>${c.passenger_name || 'Passenger'} (${c.passenger_phone || 'N/A'})</td></tr>
+          <tr><td class="label">Lodged Date:</td><td>${new Date(c.created_at).toLocaleString()}</td></tr>
+        </table>
+        <div class="box">
+          <strong style="color: #006045;">Official Action Taken / Depot Findings:</strong><br>
+          <div style="margin-top: 6px; font-size: 13px; line-height: 1.5; color: #065f46; font-weight: 600;">
+            ${c.officer_notes || 'Investigation active under Regional Depot Vigilance Officer.'}
+          </div>
+        </div>
+        <div style="margin-top: 24px; font-size: 11px; color: #94a3b8; text-align: center;">
+          This is an official computer-generated receipt from APSRTC SmartTrack Telemetry & Redressal Portal. 24x7 Helpline: 149
+        </div>
+      </body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => {
+    printWindow.print();
+  }, 350);
 }
 
 function closeModal(modalId) {
@@ -620,6 +932,8 @@ window.passengerApp = {
   openComplaintModal,
   openBusDetailsModal,
   trackComplaintModal,
+  handleTrackSubmit,
+  printGrievanceReceipt,
   selectComplaintTarget,
   closeModal
 };

@@ -72,7 +72,8 @@ function createComplaint(req, res, next) {
 function trackComplaintByRef(req, res, next) {
   try {
     const { ref } = req.params;
-    const complaint = queryOne('SELECT * FROM complaints WHERE complaint_ref = ?', [ref.trim().toUpperCase()]);
+    const cleanRef = (ref || '').trim().toUpperCase();
+    const complaint = queryOne('SELECT * FROM complaints WHERE complaint_ref = ? OR UPPER(complaint_ref) = ? OR id = ?', [cleanRef, cleanRef, cleanRef]);
     if (!complaint) {
       return res.status(404).json({
         success: false,
@@ -82,9 +83,17 @@ function trackComplaintByRef(req, res, next) {
 
     const history = queryAll('SELECT * FROM complaint_status_history WHERE complaint_id = ? ORDER BY created_at DESC', [complaint.id]);
 
+    // Attach depot & bus metadata
+    const bus = queryOne('SELECT depot, service_type, registration_number FROM buses WHERE bus_number = ?', [complaint.bus_number]);
+
     res.json({
       success: true,
-      complaint,
+      complaint: {
+        ...complaint,
+        depot: bus?.depot || 'Regional Depot',
+        service_type: bus?.service_type || 'EXPRESS',
+        registration_number: bus?.registration_number || `AP-39-Z-${complaint.bus_number}`
+      },
       history
     });
   } catch (err) {
@@ -133,15 +142,7 @@ function getComplaints(req, res, next) {
 function updateComplaintStatus(req, res, next) {
   try {
     const { id } = req.params;
-    const { status, officerNotes, officerName } = req.body;
-
-    const validStatuses = ['NEW', 'ACKNOWLEDGED', 'INVESTIGATING', 'ACTION_TAKEN', 'RESOLVED', 'CLOSED'];
-    if (!validStatuses.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
-      });
-    }
+    const { status, officerNotes, officerName, actionTaken } = req.body;
 
     const complaint = queryOne('SELECT * FROM complaints WHERE id = ? OR complaint_ref = ?', [id, id]);
     if (!complaint) {
@@ -151,13 +152,23 @@ function updateComplaintStatus(req, res, next) {
       });
     }
 
+    const targetStatus = status || complaint.status;
+    const validStatuses = ['NEW', 'ACKNOWLEDGED', 'INVESTIGATING', 'ACTION_TAKEN', 'RESOLVED', 'CLOSED'];
+    if (!validStatuses.includes(targetStatus)) {
+      return res.status(400).json({
+        success: false,
+        error: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+      });
+    }
+
     const oldStatus = complaint.status;
+    const notesToSave = (actionTaken || officerNotes || '').trim() || complaint.officer_notes || 'Status updated by Depot Officer';
 
     run(`
       UPDATE complaints 
-      SET status = ?, officer_notes = COALESCE(?, officer_notes), updated_at = datetime('now')
+      SET status = ?, officer_notes = ?, updated_at = datetime('now')
       WHERE id = ?
-    `, [status, officerNotes || null, complaint.id]);
+    `, [targetStatus, notesToSave, complaint.id]);
 
     // Record status history audit
     run(`
@@ -166,9 +177,9 @@ function updateComplaintStatus(req, res, next) {
     `, [
       complaint.id,
       oldStatus,
-      status,
+      targetStatus,
       officerName || 'Depot Officer',
-      officerNotes || 'Status updated'
+      notesToSave
     ]);
 
     const updated = queryOne('SELECT * FROM complaints WHERE id = ?', [complaint.id]);
@@ -177,7 +188,7 @@ function updateComplaintStatus(req, res, next) {
 
     res.json({
       success: true,
-      message: `Complaint ${complaint.complaint_ref} updated to ${status}`,
+      message: `Complaint ${complaint.complaint_ref} updated to ${targetStatus}`,
       complaint: updated
     });
   } catch (err) {

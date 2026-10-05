@@ -183,11 +183,11 @@ const api = {
     return json;
   },
 
-  updateComplaintStatus: async (id, status, notes = '') => {
+  updateComplaintStatus: async (id, status, notes = '', officerName = '') => {
     const res = await fetch(`${API_BASE}/api/v1/complaints/${id}/status`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status, officerNotes: notes })
+      body: JSON.stringify({ status, officerNotes: notes, officerName, actionTaken: notes })
     });
     return res.json();
   },

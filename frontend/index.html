@@ -904,6 +904,120 @@
   </div>
 
   <!-- ========================================== -->
+  <!-- 8B. MODAL: PASSENGER GRIEVANCE STATUS & ACTION TAKEN -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="complaintStatusModal">
+    <div class="modal-dialog" style="max-width: 760px; max-height: 90vh;">
+      <div class="modal-header" style="background: #003325; color: #ffffff;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.5rem;">📋</span>
+          <div>
+            <h3 style="color: #ffb703; margin: 0; font-size: 1.15rem;">APSRTC Grievance Tracking & Action Taken Portal</h3>
+            <div style="font-size: 0.72rem; color: #cbd5e1;">ప్రయాణీకుల ఫిర్యాదు స్థితి & అధికారులు తీసుకున్న చర్యల నివేదిక</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('complaintStatusModal')">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem; max-height: calc(85vh - 120px); overflow-y: auto;">
+        <!-- Search & Quick Selection Row -->
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
+          <form id="trackComplaintSearchForm" onsubmit="passengerApp.handleTrackSubmit(event)" style="display: flex; gap: 0.5rem; margin-bottom: 0.6rem;">
+            <input type="text" id="trackComplaintInput" class="search-input" placeholder="Enter Ref ID e.g. APSRTC-G-2026-9083" style="font-weight: 700; text-transform: uppercase;" required>
+            <button type="submit" class="btn-primary" style="background: #006045; white-space: nowrap; padding: 0.6rem 1.25rem;">
+              🔍 Track Status
+            </button>
+          </form>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.75rem; color: #64748b;">
+            <span style="font-weight: 700; color: #004230;">Quick Check:</span>
+            <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-9083')" style="color: #0369a1; background: #e0f2fe; padding: 2px 8px; font-size: 0.72rem;">Bus 518 (Broken Seats)</button>
+            <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-1011')" style="color: #991b1b; background: #fee2e2; padding: 2px 8px; font-size: 0.72rem;">Bus 415 (Rash Driving)</button>
+            <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-1049')" style="color: #166534; background: #dcfce7; padding: 2px 8px; font-size: 0.72rem;">Bus 415 (Delay)</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Container for Result -->
+        <div id="complaintStatusResult">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 0.72rem; color: #64748b;">
+          APSRTC Citizen Grievance Redressal Cell &bull; 24x7 Helpline: <strong>149</strong>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn-secondary" onclick="passengerApp.printGrievanceReceipt()">🖨️ Print Slip</button>
+          <button type="button" class="btn-primary" style="background: #006045;" onclick="passengerApp.closeModal('complaintStatusModal')">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 8C. MODAL: OFFICER RECORD ACTION TAKEN     -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="officerActionModal">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header" style="background: #004230; color: #ffffff;">
+        <div>
+          <h3 style="color: #ffb703; margin: 0; font-size: 1.1rem;">📝 Record Official Action Taken & Resolution</h3>
+          <div style="font-size: 0.72rem; color: #cbd5e1;">డిపో మేనేజర్ అధికారిక చర్య & పరిష్కార నివేదిక</div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('officerActionModal')">&times;</button>
+      </div>
+
+      <form id="officerActionForm" onsubmit="officerApp.submitActionTaken(event)">
+        <div class="modal-body">
+          <input type="hidden" id="actionComplaintId">
+
+          <!-- Summary banner of selected complaint -->
+          <div id="actionComplaintSummary" style="background: #f8fafc; border-left: 3.5px solid #006045; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.82rem;">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="actionStatusSelect">Updated Grievance Status / ప్రస్తుత స్థితి</label>
+            <select id="actionStatusSelect" class="search-select" required>
+              <option value="ACKNOWLEDGED">🔵 ACKNOWLEDGED - Depot Officer Assigned</option>
+              <option value="INVESTIGATING">🟠 INVESTIGATING - Mechanical / Vigilance Inquiry Active</option>
+              <option value="ACTION_TAKEN" selected>🟢 ACTION TAKEN - Remedial / Disciplinary Action Executed</option>
+              <option value="RESOLVED">✅ RESOLVED - Problem Rectified & Fitness Certified</option>
+              <option value="CLOSED">🔒 CLOSED - Case Formally Closed</option>
+            </select>
+          </div>
+
+          <!-- Quick Action Templates / Presets -->
+          <label class="search-label">1-Click Official Action Presets (సిద్ధంగా ఉన్న చర్యలు)</label>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('workshop')" style="background: #e0f2fe; color: #0369a1; font-size: 0.72rem; padding: 3px 8px;">🛠️ Workshop Repair Done</button>
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('crew_warning')" style="background: #fee2e2; color: #991b1b; font-size: 0.72rem; padding: 3px 8px;">👨‍✈️ Crew Warning Memo</button>
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('standby_bus')" style="background: #fef3c7; color: #92400e; font-size: 0.72rem; padding: 3px 8px;">🚌 Standby Bus Deployed</button>
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('inspection_active')" style="background: #f1f5f9; color: #334155; font-size: 0.72rem; padding: 3px 8px;">🔍 Bay Inspection Active</button>
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="actionNotesText">Action Taken Details / తీసుకున్న చర్య వివరాలు</label>
+            <textarea id="actionNotesText" rows="4" class="search-input" style="height: auto; font-size: 0.85rem;" placeholder="Specify exact mechanical repairs done, spare parts replaced, crew disciplinary memo number, or route adjustment details..." required></textarea>
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="actionOfficerName">Authorized Officer Name & Title</label>
+            <input type="text" id="actionOfficerName" class="search-input" value="K. Satyanarayana, Senior Depot Manager & Vigilance Officer, Paderu" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('officerActionModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="background: #006045;">
+            💾 Save & Dispatch Official Action
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
   <!-- MODAL: ADMIN AUTHENTICATION GATE           -->
   <!-- ========================================== -->
   <div class="modal-backdrop" id="adminAuthModal">

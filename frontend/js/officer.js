@@ -174,6 +174,8 @@ async function loadComplaintsTable() {
   }
 }
 
+let selectedComplaintForAction = null;
+
 function renderComplaintsTable(complaints) {
   const tbody = document.getElementById('officerComplaintsTableBody');
   if (!tbody) return;
@@ -193,36 +195,127 @@ function renderComplaintsTable(complaints) {
       targetBadge = `<span style="display: inline-block; background: #e0f2fe; color: #0369a1; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; margin-bottom: 2px;">⏱️ Service</span>`;
     }
 
+    const hasAction = Boolean(c.officer_notes);
+
     return `
     <tr>
-      <td><strong>${c.complaint_ref}</strong></td>
+      <td>
+        <strong style="color: #004230; font-size: 0.9rem;">${c.complaint_ref}</strong>
+      </td>
       <td>
         ${targetBadge}<br>
         <span class="bus-num-pill" style="font-size: 0.85rem; padding: 2px 6px;">Bus ${c.bus_number}</span>
       </td>
       <td><strong>${c.category}</strong></td>
-      <td style="max-width: 250px;">
-        <div style="font-size: 0.8rem; font-weight: 600;">${c.description}</div>
-        ${c.location ? `<div style="font-size: 0.72rem; color: #006045;">📍 ${c.location}</div>` : ''}
+      <td style="max-width: 280px;">
+        <div style="font-size: 0.82rem; font-weight: 600; color: #1e293b;">${c.description}</div>
+        ${c.location ? `<div style="font-size: 0.72rem; color: #006045; margin-top: 2px;">📍 ${c.location}</div>` : ''}
         <span style="font-size: 0.72rem; color: #64748b;">By: ${c.passenger_name} (${c.passenger_phone || 'No phone'})</span>
+        
+        <!-- Live Action Taken Preview -->
+        <div style="margin-top: 5px; padding: 4px 6px; background: ${hasAction ? '#f0fdf4' : '#fffbeb'}; border-left: 3px solid ${hasAction ? '#22c55e' : '#f59e0b'}; border-radius: 3px; font-size: 0.75rem;">
+          <strong style="color: ${hasAction ? '#15803d' : '#92400e'};">🛠️ Action Taken:</strong>
+          <span style="color: #334155; line-height: 1.3; display: block;">${c.officer_notes || 'Pending depot inspection'}</span>
+        </div>
       </td>
       <td>
         <span class="status-badge-complaint ${c.status}">${c.status}</span>
       </td>
       <td style="font-size: 0.75rem; color: #64748b;">${new Date(c.created_at).toLocaleString()}</td>
-      <td>
-        <select onchange="officerApp.updateStatus('${c.id}', this.value)" style="font-size: 0.75rem; padding: 4px; border-radius: 4px; border: 1px solid #cbd5e1;">
-          <option value="NEW" ${c.status === 'NEW' ? 'selected' : ''}>NEW</option>
-          <option value="ACKNOWLEDGED" ${c.status === 'ACKNOWLEDGED' ? 'selected' : ''}>ACKNOWLEDGED</option>
-          <option value="INVESTIGATING" ${c.status === 'INVESTIGATING' ? 'selected' : ''}>INVESTIGATING</option>
-          <option value="ACTION_TAKEN" ${c.status === 'ACTION_TAKEN' ? 'selected' : ''}>ACTION TAKEN</option>
-          <option value="RESOLVED" ${c.status === 'RESOLVED' ? 'selected' : ''}>RESOLVED</option>
-          <option value="CLOSED" ${c.status === 'CLOSED' ? 'selected' : ''}>CLOSED</option>
-        </select>
+      <td style="white-space: nowrap;">
+        <button type="button" class="btn-primary" style="padding: 5px 9px; font-size: 0.75rem; background: #006045; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="officerApp.openActionModal('${c.id}')">
+          📝 Record Action
+        </button>
+        <div style="margin-top: 4px;">
+          <button type="button" class="gov-link-btn" style="padding: 2px 6px; font-size: 0.7rem; color: #0369a1; background: #e0f2fe;" onclick="passengerApp.trackComplaintModal('${c.complaint_ref}')">
+            🔍 View Dossier
+          </button>
+        </div>
       </td>
     </tr>
     `;
   }).join('');
+}
+
+function openActionModal(id) {
+  const complaint = complaintsData.find(c => String(c.id) === String(id) || c.complaint_ref === id);
+  if (!complaint) return;
+
+  selectedComplaintForAction = complaint;
+
+  const modal = document.getElementById('officerActionModal');
+  const summaryBox = document.getElementById('actionComplaintSummary');
+  const idInput = document.getElementById('actionComplaintId');
+  const statusSelect = document.getElementById('actionStatusSelect');
+  const notesText = document.getElementById('actionNotesText');
+
+  if (idInput) idInput.value = complaint.id;
+  if (statusSelect) statusSelect.value = (complaint.status === 'NEW' || complaint.status === 'ACKNOWLEDGED') ? 'ACTION_TAKEN' : complaint.status;
+  if (notesText) notesText.value = complaint.officer_notes || '';
+
+  if (summaryBox) {
+    summaryBox.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+        <strong style="color: #004230; font-size: 0.95rem;">Grievance: ${complaint.complaint_ref}</strong>
+        <span class="status-badge-complaint ${complaint.status}">${complaint.status}</span>
+      </div>
+      <div><strong>Bus:</strong> Bus ${complaint.bus_number} &bull; <strong>Target:</strong> ${complaint.target_type}</div>
+      <div><strong>Category:</strong> ${complaint.category}</div>
+      <div style="color: #475569; margin-top: 3px; font-style: italic; background: #ffffff; padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+        "${complaint.description}"
+      </div>
+      <div style="font-size: 0.72rem; color: #64748b; margin-top: 4px;">Filed by: <strong>${complaint.passenger_name}</strong> on ${new Date(complaint.created_at).toLocaleString()}</div>
+    `;
+  }
+
+  if (modal) modal.classList.add('open');
+}
+
+function fillActionPreset(type) {
+  const notesText = document.getElementById('actionNotesText');
+  const statusSelect = document.getElementById('actionStatusSelect');
+  if (!notesText) return;
+
+  const busNo = selectedComplaintForAction ? selectedComplaintForAction.bus_number : 'the bus';
+
+  if (type === 'workshop') {
+    notesText.value = `Bus ${busNo} brought into Paderu Depot Mechanical Bay #2. Mechanical inspection completed, defective seating/hardware repaired and tightened, fit-to-run certificate issued.`;
+    if (statusSelect) statusSelect.value = 'ACTION_TAKEN';
+  } else if (type === 'crew_warning') {
+    notesText.value = `Duty crew on Bus ${busNo} summoned to Depot Manager chamber. Official written warning memo served under APSRTC Disciplinary Rules. Roster updated for mandatory road safety counseling.`;
+    if (statusSelect) statusSelect.value = 'ACTION_TAKEN';
+  } else if (type === 'standby_bus') {
+    notesText.value = `Backup standby vehicle dispatched from Regional Depot to replace delayed Bus ${busNo}. Passenger transit cleared with zero additional delay.`;
+    if (statusSelect) statusSelect.value = 'RESOLVED';
+  } else if (type === 'inspection_active') {
+    notesText.value = `Junior Mechanical Engineer and Depot Vigilance Officer dispatched to bus halt for physical verification and telemetry speed audit on Bus ${busNo}.`;
+    if (statusSelect) statusSelect.value = 'INVESTIGATING';
+  }
+}
+
+async function submitActionTaken(e) {
+  if (e) e.preventDefault();
+  const id = document.getElementById('actionComplaintId')?.value;
+  const status = document.getElementById('actionStatusSelect')?.value;
+  const notes = document.getElementById('actionNotesText')?.value;
+  const officerName = document.getElementById('actionOfficerName')?.value || 'Depot Manager';
+
+  if (!id) return;
+
+  try {
+    await api.updateComplaintStatus(id, status, notes, officerName);
+    passengerApp.closeModal('officerActionModal');
+    await loadComplaintsTable();
+    await loadFleetOverview();
+
+    alert(`✅ OFFICIAL ACTION DISPATCHED!\n\n` +
+          `Status: ${status}\n` +
+          `Officer: ${officerName}\n` +
+          `Action Notes: ${notes}\n\n` +
+          `Passengers tracking this complaint will immediately see this updated resolution dossier.`);
+  } catch (err) {
+    alert(`Failed to save action: ${err.message}`);
+  }
 }
 
 function applyGrievanceFilter(targetType) {
@@ -235,17 +328,7 @@ function applyGrievanceFilter(targetType) {
 }
 
 async function updateStatus(id, newStatus) {
-  const notes = prompt(`Enter officer investigation notes for status "${newStatus}":`, 'Reviewed by Depot Manager');
-  if (notes === null) return;
-
-  try {
-    await api.updateComplaintStatus(id, newStatus, notes);
-    await loadComplaintsTable();
-    await loadFleetOverview();
-    alert(`Complaint status updated to ${newStatus}`);
-  } catch (err) {
-    alert(`Failed to update status: ${err.message}`);
-  }
+  openActionModal(id);
 }
 
 function formatSource(source) {
@@ -263,5 +346,8 @@ window.officerApp = {
   loadFleetOverview,
   handleFailoverTest,
   updateStatus,
+  openActionModal,
+  fillActionPreset,
+  submitActionTaken,
   applyGrievanceFilter
 };
