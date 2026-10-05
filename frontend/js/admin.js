@@ -1,28 +1,73 @@
 /**
  * APSRTC SmartTrack Admin Control Module
- * Depot fleet registration, crew duty assignments, GPS hardware registry, and emergency broadcasts.
+ * Secure Depot Fleet Registration, Device Registry, and Emergency Broadcasts.
+ * Protected by Administrative Security Gate: Unauthorized users cannot view console.
  */
 
 let adminFleetData = [];
 
 async function initAdmin() {
   console.log('⚙️ Initializing APSRTC Admin Control Module...');
-  await loadFleetAssets();
-  await loadDeviceInventory();
   setupAdminEvents();
+  checkAuthUI();
+
+  if (api.isAdminAuthenticated()) {
+    await loadFleetAssets();
+    await loadDeviceInventory();
+  }
+}
+
+function checkAuthUI() {
+  const isAuth = api.isAdminAuthenticated();
+  const navTab = document.getElementById('navTabAdmin');
+  const gateLock = document.getElementById('adminAuthGateLock');
+  const consoleContent = document.getElementById('adminConsoleContent');
+  const authTopBadge = document.getElementById('adminTopAuthBadge');
+
+  if (navTab) {
+    navTab.style.display = isAuth ? 'flex' : 'none';
+  }
+
+  if (gateLock) {
+    gateLock.style.display = isAuth ? 'none' : 'block';
+  }
+
+  if (consoleContent) {
+    consoleContent.style.display = isAuth ? 'block' : 'none';
+  }
+
+  if (authTopBadge) {
+    if (isAuth) {
+      authTopBadge.innerHTML = `
+        <span style="color: #4ade80; font-weight: 700;">🟢 Depot Admin</span>
+        <button type="button" class="gov-link-btn" onclick="adminApp.logout()" style="background: rgba(220, 38, 38, 0.4); border-color: rgba(248, 113, 113, 0.4);">
+          🚪 Sign Out
+        </button>
+      `;
+    } else {
+      authTopBadge.innerHTML = `
+        <button type="button" class="gov-link-btn" onclick="adminApp.openLoginModal()" style="background: rgba(255, 255, 255, 0.12);">
+          🔒 Staff / Depot Login
+        </button>
+      `;
+    }
+  }
 }
 
 function setupAdminEvents() {
+  // 1. Bus Registration Form
   const regForm = document.getElementById('adminRegisterBusForm');
   if (regForm) {
     regForm.addEventListener('submit', handleRegisterBus);
   }
 
+  // 2. Broadcast Form
   const broadcastForm = document.getElementById('adminBroadcastForm');
   if (broadcastForm) {
     broadcastForm.addEventListener('submit', handleBroadcastSubmit);
   }
 
+  // 3. Search Filter
   const searchInput = document.getElementById('adminFleetSearch');
   if (searchInput) {
     searchInput.addEventListener('input', () => {
@@ -36,9 +81,69 @@ function setupAdminEvents() {
       renderFleetAssetsTable(filtered);
     });
   }
+
+  // 4. Modal Login Form
+  const modalLoginForm = document.getElementById('adminModalLoginForm');
+  if (modalLoginForm) {
+    modalLoginForm.addEventListener('submit', (e) => handleLoginSubmit(e, 'modal'));
+  }
+
+  // 5. In-Page Gate Login Form
+  const gateLoginForm = document.getElementById('adminGateLoginForm');
+  if (gateLoginForm) {
+    gateLoginForm.addEventListener('submit', (e) => handleLoginSubmit(e, 'gate'));
+  }
+}
+
+async function handleLoginSubmit(e, source = 'modal') {
+  e.preventDefault();
+  const userField = source === 'modal' ? 'adminModalUser' : 'adminGateUser';
+  const passField = source === 'modal' ? 'adminModalPass' : 'adminGatePass';
+  const pinField = source === 'modal' ? 'adminModalPin' : 'adminGatePin';
+
+  const username = document.getElementById(userField)?.value?.trim() || '';
+  const password = document.getElementById(passField)?.value?.trim() || '';
+  const pin = document.getElementById(pinField)?.value?.trim() || '';
+
+  try {
+    const res = await api.adminLogin({ username, password, pin });
+    closeModal('adminAuthModal');
+    checkAuthUI();
+    await loadFleetAssets();
+    await loadDeviceInventory();
+
+    // Switch to admin view automatically
+    if (window.app && window.app.switchTab) {
+      window.app.switchTab('admin');
+    }
+
+    alert(`✅ APSRTC DEPOT ADMIN AUTHENTICATED!\n\n` +
+          `Welcome, ${res.admin?.name || 'Depot Officer'}.\n` +
+          `Assigned: ${res.admin?.depot || 'Headquarters'}\n\n` +
+          `Administrative fleet tools and broadcast controls are now active.`);
+  } catch (err) {
+    alert(`❌ Authentication Failed: ${err.message}\n\nHint for Demo: Enter PIN "2026" or Username "admin" / Password "apsrtc@admin2026".`);
+  }
+}
+
+function logout() {
+  api.logoutAdmin();
+  checkAuthUI();
+  if (window.app && window.app.switchTab) {
+    window.app.switchTab('passenger');
+  }
+  alert('🚪 You have been signed out from APSRTC Depot Admin Console.');
+}
+
+function openLoginModal() {
+  const modal = document.getElementById('adminAuthModal');
+  if (modal) {
+    modal.classList.add('open');
+  }
 }
 
 async function loadFleetAssets() {
+  if (!api.isAdminAuthenticated()) return;
   try {
     const data = await api.getFleetOverview();
     if (!data.success) return;
@@ -110,6 +215,11 @@ function renderFleetAssetsTable(buses) {
 
 async function handleRegisterBus(e) {
   e.preventDefault();
+  if (!api.isAdminAuthenticated()) {
+    openLoginModal();
+    return;
+  }
+
   const busNumber = document.getElementById('regBusNumber').value.trim();
   const registrationNumber = document.getElementById('regRegistrationNumber').value.trim().toUpperCase();
   const depot = document.getElementById('regDepot').value;
@@ -140,6 +250,11 @@ async function handleRegisterBus(e) {
 }
 
 async function updateStatus(busNumber, newStatus) {
+  if (!api.isAdminAuthenticated()) {
+    openLoginModal();
+    return;
+  }
+
   try {
     await api.updateBusStatus(busNumber, newStatus);
     await loadFleetAssets();
@@ -149,6 +264,7 @@ async function updateStatus(busNumber, newStatus) {
 }
 
 async function loadDeviceInventory() {
+  if (!api.isAdminAuthenticated()) return;
   try {
     const data = await api.getDeviceRegistry();
     if (!data.success) return;
@@ -196,6 +312,11 @@ async function loadDeviceInventory() {
 
 async function handleBroadcastSubmit(e) {
   e.preventDefault();
+  if (!api.isAdminAuthenticated()) {
+    openLoginModal();
+    return;
+  }
+
   const message = document.getElementById('adminBroadcastMsg').value.trim();
   const severity = document.getElementById('adminBroadcastSeverity').value;
 
@@ -206,7 +327,6 @@ async function handleBroadcastSubmit(e) {
     alert('📢 BROADCAST DISPATCHED!\n\nMessage has been streamed live across all passenger screens and crew portals.');
     document.getElementById('adminBroadcastMsg').value = '';
 
-    // Also update current news ticker track in DOM immediately
     const ticker = document.querySelector('.ticker-track');
     if (ticker) {
       const span = document.createElement('span');
@@ -218,8 +338,16 @@ async function handleBroadcastSubmit(e) {
   }
 }
 
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) modal.classList.remove('open');
+}
+
 window.adminApp = {
   init: initAdmin,
   loadFleetAssets,
-  updateStatus
+  updateStatus,
+  openLoginModal,
+  logout,
+  checkAuthUI
 };

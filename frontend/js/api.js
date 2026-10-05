@@ -207,11 +207,39 @@ const api = {
     return res.json();
   },
 
-  // Admin Fleet Controls
-  createBus: async (payload) => {
-    const res = await fetch(`${API_BASE}/api/v1/buses`, {
+  // Admin Authentication & Fleet Controls
+  adminLogin: async (credentials) => {
+    const res = await fetch(`${API_BASE}/api/v1/operations/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(credentials)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Authentication failed');
+    if (json.token) {
+      sessionStorage.setItem('apsrtc_admin_token', json.token);
+      sessionStorage.setItem('apsrtc_admin_user', JSON.stringify(json.admin || { role: 'DEPOT_ADMIN' }));
+    }
+    return json;
+  },
+
+  logoutAdmin: () => {
+    sessionStorage.removeItem('apsrtc_admin_token');
+    sessionStorage.removeItem('apsrtc_admin_user');
+  },
+
+  isAdminAuthenticated: () => {
+    return Boolean(sessionStorage.getItem('apsrtc_admin_token'));
+  },
+
+  createBus: async (payload) => {
+    const token = sessionStorage.getItem('apsrtc_admin_token') || '';
+    const res = await fetch(`${API_BASE}/api/v1/buses`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-admin-key': token
+      },
       body: JSON.stringify(payload)
     });
     const json = await res.json();
@@ -220,9 +248,13 @@ const api = {
   },
 
   updateBusStatus: async (busId, status) => {
+    const token = sessionStorage.getItem('apsrtc_admin_token') || '';
     const res = await fetch(`${API_BASE}/api/v1/buses/${busId}/status`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-admin-key': token
+      },
       body: JSON.stringify({ status })
     });
     const json = await res.json();
@@ -236,12 +268,18 @@ const api = {
   },
 
   broadcastAnnouncement: async (message, severity = 'INFO') => {
+    const token = sessionStorage.getItem('apsrtc_admin_token') || '';
     const res = await fetch(`${API_BASE}/api/v1/operations/broadcast`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-admin-key': token
+      },
       body: JSON.stringify({ message, severity })
     });
-    return res.json();
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Failed to broadcast announcement');
+    return json;
   }
 };
 

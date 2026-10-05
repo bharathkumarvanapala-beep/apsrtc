@@ -38,6 +38,11 @@
         <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal()">
           📋 Track Status
         </button>
+        <div id="adminTopAuthBadge" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+          <button type="button" class="gov-link-btn" onclick="adminApp.openLoginModal()" style="background: rgba(255, 255, 255, 0.12);">
+            🔒 Staff / Depot Login
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -66,7 +71,7 @@
         <button class="tab-btn" data-tab="officer">
           <span>🛡️</span> Officer Fleet Ops
         </button>
-        <button class="tab-btn" data-tab="admin">
+        <button class="tab-btn" id="navTabAdmin" data-tab="admin" style="display: none;">
           <span>⚙️</span> Admin Control
         </button>
         <button class="tab-btn" data-tab="simulator">
@@ -537,179 +542,225 @@
     <!-- 7. ADMIN FLEET & DEPOT CONTROL CONSOLE     -->
     <!-- ========================================== -->
     <section id="view-admin" class="view-section">
-      <!-- Admin Top Metrics Row -->
-      <div class="metrics-summary-row">
-        <div class="summary-metric-card">
-          <span class="label">Total Fleet Registered</span>
-          <span class="number" id="adminTotalAssetsCount">0</span>
-          <span class="sub-detail">APSRTC Assets</span>
-        </div>
-        <div class="summary-metric-card">
-          <span class="label">Active Running Trips</span>
-          <span class="number" id="adminActiveTripsCount" style="color: #0284c7;">0</span>
-          <span class="sub-detail">On Corridor Duty</span>
-        </div>
-        <div class="summary-metric-card">
-          <span class="label">Pending Grievances</span>
-          <span class="number" id="adminPendingGrievancesCount" style="color: #b91c1c;">0</span>
-          <span class="sub-detail">Citizen Reports</span>
-        </div>
-        <div class="summary-metric-card">
-          <span class="label">Depot Regions</span>
-          <span class="number" style="color: #006045;">5</span>
-          <span class="sub-detail">Paderu &bull; Araku &bull; VSKP</span>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
-        <!-- Register New Bus Card -->
-        <div class="card">
-          <div class="card-header" style="background: #004230; color: #ffffff;">
-            <div>
-              <h3 class="card-title" style="color: #ffffff;">➕ Register New Corridor Bus Asset</h3>
-              <div style="font-size: 0.72rem; color: #ffb703; margin-top: 2px;">కొత్త బస్సు రిజిస్ట్రేషన్ &bull; APSRTC Asset Master</div>
-            </div>
-            <span class="brand-badge" style="background: #ffb703; color: #003325;">Depot Master</span>
+      <!-- 7A. SECURITY GATE LOCK CARD (Shown to unauthorized users) -->
+      <div id="adminAuthGateLock" style="max-width: 480px; margin: 3rem auto;">
+        <div class="card" style="box-shadow: 0 10px 30px rgba(0, 66, 48, 0.2); border: 2px solid #004230;">
+          <div class="card-header" style="background: #003325; color: #ffffff; text-align: center; flex-direction: column; gap: 0.5rem; padding: 1.5rem;">
+            <img src="assets/logo.svg" alt="APSRTC Emblem" style="width: 58px; height: 58px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));">
+            <h3 style="color: #ffb703; font-size: 1.15rem; font-weight: 800;">🔒 Restricted Administrative Area</h3>
+            <div style="font-size: 0.78rem; color: #cbd5e1;">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ &bull; డిపో అడ్మిన్ లాగిన్</div>
           </div>
-          <div class="card-body">
-            <form id="adminRegisterBusForm">
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                <div class="search-form-group">
-                  <label class="search-label" for="regBusNumber">Bus Number (బస్సు నంబర్)</label>
-                  <input type="text" id="regBusNumber" class="search-input" placeholder="e.g. 950" required>
-                </div>
-                <div class="search-form-group">
-                  <label class="search-label" for="regRegistrationNumber">AP Registration No</label>
-                  <input type="text" id="regRegistrationNumber" class="search-input" placeholder="e.g. AP-39-Z-9501" required>
-                </div>
+          <div class="card-body" style="padding: 1.5rem;">
+            <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1.25rem; text-align: center; line-height: 1.5;">
+              This console is reserved exclusively for authorized <strong>APSRTC Regional Operations Officers & Depot Managers</strong>. Please authenticate to access fleet controls.
+            </p>
+
+            <form id="adminGateLoginForm">
+              <div class="search-form-group">
+                <label class="search-label" for="adminGatePin">Depot Security PIN (ఆఫీసర్ పిన్)</label>
+                <input type="password" id="adminGatePin" class="search-input" placeholder="Enter 4-digit Depot PIN (e.g. 2026)" autofocus>
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
-                <div class="search-form-group">
-                  <label class="search-label" for="regDepot">Operating RTC Depot</label>
-                  <select id="regDepot" class="search-select">
-                    <option value="Paderu" selected>Paderu Depot</option>
-                    <option value="Araku">Araku Depot</option>
-                    <option value="Chintapalli">Chintapalli Depot</option>
-                    <option value="Anakapalle">Anakapalle Depot</option>
-                    <option value="Visakhapatnam">Visakhapatnam Depot</option>
-                  </select>
-                </div>
-                <div class="search-form-group">
-                  <label class="search-label" for="regServiceType">Service Classification</label>
-                  <select id="regServiceType" class="search-select">
-                    <option value="PALLE_VELUGU">Palle Velugu (పల్లె వెలుగు)</option>
-                    <option value="EXPRESS" selected>Express (ఎక్స్‌ప్రెస్)</option>
-                    <option value="ULTRA_DELUXE">Ultra Deluxe (అల్ట్రా డీలక్స్)</option>
-                    <option value="SUPER_LUXURY">Super Luxury (సూపర్ లగ్జరీ)</option>
-                    <option value="INDRA_AC">Indra AC (ఇంద్ర ఏసీ)</option>
-                  </select>
-                </div>
+              <div style="text-align: center; margin: 0.75rem 0; font-size: 0.75rem; color: #94a3b8; font-weight: 700;">— OR SIGN IN WITH CREDENTIALS —</div>
+
+              <div class="search-form-group">
+                <label class="search-label" for="adminGateUser">Admin Username</label>
+                <input type="text" id="adminGateUser" class="search-input" placeholder="admin">
               </div>
 
               <div class="search-form-group">
-                <label class="search-label" for="regTotalSeats">Passenger Seating Capacity</label>
-                <input type="number" id="regTotalSeats" class="search-input" value="48" min="20" max="65">
+                <label class="search-label" for="adminGatePass">Password</label>
+                <input type="password" id="adminGatePass" class="search-input" placeholder="••••••••">
               </div>
 
-              <button type="submit" class="btn-primary" style="background: #006045;">
-                ➕ Register Bus to Active Fleet
+              <button type="submit" class="btn-primary" style="background: #006045; margin-top: 0.5rem;">
+                🔓 Verify & Access Admin Control
               </button>
             </form>
-          </div>
-        </div>
 
-        <!-- Depot Broadcast Control Card -->
-        <div class="card">
-          <div class="card-header" style="background: #004230; color: #ffffff;">
-            <div>
-              <h3 class="card-title" style="color: #ffffff;">📢 Dispatch Live Corridor Broadcast</h3>
-              <div style="font-size: 0.72rem; color: #ffb703; margin-top: 2px;">ప్రత్యక్ష ప్రసార హెచ్చరిక &bull; Streams to Passenger News Marquee</div>
+            <div style="font-size: 0.72rem; color: #64748b; margin-top: 1rem; text-align: center; background: #f8fafc; padding: 0.5rem; border-radius: 6px;">
+              <strong>Demo Credentials:</strong> PIN: <code>2026</code> &bull; User: <code>admin</code> / Password: <code>apsrtc@admin2026</code>
             </div>
-            <span class="brand-badge" style="background: #ef4444; color: #ffffff;">Live Push</span>
-          </div>
-          <div class="card-body">
-            <form id="adminBroadcastForm">
-              <div class="search-form-group">
-                <label class="search-label" for="adminBroadcastSeverity">Notice Urgency / Category</label>
-                <select id="adminBroadcastSeverity" class="search-select">
-                  <option value="INFO">ℹ️ General Advisory / Special Bus Announcement</option>
-                  <option value="WARNING">⚠️ Weather / Ghat Road Caution / Heavy Mist</option>
-                  <option value="CRITICAL">🚨 Critical Service Alert / Landslide Clearance</option>
-                </select>
-              </div>
-
-              <div class="search-form-group">
-                <label class="search-label" for="adminBroadcastMsg">Announcement Text (Telugu / English)</label>
-                <textarea id="adminBroadcastMsg" rows="3" class="search-input" placeholder="e.g. Heavy rainfall reported between Bowdara and Ananthagiri ghat sections. All buses operating with 30 km/h advisory speed." required></textarea>
-              </div>
-
-              <button type="submit" class="btn-primary" style="background: #b91c1c;">
-                📡 Dispatch Live Ticker Broadcast
-              </button>
-            </form>
           </div>
         </div>
       </div>
 
-      <!-- Fleet Asset Master Table -->
-      <div class="card" style="margin-bottom: 1.5rem;">
-        <div class="card-header">
-          <div>
-            <h3 class="card-title">🚍 APSRTC Fleet Assets Master Directory</h3>
-            <div style="font-size: 0.75rem; color: #64748b;">Manage bus registration, depot allocation, and status toggle (ACTIVE / MAINTENANCE / STANDBY)</div>
+      <!-- 7B. SECURE CONSOLE CONTENT (Visible only after authentication) -->
+      <div id="adminConsoleContent" style="display: none;">
+        <!-- Admin Top Metrics Row -->
+        <div class="metrics-summary-row">
+          <div class="summary-metric-card">
+            <span class="label">Total Fleet Registered</span>
+            <span class="number" id="adminTotalAssetsCount">0</span>
+            <span class="sub-detail">APSRTC Assets</span>
           </div>
-          <input type="text" id="adminFleetSearch" placeholder="Search by Bus, Reg, Depot..." style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 240px;">
-        </div>
-
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Bus No</th>
-                <th>Registration</th>
-                <th>Depot</th>
-                <th>Service Class</th>
-                <th>Seats</th>
-                <th>Current Status</th>
-                <th>Administrative Action</th>
-              </tr>
-            </thead>
-            <tbody id="adminFleetTableBody">
-              <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading fleet assets...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Hardware & ETM Device Registry Table -->
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <h3 class="card-title">📡 Hardware GPS & ETM Devices Inventory</h3>
-            <div style="font-size: 0.75rem; color: #64748b;">GPS telematics boxes, electronic ticketing machines, and firmware status</div>
+          <div class="summary-metric-card">
+            <span class="label">Active Running Trips</span>
+            <span class="number" id="adminActiveTripsCount" style="color: #0284c7;">0</span>
+            <span class="sub-detail">On Corridor Duty</span>
           </div>
-          <button type="button" class="btn-secondary" onclick="adminApp.init()" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
-            🔄 Refresh Devices
-          </button>
+          <div class="summary-metric-card">
+            <span class="label">Pending Grievances</span>
+            <span class="number" id="adminPendingGrievancesCount" style="color: #b91c1c;">0</span>
+            <span class="sub-detail">Citizen Reports</span>
+          </div>
+          <div class="summary-metric-card">
+            <span class="label">Depot Regions</span>
+            <span class="number" style="color: #006045;">5</span>
+            <span class="sub-detail">Paderu &bull; Araku &bull; VSKP</span>
+          </div>
         </div>
 
-        <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Device ID</th>
-                <th>Device Type</th>
-                <th>Assigned Bus</th>
-                <th>Depot / Sector</th>
-                <th>Network Status</th>
-                <th>Firmware & Diagnostics</th>
-              </tr>
-            </thead>
-            <tbody id="adminDevicesTableBody">
-              <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading devices inventory...</td></tr>
-            </tbody>
-          </table>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          <!-- Register New Bus Card -->
+          <div class="card">
+            <div class="card-header" style="background: #004230; color: #ffffff;">
+              <div>
+                <h3 class="card-title" style="color: #ffffff;">➕ Register New Corridor Bus Asset</h3>
+                <div style="font-size: 0.72rem; color: #ffb703; margin-top: 2px;">కొత్త బస్సు రిజిస్ట్రేషన్ &bull; APSRTC Asset Master</div>
+              </div>
+              <span class="brand-badge" style="background: #ffb703; color: #003325;">Depot Master</span>
+            </div>
+            <div class="card-body">
+              <form id="adminRegisterBusForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div class="search-form-group">
+                    <label class="search-label" for="regBusNumber">Bus Number (బస్సు నంబర్)</label>
+                    <input type="text" id="regBusNumber" class="search-input" placeholder="e.g. 950" required>
+                  </div>
+                  <div class="search-form-group">
+                    <label class="search-label" for="regRegistrationNumber">AP Registration No</label>
+                    <input type="text" id="regRegistrationNumber" class="search-input" placeholder="e.g. AP-39-Z-9501" required>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div class="search-form-group">
+                    <label class="search-label" for="regDepot">Operating RTC Depot</label>
+                    <select id="regDepot" class="search-select">
+                      <option value="Paderu" selected>Paderu Depot</option>
+                      <option value="Araku">Araku Depot</option>
+                      <option value="Chintapalli">Chintapalli Depot</option>
+                      <option value="Anakapalle">Anakapalle Depot</option>
+                      <option value="Visakhapatnam">Visakhapatnam Depot</option>
+                    </select>
+                  </div>
+                  <div class="search-form-group">
+                    <label class="search-label" for="regServiceType">Service Classification</label>
+                    <select id="regServiceType" class="search-select">
+                      <option value="PALLE_VELUGU">Palle Velugu (పల్లె వెలుగు)</option>
+                      <option value="EXPRESS" selected>Express (ఎక్స్‌ప్రెస్)</option>
+                      <option value="ULTRA_DELUXE">Ultra Deluxe (అల్ట్రా డీలక్స్)</option>
+                      <option value="SUPER_LUXURY">Super Luxury (సూపర్ లగ్జరీ)</option>
+                      <option value="INDRA_AC">Indra AC (ఇంద్ర ఏసీ)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="search-form-group">
+                  <label class="search-label" for="regTotalSeats">Passenger Seating Capacity</label>
+                  <input type="number" id="regTotalSeats" class="search-input" value="48" min="20" max="65">
+                </div>
+
+                <button type="submit" class="btn-primary" style="background: #006045;">
+                  ➕ Register Bus to Active Fleet
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Depot Broadcast Control Card -->
+          <div class="card">
+            <div class="card-header" style="background: #004230; color: #ffffff;">
+              <div>
+                <h3 class="card-title" style="color: #ffffff;">📢 Dispatch Live Corridor Broadcast</h3>
+                <div style="font-size: 0.72rem; color: #ffb703; margin-top: 2px;">ప్రత్యక్ష ప్రసార హెచ్చరిక &bull; Streams to Passenger News Marquee</div>
+              </div>
+              <span class="brand-badge" style="background: #ef4444; color: #ffffff;">Live Push</span>
+            </div>
+            <div class="card-body">
+              <form id="adminBroadcastForm">
+                <div class="search-form-group">
+                  <label class="search-label" for="adminBroadcastSeverity">Notice Urgency / Category</label>
+                  <select id="adminBroadcastSeverity" class="search-select">
+                    <option value="INFO">ℹ️ General Advisory / Special Bus Announcement</option>
+                    <option value="WARNING">⚠️ Weather / Ghat Road Caution / Heavy Mist</option>
+                    <option value="CRITICAL">🚨 Critical Service Alert / Landslide Clearance</option>
+                  </select>
+                </div>
+
+                <div class="search-form-group">
+                  <label class="search-label" for="adminBroadcastMsg">Announcement Text (Telugu / English)</label>
+                  <textarea id="adminBroadcastMsg" rows="3" class="search-input" placeholder="e.g. Heavy rainfall reported between Bowdara and Ananthagiri ghat sections. All buses operating with 30 km/h advisory speed." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="background: #b91c1c;">
+                  📡 Dispatch Live Ticker Broadcast
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fleet Asset Master Table -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">🚍 APSRTC Fleet Assets Master Directory</h3>
+              <div style="font-size: 0.75rem; color: #64748b;">Manage bus registration, depot allocation, and status toggle (ACTIVE / MAINTENANCE / STANDBY)</div>
+            </div>
+            <input type="text" id="adminFleetSearch" placeholder="Search by Bus, Reg, Depot..." style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 240px;">
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Bus No</th>
+                  <th>Registration</th>
+                  <th>Depot</th>
+                  <th>Service Class</th>
+                  <th>Seats</th>
+                  <th>Current Status</th>
+                  <th>Administrative Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminFleetTableBody">
+                <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading fleet assets...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Hardware & ETM Device Registry Table -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">📡 Hardware GPS & ETM Devices Inventory</h3>
+              <div style="font-size: 0.75rem; color: #64748b;">GPS telematics boxes, electronic ticketing machines, and firmware status</div>
+            </div>
+            <button type="button" class="btn-secondary" onclick="adminApp.loadFleetAssets();" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+              🔄 Refresh Devices
+            </button>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Device ID</th>
+                  <th>Device Type</th>
+                  <th>Assigned Bus</th>
+                  <th>Depot / Sector</th>
+                  <th>Network Status</th>
+                  <th>Firmware & Diagnostics</th>
+                </tr>
+              </thead>
+              <tbody id="adminDevicesTableBody">
+                <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading devices inventory...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -831,6 +882,53 @@
         <div class="modal-footer">
           <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('complaintModal')">Cancel</button>
           <button type="submit" class="btn-primary" style="background: #b91c1c;">🚨 Submit Grievance / ఫిర్యాదు సమర్పించండి</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADMIN AUTHENTICATION GATE           -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="adminAuthModal">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header" style="background: #003325;">
+        <div>
+          <h3 style="color: #ffb703;">🔒 APSRTC Depot Officer Verification</h3>
+          <div style="font-size: 0.75rem; color: #e2e8f0;">డిపో అడ్మినిస్ట్రేటర్ అధికారిక లాగిన్</div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('adminAuthModal')">&times;</button>
+      </div>
+      <form id="adminModalLoginForm">
+        <div class="modal-body">
+          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 1rem;">
+            Enter your APSRTC Depot Officer Security PIN or credentials to unlock administrative fleet controls.
+          </p>
+
+          <div class="search-form-group">
+            <label class="search-label" for="adminModalPin">Security PIN (క్విక్ పిన్)</label>
+            <input type="password" id="adminModalPin" class="search-input" placeholder="e.g. 2026">
+          </div>
+
+          <div style="text-align: center; margin: 0.5rem 0; font-size: 0.72rem; color: #94a3b8; font-weight: 700;">— OR USERNAME & PASSWORD —</div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="adminModalUser">Username</label>
+            <input type="text" id="adminModalUser" class="search-input" placeholder="admin">
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="adminModalPass">Password</label>
+            <input type="password" id="adminModalPass" class="search-input" placeholder="••••••••">
+          </div>
+
+          <div style="font-size: 0.72rem; color: #64748b; background: #f8fafc; padding: 0.4rem 0.6rem; border-radius: 4px; margin-top: 0.5rem;">
+            Demo PIN: <code>2026</code> &bull; User: <code>admin</code> / <code>apsrtc@admin2026</code>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('adminAuthModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="background: #006045;">Authorize Login</button>
         </div>
       </form>
     </div>

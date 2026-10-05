@@ -82,7 +82,10 @@ function switchTab(tabId) {
 
   // Refresh admin table if switching to admin tab
   if (tabId === 'admin' && window.adminApp) {
-    window.adminApp.loadFleetAssets();
+    window.adminApp.checkAuthUI();
+    if (window.api && window.api.isAdminAuthenticated()) {
+      window.adminApp.loadFleetAssets();
+    }
   }
 }
 

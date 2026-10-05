@@ -34,5 +34,9 @@ module.exports = {
     HIGH: 10,   // <= 10m
     GOOD: 25,   // <= 25m
     WEAK: 80,   // <= 80m
-  }
+  },
+
+  // Admin Access Security Credentials
+  ADMIN_KEY: process.env.ADMIN_KEY || 'apsrtc@admin2026',
+  ADMIN_PIN: process.env.ADMIN_PIN || '2026'
 };
