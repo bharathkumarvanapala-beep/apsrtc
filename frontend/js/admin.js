@@ -9,11 +9,52 @@ let adminFleetData = [];
 async function initAdmin() {
   console.log('⚙️ Initializing APSRTC Admin Control Module...');
   setupAdminEvents();
+
+  // Developer auto-access detection via URL parameters: ?admin=true, ?dev=true, or ?auto=true
+  const urlParams = new URLSearchParams(window.location.search);
+  const wantsDevAccess = urlParams.get('admin') === 'true' || 
+                         urlParams.get('dev') === 'true' || 
+                         urlParams.get('auto') === 'true';
+
+  if (wantsDevAccess && !api.isAdminAuthenticated()) {
+    console.log('⚡ Developer auto-access triggered via URL parameter');
+    await quickDevLogin(false);
+  }
+
   checkAuthUI();
 
   if (api.isAdminAuthenticated()) {
     await loadFleetAssets();
     await loadDeviceInventory();
+  }
+}
+
+async function quickDevLogin(showAlert = true) {
+  try {
+    const res = await api.adminLogin({ pin: '2026' });
+    closeModal('adminAuthModal');
+    checkAuthUI();
+    await loadFleetAssets();
+    await loadDeviceInventory();
+
+    // Switch to admin view automatically
+    if (window.app && window.app.switchTab) {
+      window.app.switchTab('admin');
+    }
+
+    if (showAlert) {
+      alert(`⚡ DEVELOPER ACCESS GRANTED!\n\n` +
+            `Authenticated as: ${res.admin?.name || 'Chief Depot Controller'}\n` +
+            `Assigned: ${res.admin?.depot || 'Headquarters'}\n` +
+            `PIN: 2026 (Saved in browser storage for persistent building session).`);
+    }
+    return true;
+  } catch (err) {
+    console.error('quickDevLogin error:', err);
+    if (showAlert) {
+      alert(`Developer auto-login failed: ${err.message}`);
+    }
+    return false;
   }
 }
 
@@ -349,5 +390,6 @@ window.adminApp = {
   updateStatus,
   openLoginModal,
   logout,
-  checkAuthUI
+  checkAuthUI,
+  quickDevLogin
 };

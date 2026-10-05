@@ -552,34 +552,50 @@
           </div>
           <div class="card-body" style="padding: 1.5rem;">
             <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1.25rem; text-align: center; line-height: 1.5;">
-              This console is reserved exclusively for authorized <strong>APSRTC Regional Operations Officers & Depot Managers</strong>. Please authenticate to access fleet controls.
+              This console is reserved exclusively for authorized <strong>APSRTC Regional Operations Officers & Depot Managers</strong>.
             </p>
+
+            <!-- Builder / Developer Quick Access Banner -->
+            <div style="margin-bottom: 1.25rem; padding: 0.85rem; background: #ecfdf5; border: 1.5px solid #10b981; border-radius: 8px; text-align: center;">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: #065f46; margin-bottom: 0.4rem;">
+                <span>🛠️ Developer / Builder Mode Active</span>
+              </div>
+              <button type="button" class="btn-primary" onclick="adminApp.quickDevLogin()" style="background: #059669; padding: 0.65rem 1rem; width: 100%; font-size: 0.9rem; font-weight: 800; cursor: pointer; border: none; box-shadow: 0 4px 12px rgba(5,150,105,0.3); transition: all 0.2s;">
+                ⚡ 1-Click Developer Auto-Login (PIN: 2026)
+              </button>
+              <div style="font-size: 0.72rem; color: #047857; margin-top: 0.4rem;">
+                Auto-authorizes your session and keeps you logged in across page refreshes.
+              </div>
+            </div>
 
             <form id="adminGateLoginForm">
               <div class="search-form-group">
                 <label class="search-label" for="adminGatePin">Depot Security PIN (ఆఫీసర్ పిన్)</label>
-                <input type="password" id="adminGatePin" class="search-input" placeholder="Enter 4-digit Depot PIN (e.g. 2026)" autofocus>
+                <input type="password" id="adminGatePin" class="search-input" placeholder="Enter 4-digit Depot PIN (e.g. 2026)" value="2026" autofocus>
               </div>
 
               <div style="text-align: center; margin: 0.75rem 0; font-size: 0.75rem; color: #94a3b8; font-weight: 700;">— OR SIGN IN WITH CREDENTIALS —</div>
 
               <div class="search-form-group">
                 <label class="search-label" for="adminGateUser">Admin Username</label>
-                <input type="text" id="adminGateUser" class="search-input" placeholder="admin">
+                <input type="text" id="adminGateUser" class="search-input" placeholder="admin" value="admin">
               </div>
 
               <div class="search-form-group">
                 <label class="search-label" for="adminGatePass">Password</label>
-                <input type="password" id="adminGatePass" class="search-input" placeholder="••••••••">
+                <input type="password" id="adminGatePass" class="search-input" placeholder="••••••••" value="apsrtc@admin2026">
               </div>
 
               <button type="submit" class="btn-primary" style="background: #006045; margin-top: 0.5rem;">
-                🔓 Verify & Access Admin Control
+                🔓 Authorize Login
               </button>
             </form>
 
-            <div style="font-size: 0.72rem; color: #64748b; margin-top: 1rem; text-align: center; background: #f8fafc; padding: 0.5rem; border-radius: 6px;">
-              <strong>Demo Credentials:</strong> PIN: <code>2026</code> &bull; User: <code>admin</code> / Password: <code>apsrtc@admin2026</code>
+            <div style="font-size: 0.75rem; color: #334155; margin-top: 1rem; background: #f1f5f9; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid #cbd5e1; line-height: 1.4;">
+              <strong style="color: #004230;">🔑 Admin Credentials for Development:</strong><br>
+              &bull; <strong>Master PIN:</strong> <code>2026</code> (instant 1-field login)<br>
+              &bull; <strong>Account:</strong> <code>admin</code> / Password: <code>apsrtc@admin2026</code><br>
+              <span style="font-size: 0.7rem; color: #64748b;">(Configured in <code>backend/config/config.js</code> under <code>ADMIN_PIN</code> & <code>ADMIN_KEY</code>)</span>
             </div>
           </div>
         </div>
@@ -905,25 +921,41 @@
             Enter your APSRTC Depot Officer Security PIN or credentials to unlock administrative fleet controls.
           </p>
 
+          <!-- Builder / Developer Quick Access Banner -->
+          <div style="margin-bottom: 1.25rem; padding: 0.85rem; background: #ecfdf5; border: 1.5px solid #10b981; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: #065f46; margin-bottom: 0.4rem;">
+              <span>🛠️ Developer / Builder Mode Active</span>
+            </div>
+            <button type="button" class="btn-primary" onclick="adminApp.quickDevLogin()" style="background: #059669; padding: 0.65rem 1rem; width: 100%; font-size: 0.9rem; font-weight: 800; cursor: pointer; border: none; box-shadow: 0 4px 12px rgba(5,150,105,0.3); transition: all 0.2s;">
+              ⚡ 1-Click Developer Auto-Login (PIN: 2026)
+            </button>
+            <div style="font-size: 0.72rem; color: #047857; margin-top: 0.4rem;">
+              Auto-authorizes your session and keeps you logged in across page refreshes.
+            </div>
+          </div>
+
           <div class="search-form-group">
             <label class="search-label" for="adminModalPin">Security PIN (క్విక్ పిన్)</label>
-            <input type="password" id="adminModalPin" class="search-input" placeholder="e.g. 2026">
+            <input type="password" id="adminModalPin" class="search-input" placeholder="e.g. 2026" value="2026">
           </div>
 
           <div style="text-align: center; margin: 0.5rem 0; font-size: 0.72rem; color: #94a3b8; font-weight: 700;">— OR USERNAME & PASSWORD —</div>
 
           <div class="search-form-group">
             <label class="search-label" for="adminModalUser">Username</label>
-            <input type="text" id="adminModalUser" class="search-input" placeholder="admin">
+            <input type="text" id="adminModalUser" class="search-input" placeholder="admin" value="admin">
           </div>
 
           <div class="search-form-group">
             <label class="search-label" for="adminModalPass">Password</label>
-            <input type="password" id="adminModalPass" class="search-input" placeholder="••••••••">
+            <input type="password" id="adminModalPass" class="search-input" placeholder="••••••••" value="apsrtc@admin2026">
           </div>
 
-          <div style="font-size: 0.72rem; color: #64748b; background: #f8fafc; padding: 0.4rem 0.6rem; border-radius: 4px; margin-top: 0.5rem;">
-            Demo PIN: <code>2026</code> &bull; User: <code>admin</code> / <code>apsrtc@admin2026</code>
+          <div style="font-size: 0.75rem; color: #334155; margin-top: 0.75rem; background: #f1f5f9; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid #cbd5e1; line-height: 1.4;">
+            <strong style="color: #004230;">🔑 Admin Credentials for Development:</strong><br>
+            &bull; <strong>Master PIN:</strong> <code>2026</code> (instant 1-field login)<br>
+            &bull; <strong>Account:</strong> <code>admin</code> / Password: <code>apsrtc@admin2026</code><br>
+            <span style="font-size: 0.7rem; color: #64748b;">(Configured in <code>backend/config/config.js</code> under <code>ADMIN_PIN</code> & <code>ADMIN_KEY</code>)</span>
           </div>
         </div>
         <div class="modal-footer">

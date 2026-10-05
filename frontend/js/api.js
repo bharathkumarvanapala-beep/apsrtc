@@ -208,6 +208,10 @@ const api = {
   },
 
   // Admin Authentication & Fleet Controls
+  getAdminToken: () => {
+    return localStorage.getItem('apsrtc_admin_token') || sessionStorage.getItem('apsrtc_admin_token') || '';
+  },
+
   adminLogin: async (credentials) => {
     const res = await fetch(`${API_BASE}/api/v1/operations/login`, {
       method: 'POST',
@@ -217,23 +221,26 @@ const api = {
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || 'Authentication failed');
     if (json.token) {
+      localStorage.setItem('apsrtc_admin_token', json.token);
+      localStorage.setItem('apsrtc_admin_user', JSON.stringify(json.admin || { role: 'DEPOT_ADMIN' }));
       sessionStorage.setItem('apsrtc_admin_token', json.token);
-      sessionStorage.setItem('apsrtc_admin_user', JSON.stringify(json.admin || { role: 'DEPOT_ADMIN' }));
     }
     return json;
   },
 
   logoutAdmin: () => {
+    localStorage.removeItem('apsrtc_admin_token');
+    localStorage.removeItem('apsrtc_admin_user');
     sessionStorage.removeItem('apsrtc_admin_token');
     sessionStorage.removeItem('apsrtc_admin_user');
   },
 
   isAdminAuthenticated: () => {
-    return Boolean(sessionStorage.getItem('apsrtc_admin_token'));
+    return Boolean(localStorage.getItem('apsrtc_admin_token') || sessionStorage.getItem('apsrtc_admin_token'));
   },
 
   createBus: async (payload) => {
-    const token = sessionStorage.getItem('apsrtc_admin_token') || '';
+    const token = api.getAdminToken();
     const res = await fetch(`${API_BASE}/api/v1/buses`, {
       method: 'POST',
       headers: { 
@@ -248,7 +255,7 @@ const api = {
   },
 
   updateBusStatus: async (busId, status) => {
-    const token = sessionStorage.getItem('apsrtc_admin_token') || '';
+    const token = api.getAdminToken();
     const res = await fetch(`${API_BASE}/api/v1/buses/${busId}/status`, {
       method: 'PATCH',
       headers: { 
@@ -268,7 +275,7 @@ const api = {
   },
 
   broadcastAnnouncement: async (message, severity = 'INFO') => {
-    const token = sessionStorage.getItem('apsrtc_admin_token') || '';
+    const token = api.getAdminToken();
     const res = await fetch(`${API_BASE}/api/v1/operations/broadcast`, {
       method: 'POST',
       headers: { 
