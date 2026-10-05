@@ -1,0 +1,99 @@
+================================================================================
+APSRTC SmartTrack - Complete Project File Inventory & Descriptions
+Andhra Pradesh State Road Transport Corporation
+================================================================================
+
+Root Directory:
+├── .gitignore                      : Git exclusion rules for node_modules, logs, and database binaries.
+├── Dockerfile                      : Multi-stage Docker container build definition.
+├── docker-compose.yml              : Docker orchestration for backend, web app, and PostgreSQL.
+├── README.md                       : Master project guide, Windows PowerShell instructions, and demo walkthrough.
+├── PROJECT_FILES.txt               : Inventory of all project files and their architectural responsibilities.
+
+Backend Directory (backend/):
+├── server.js                       : Main Express server, Socket.IO WebSockets, REST v1 mounting, static frontend hosting.
+├── package.json                    : NPM dependencies (express, socket.io, better-sqlite3, helmet, cors) and scripts.
+├── .env.example                    : Configuration environment variable template.
+├── .env                            : Active local environment configuration.
+├── apsrtc.db                       : Embedded SQLite WAL database instance with pre-seeded corridor data.
+├── config/
+│   ├── config.js                   : Centralized configuration parser with freshness thresholds and priority arrays.
+│   └── db.js                       : SQLite database connection pool, WAL mode enabler, and query helper functions.
+├── utils/
+│   ├── logger.js                   : Structured timestamped logger (DEBUG, INFO, WARN, ERROR).
+│   └── haversine.js                : WGS84 spherical distance, meters, bearing azimuth, and direction utilities.
+├── services/
+│   ├── geoService.js               : Spatial reverse-geocoding into human-readable corridor stop landmarks.
+│   ├── etaService.js               : Dynamic ETA engine factoring speed, stop dwell times, and Eastern Ghats topography.
+│   ├── socketService.js            : Real-time Socket.IO dispatch manager for fleet, bus, and corridor rooms.
+│   ├── locationResolverService.js  : Multi-source priority failover, freshness checking, and state persistence.
+│   └── journeyMatcherService.js    : Generic corridor journey matching algorithm for directional multi-bus searches.
+├── controllers/
+│   ├── busController.js            : REST controllers for fleet listing, bus profile, and single-bus location.
+│   ├── journeyController.js        : REST controllers for From-To journey searches and corridor stops listing.
+│   ├── trackingController.js       : Multi-source telemetry ingestion (/device, /crew, /etm, /demo) and failover toggle.
+│   ├── tripController.js           : REST controllers for crew trip start, end, and active running trips.
+│   ├── complaintController.js      : REST controllers for grievance submission and officer status transitions.
+│   └── operationsController.js     : REST controllers for fleet metrics, SOS emergency dispatch, and alerts.
+├── routes/
+│   ├── busRoutes.js                : Express route mappings for /api/v1/buses.
+│   ├── journeyRoutes.js            : Express route mappings for /api/v1/journey.
+│   ├── trackingRoutes.js           : Express route mappings for /api/v1/tracking.
+│   ├── tripRoutes.js               : Express route mappings for /api/v1/trips.
+│   ├── complaintRoutes.js          : Express route mappings for /api/v1/complaints.
+│   └── operationsRoutes.js         : Express route mappings for /api/v1/operations.
+├── middleware/
+│   ├── validationMiddleware.js     : Request body sanitization and coordinate boundary validation (-90..90, -180..180).
+│   └── errorHandler.js             : Human-readable error translation middleware.
+├── sockets/
+│   └── socketHandler.js            : Socket.IO event listener and room join/leave delegator.
+├── models/
+│   └── index.js                    : Data access models for Bus, Route, Trip, and Complaint entities.
+└── tests/
+    └── suite.test.js               : 18-step automated test suite covering all routes, failover, and calculation criteria.
+
+Frontend Directory (frontend/ & public/):
+├── index.html                      : Complete Single Page Application featuring Passenger, Crew, Officer, and Simulator views.
+├── css/
+│   └── style.css                   : Official APSRTC design system, responsive grid/flexbox, Leaflet markers, pulse dots.
+├── js/
+│   ├── api.js                      : REST API client wrapper for all backend endpoints.
+│   ├── socket.js                   : Socket.IO client manager with automatic reconnect handling.
+│   ├── map.js                      : Leaflet.js interactive corridor map with custom bus markers and polylines.
+│   ├── passenger.js                : Passenger journey search, multi-bus card rendering, and grievance filing.
+│   ├── crew.js                     : Crew mobile duty portal, HTML5 GPS watchPosition, and SOS button.
+│   ├── officer.js                  : Operations dashboard, live fleet table filters, failover console, complaints desk.
+│   └── app.js                      : Master coordinator initializing tabs, modals, and in-browser simulation controls.
+├── pages/
+│   ├── passenger.html              : Modular passenger view entry point.
+│   ├── crew.html                   : Modular crew view entry point.
+│   └── officer.html                : Modular officer view entry point.
+└── assets/
+    └── logo.svg                    : Official APSRTC SmartTrack vector emblem.
+
+Database Directory (database/):
+├── schema/
+│   ├── schema.sqlite.sql           : SQLite DDL schema with 15 tables and performance indexes.
+│   └── schema.postgres.sql         : PostgreSQL DDL schema with custom ENUMs and production indexes.
+├── migrations/
+│   └── 001_initial_schema.sql      : Initial migration script.
+└── seed/
+    ├── seed.sqlite.sql             : Raw SQL seed file for corridor reference data.
+    ├── seed.postgres.sql           : PostgreSQL seed script.
+    └── seedData.js                 : Programmatic database initializer populating routes, stops, buses, devices, and trips.
+
+Demo & Simulator Directory (demo/):
+└── gps-simulator/
+    └── simulator.js                : Multi-bus telemetry generator simulating 7 buses along the Eastern Ghats corridor.
+
+Documentation Directory (docs/):
+├── architecture.md                 : Comprehensive system architecture, multi-source priority, and journey matching logic.
+├── api.md                          : Complete REST and WebSocket API specifications with sample payloads.
+├── database.md                     : Database entity-relationship diagram and complete data dictionary.
+├── gps-integration.md              : Physical hardware GPS tracker integration protocol and fallback strategy.
+├── crew-gps.md                     : Crew mobile smartphone GPS workflow, HTML5 geolocation, and SOS dispatch.
+├── etm-integration.md              : Electronic Ticketing Machine (ETM) telemetry architecture.
+├── deployment.md                   : Production cloud deployment guide with Docker and NGINX reverse proxy configs.
+├── security.md                     : Security threat model, rate limiting, and RBAC policies.
+└── user-guide.md                   : Step-by-step user manuals for Passengers, Crew, and Operations Officers.
+================================================================================

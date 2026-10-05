@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  smarttrack-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apsrtc-smarttrack
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DB_CLIENT=sqlite
+      - DB_PATH=/app/backend/apsrtc.db
+      - DEMO_MODE=true
+    volumes:
+      - smarttrack_data:/app/backend
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:5000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  smarttrack_data:

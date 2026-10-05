@@ -1,0 +1,33 @@
+{
+  "name": "apsrtc-smarttrack-backend",
+  "version": "1.0.0",
+  "description": "APSRTC SmartTrack Multi-Source GPS Fleet Tracking & Journey Matching Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node ../database/seed/seedData.js",
+    "simulate": "node ../demo/gps-simulator/simulator.js",
+    "test": "node tests/suite.test.js"
+  },
+  "keywords": [
+    "apsrtc",
+    "gps",
+    "tracking",
+    "transport",
+    "smarttrack",
+    "fleet-management",
+    "socket.io"
+  ],
+  "author": "APSRTC SmartTrack Engineering Team",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "socket.io": "^4.8.1"
+  }
+}

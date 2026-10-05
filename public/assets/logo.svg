@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <linearGradient id="apsrtcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00695c" />
+      <stop offset="100%" stop-color="#004d40" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd54f" />
+      <stop offset="100%" stop-color="#ffb300" />
+    </linearGradient>
+  </defs>
+  <!-- Outer Wheel -->
+  <circle cx="50" cy="50" r="46" fill="url(#apsrtcGrad)" stroke="url(#goldGrad)" stroke-width="4"/>
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-dasharray="3 2"/>
+  
+  <!-- Bus Shape -->
+  <path d="M 32 30 C 32 26 36 24 50 24 C 64 24 68 26 68 30 L 68 62 C 68 65 65 67 62 67 L 38 67 C 35 67 32 65 32 62 Z" fill="#ffffff" />
+  
+  <!-- Windshield -->
+  <path d="M 36 32 C 36 30 38 28 50 28 C 62 28 64 30 64 32 L 64 42 L 36 42 Z" fill="#004d40" />
+  
+  <!-- Destination Board -->
+  <rect x="40" y="25" width="20" height="3" rx="1" fill="url(#goldGrad)" />
+  
+  <!-- Headlights -->
+  <circle cx="38" cy="58" r="3" fill="#ffd54f" />
+  <circle cx="62" cy="58" r="3" fill="#ffd54f" />
+  <rect x="44" y="56" width="12" height="4" rx="1" fill="#004d40" />
+
+  <!-- Wheels -->
+  <circle cx="36" cy="67" r="5" fill="#212121" stroke="#ffffff" stroke-width="1.5"/>
+  <circle cx="64" cy="67" r="5" fill="#212121" stroke="#ffffff" stroke-width="1.5"/>
+
+  <!-- GPS Signal Waves Above -->
+  <path d="M 42 16 A 12 12 0 0 1 58 16" fill="none" stroke="url(#goldGrad)" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 46 19 A 6 6 0 0 1 54 19" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="50" cy="21" r="1.5" fill="url(#goldGrad)" />
+
+  <!-- APSRTC Text Ribbon Accent -->
+  <path d="M 20 80 Q 50 90 80 80" fill="none" stroke="url(#goldGrad)" stroke-width="3" stroke-linecap="round"/>
+</svg>

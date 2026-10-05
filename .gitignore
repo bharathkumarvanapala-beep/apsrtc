@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+
+# Databases & logs
+*.log
+*.db-wal
+*.db-shm
+
+# IDE & Editor folders
+.vscode/
+.idea/
+*.swp
+*.swo

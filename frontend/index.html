@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APSRTC SmartTrack - Real-Time Fleet & Corridor Tracking Prototype</title>
+  <meta name="description" content="APSRTC SmartTrack real-time bus tracking and journey matching system. Know where your bus is before you wait.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Official Government Header -->
+  <header class="official-header">
+    <div class="header-inner">
+      <div class="brand-wrapper">
+        <img src="assets/logo.svg" alt="APSRTC Official Emblem" class="brand-logo">
+        <div class="brand-text">
+          <h1>APSRTC SmartTrack</h1>
+          <div class="telugu-sub">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ • Corridor GPS Live</div>
+        </div>
+        <span class="brand-badge">Official Prototype</span>
+      </div>
+
+      <nav class="nav-tabs">
+        <button class="tab-btn active" data-tab="passenger">
+          <span>🚌</span> Passenger Portal
+        </button>
+        <button class="tab-btn" data-tab="crew">
+          <span>📱</span> Crew Mobile Portal
+        </button>
+        <button class="tab-btn" data-tab="officer">
+          <span>🛡️</span> Officer Fleet Ops
+        </button>
+        <button class="tab-btn" data-tab="simulator">
+          <span>🛰️</span> Simulator & Failover
+        </button>
+      </nav>
+
+      <div id="wsStatusIndicator" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-weight: 700; background: rgba(0,0,0,0.3); padding: 0.35rem 0.75rem; border-radius: 9999px;">
+        <span class="pulse-dot" style="color: #4ade80;"></span> <span>CONNECTING</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Prototype Advisory Banner -->
+  <div class="demo-banner">
+    <span>⚠️ <strong>PROTOTYPE DEMONSTRATION SYSTEM:</strong> Displays multi-source GPS failover architecture (Hardware Tracker, Crew Mobile GPS, ETM, and Demo). Real operational deployment requires authorized APSRTC enterprise access.</span>
+  </div>
+
+  <main class="main-wrapper">
+
+    <!-- ========================================== -->
+    <!-- 1. PASSENGER VIEW                         -->
+    <!-- ========================================== -->
+    <section id="view-passenger" class="view-section active">
+      <div class="passenger-grid">
+        
+        <!-- Left: Search & Bus Cards -->
+        <div class="passenger-search-column">
+          
+          <!-- Search Form Card -->
+          <div class="card" style="margin-bottom: 1.25rem;">
+            <div class="card-header">
+              <h2 class="card-title">🔍 Search Corridor Buses</h2>
+              <span style="font-size: 0.75rem; font-weight: 700; color: #00695c;">Eastern Ghats Corridor</span>
+            </div>
+            <div class="card-body">
+              <form id="journeySearchForm">
+                
+                <div class="search-form-group">
+                  <label class="search-label" for="searchFrom">From (Boarding Stop)</label>
+                  <div class="input-with-icon">
+                    <span class="input-icon">🟢</span>
+                    <select id="searchFrom" class="search-select" required>
+                      <option value="">Loading stops...</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="swap-row">
+                  <button type="button" id="swapStopsBtn" class="swap-btn" title="Swap From and To">
+                    ⇅
+                  </button>
+                </div>
+
+                <div class="search-form-group">
+                  <label class="search-label" for="searchTo">To (Destination Stop)</label>
+                  <div class="input-with-icon">
+                    <span class="input-icon">🔴</span>
+                    <select id="searchTo" class="search-select" required>
+                      <option value="">Loading stops...</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="searchSubmitBtn">
+                  <span>🚍</span> Find Relevant Incoming Buses
+                </button>
+              </form>
+
+              <!-- Quick Corridor Chips -->
+              <div class="quick-chips">
+                <div class="quick-chips-title">Frequent Corridor Routes:</div>
+                <div class="chips-list">
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Paderu', 'Visakhapatnam')">Paderu ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Araku', 'Paderu')">Araku ➔ Paderu</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Visakhapatnam', 'Araku')">Visakhapatnam ➔ Araku (Up)</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('G. Madugula', 'Chintapalli')">G. Madugula ➔ Chintapalli</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chintapalli', 'Anakapalle')">Chintapalli ➔ Anakapalle</button>
+                </div>
+              </div>
+
+              <!-- Bus Number Direct Lookup -->
+              <div class="bus-number-search">
+                <label class="search-label" for="busNumberInput">Direct Bus Number Lookup:</label>
+                <div class="bus-search-bar">
+                  <input type="text" id="busNumberInput" class="search-input" style="padding-left: 0.85rem;" placeholder="e.g. 415, 302, 518...">
+                  <button type="button" id="busNumberSearchBtn" class="btn-secondary">Track</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Relevant Buses List Section -->
+          <div class="results-header-info">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #004d40;">Active Incoming Buses</h3>
+            <span class="results-count-badge" id="resultsCountBadge">Loading...</span>
+          </div>
+
+          <div id="busesListContainer">
+            <!-- Dynamic Bus Cards Rendered Here -->
+          </div>
+
+        </div>
+
+        <!-- Right: Live Interactive Fleet Map -->
+        <div class="passenger-map-column">
+          <div class="card map-card-wrapper">
+            <div class="card-header">
+              <h2 class="card-title">🗺️ Live GPS Corridor Map</h2>
+              <span style="font-size: 0.75rem; color: #64748b;">Real-time Telemetry Updates</span>
+            </div>
+            
+            <div id="fleetMap"></div>
+
+            <div class="map-controls-bar">
+              <div class="legend-items">
+                <span style="font-weight: 800; color: #334155;">Freshness:</span>
+                <div class="legend-item"><span class="legend-swatch" style="background: var(--status-live);"></span> Live (&le;10s)</div>
+                <div class="legend-item"><span class="legend-swatch" style="background: var(--status-recent);"></span> Recent (&le;60s)</div>
+                <div class="legend-item"><span class="legend-swatch" style="background: var(--status-stale);"></span> Stale (&le;5m)</div>
+                <div class="legend-item"><span class="legend-swatch" style="background: var(--status-offline);"></span> Offline</div>
+              </div>
+
+              <div class="legend-items">
+                <span style="font-weight: 800; color: #334155;">Sources:</span>
+                <span class="source-pill HARDWARE_TRACKER">Tracker</span>
+                <span class="source-pill CREW_PHONE">Crew</span>
+                <span class="source-pill ETM">ETM</span>
+                <span class="source-pill DEMO">Demo</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 2. CREW MOBILE PORTAL                     -->
+    <!-- ========================================== -->
+    <section id="view-crew" class="view-section">
+      <div class="crew-layout">
+        <div class="card">
+          <div class="card-header" style="background: var(--apsrtc-teal-dark); color: #ffffff;">
+            <h2 class="card-title" style="color: #ffffff;">📱 APSRTC Crew Driver & Conductor Portal</h2>
+            <span class="brand-badge">Duty Mode</span>
+          </div>
+
+          <div class="card-body">
+            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">
+              Authorised APSRTC drivers/conductors can start scheduled corridor trips, stream live phone GPS to central tracking servers, and report emergency alerts.
+            </p>
+
+            <div id="crewActiveTripDisplay" style="display: none;"></div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div class="search-form-group">
+                <label class="search-label" for="crewStaffSelect">Staff Identity (Crew ID)</label>
+                <select id="crewStaffSelect" class="search-select" style="padding-left: 0.85rem;">
+                  <option value="EMP-4089">EMP-4089 (K. Ramesh Babu - Driver)</option>
+                  <option value="EMP-4102">EMP-4102 (M. Venkateswarlu - Driver)</option>
+                  <option value="EMP-5011">EMP-5011 (T. Appa Rao - Driver)</option>
+                  <option value="CON-1120">CON-1120 (P. Satyanarayana - Conductor)</option>
+                </select>
+              </div>
+
+              <div class="search-form-group">
+                <label class="search-label" for="crewBusSelect">Assigned Bus Number</label>
+                <select id="crewBusSelect" class="search-select" style="padding-left: 0.85rem;">
+                  <option value="415">Bus 415 (Araku Depot - Express)</option>
+                  <option value="302">Bus 302 (Paderu Depot - Palle Velugu)</option>
+                  <option value="518">Bus 518 (Chintapalli Depot - Ultra Deluxe)</option>
+                  <option value="624">Bus 624 (Visakhapatnam - Super Luxury)</option>
+                  <option value="731">Bus 731 (Anakapalle - Indra AC)</option>
+                  <option value="842">Bus 842 (Araku Depot - Express)</option>
+                  <option value="905">Bus 905 (Visakhapatnam - Palle Velugu)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+              <div class="search-form-group">
+                <label class="search-label" for="crewFromSelect">Trip Origin (From)</label>
+                <select id="crewFromSelect" class="search-select" style="padding-left: 0.85rem;">
+                  <option value="Araku">Araku</option>
+                  <option value="Ananthagiri">Ananthagiri</option>
+                  <option value="Paderu" selected>Paderu</option>
+                  <option value="G. Madugula">G. Madugula</option>
+                  <option value="Chintapalli">Chintapalli</option>
+                  <option value="Anakapalle">Anakapalle</option>
+                  <option value="Visakhapatnam">Visakhapatnam</option>
+                </select>
+              </div>
+
+              <div class="search-form-group">
+                <label class="search-label" for="crewToSelect">Trip Destination (To)</label>
+                <select id="crewToSelect" class="search-select" style="padding-left: 0.85rem;">
+                  <option value="Visakhapatnam" selected>Visakhapatnam</option>
+                  <option value="Anakapalle">Anakapalle</option>
+                  <option value="Chintapalli">Chintapalli</option>
+                  <option value="G. Madugula">G. Madugula</option>
+                  <option value="Paderu">Paderu</option>
+                  <option value="Ananthagiri">Ananthagiri</option>
+                  <option value="Araku">Araku</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; margin-bottom: 1.25rem;">
+              <button type="button" class="btn-primary" id="crewStartTripBtn" style="flex: 2;">
+                🚀 Start Scheduled Trip
+              </button>
+              <button type="button" class="btn-secondary" id="crewEndTripBtn" style="flex: 1;" disabled>
+                🏁 End Trip
+              </button>
+            </div>
+
+            <div id="crewGpsControlsGroup" style="display: none; padding-top: 1rem; border-top: 1px dashed var(--border-medium);">
+              <h3 style="font-size: 0.95rem; font-weight: 800; color: #004d40; margin-bottom: 0.5rem;">📡 Crew GPS Telemetry Dispatch</h3>
+              <p style="font-size: 0.78rem; color: #64748b; margin-bottom: 0.85rem;">
+                Stream real-time mobile coordinates directly to passenger dashboards.
+              </p>
+
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" id="crewGpsToggleBtn" class="btn-primary" style="flex: 1; background: #00695c;">
+                  📡 Start Phone GPS
+                </button>
+                <button type="button" id="crewStepPingBtn" class="btn-secondary" style="flex: 1;">
+                  🧪 Step Forward Along Route (Test)
+                </button>
+              </div>
+
+              <div class="crew-telemetry-box" id="crewTelemetryLog">
+                [READY] Duty terminal online. Ready to stream GPS telemetry.
+              </div>
+
+              <button type="button" id="crewSosBtn" style="width: 100%; background: #dc2626; color: #ffffff; border: none; padding: 0.85rem; border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 10px rgba(220, 38, 38, 0.3);">
+                🚨 EMERGENCY SOS BROADCAST (Depot Alarm)
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 3. OFFICER OPERATIONS DASHBOARD           -->
+    <!-- ========================================== -->
+    <section id="view-officer" class="view-section">
+      
+      <!-- Metrics Overview Row -->
+      <div class="metrics-summary-row">
+        <div class="summary-metric-card">
+          <span class="label">Total Fleet Buses</span>
+          <span class="number" id="metricTotalBuses">0</span>
+          <span class="sub-detail">Registered Assets</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Active Running Trips</span>
+          <span class="number" id="metricActiveTrips" style="color: #0284c7;">0</span>
+          <span class="sub-detail">On Corridor</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Live GPS Signal</span>
+          <span class="number" id="metricLiveBuses" style="color: var(--status-live);">0</span>
+          <span class="sub-detail">&le;10s Freshness</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Stale Signals</span>
+          <span class="number" id="metricStaleBuses" style="color: var(--status-stale);">0</span>
+          <span class="sub-detail">Heartbeat Timeout</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Offline / Unavailable</span>
+          <span class="number" id="metricOfflineBuses" style="color: var(--status-offline);">0</span>
+          <span class="sub-detail">&gt;5m Stale</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Hardware Trackers</span>
+          <span class="number" id="metricHwTrackers" style="color: var(--src-hardware);">0</span>
+          <span class="sub-detail">Installed GPS Boxes</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Crew Mobile GPS</span>
+          <span class="number" id="metricCrewGps" style="color: var(--src-crew);">0</span>
+          <span class="sub-detail">Driver Phones</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">ETM GPS</span>
+          <span class="number" id="metricEtmGps" style="color: var(--src-etm);">0</span>
+          <span class="sub-detail">Ticketing Machines</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Active Complaints</span>
+          <span class="number" id="metricActiveComplaints" style="color: #b91c1c;">0</span>
+          <span class="sub-detail">Passenger Grievances</span>
+        </div>
+        <div class="summary-metric-card">
+          <span class="label">Critical Alerts</span>
+          <span class="number" id="metricCriticalAlerts" style="color: #dc2626;">0</span>
+          <span class="sub-detail">SOS & Safety</span>
+        </div>
+      </div>
+
+      <!-- Priority Failover Simulation Panel -->
+      <div class="card" style="margin-bottom: 1.5rem; border: 2px solid #00695c;">
+        <div class="card-header" style="background: #e6fffa;">
+          <h3 class="card-title">⚡ Multi-Source Priority & Dynamic Failover Verification Console</h3>
+          <span style="font-size: 0.75rem; font-weight: 700; color: #004d40;">System Architecture Tester</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+            Test the backend location resolver: <strong>Hardware Tracker (P1) ➔ Crew Phone (P2) ➔ ETM (P3) ➔ Demo (P4)</strong>.
+            Drop a higher priority source to observe instant automatic failover to the next available fresh source.
+          </p>
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end;">
+            <div style="flex: 1; min-width: 180px;">
+              <label class="search-label" for="failoverBusSelect">Select Bus Number</label>
+              <select id="failoverBusSelect" class="search-select" style="padding-left: 0.85rem;">
+                <option value="518">Bus 518 (Currently Hardware Tracker)</option>
+                <option value="415">Bus 415 (Currently Crew Phone GPS)</option>
+                <option value="624">Bus 624 (Currently Hardware Tracker)</option>
+                <option value="731">Bus 731 (Currently ETM)</option>
+                <option value="302">Bus 302 (Currently Demo GPS)</option>
+              </select>
+            </div>
+
+            <div style="flex: 1; min-width: 180px;">
+              <label class="search-label" for="failoverSourceSelect">Source to Drop Offline</label>
+              <select id="failoverSourceSelect" class="search-select" style="padding-left: 0.85rem;">
+                <option value="HARDWARE_TRACKER">Hardware Tracker</option>
+                <option value="CREW_PHONE">Crew Mobile Phone</option>
+                <option value="ETM">ETM Ticket Machine</option>
+              </select>
+            </div>
+
+            <button type="button" id="simulateFailoverBtn" class="btn-primary" style="flex: 1.2; min-width: 220px; background: #004d40;">
+              ⚡ Drop Source & Trigger Failover
+            </button>
+          </div>
+
+          <div id="failoverResultBox" style="margin-top: 1rem; display: none;"></div>
+        </div>
+      </div>
+
+      <!-- Real-Time Fleet Monitoring Table -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 class="card-title">🚍 Fleet Telemetry Operational Monitoring</h3>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <input type="text" id="officerFleetFilter" placeholder="Filter by Bus, Location..." style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem;">
+            <select id="officerSourceFilter" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem;">
+              <option value="">All Sources</option>
+              <option value="HARDWARE_TRACKER">Hardware Tracker</option>
+              <option value="CREW_PHONE">Crew Mobile</option>
+              <option value="ETM">ETM</option>
+              <option value="DEMO">Demo</option>
+            </select>
+            <select id="officerStatusFilter" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem;">
+              <option value="">All Statuses</option>
+              <option value="LIVE">LIVE</option>
+              <option value="RECENT">RECENT</option>
+              <option value="STALE">STALE</option>
+              <option value="UNAVAILABLE">UNAVAILABLE</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Bus & Reg No</th>
+                <th>Route Corridor</th>
+                <th>Current Location</th>
+                <th>Source</th>
+                <th>Freshness</th>
+                <th>Speed</th>
+                <th>GPS Accuracy</th>
+                <th>Age</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="officerFleetTableBody">
+              <tr><td colspan="9" style="text-align: center; padding: 2rem;">Loading fleet data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Passenger Grievances & Complaints Table -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📋 Passenger Grievance Resolution Desk</h3>
+          <span style="font-size: 0.75rem; color: #64748b;">Grievance Workflow: NEW ➔ ACKNOWLEDGED ➔ INVESTIGATING ➔ RESOLVED ➔ CLOSED</span>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Ref ID</th>
+                <th>Bus</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Current Status</th>
+                <th>Filed At</th>
+                <th>Update Status</th>
+              </tr>
+            </thead>
+            <tbody id="officerComplaintsTableBody">
+              <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading grievances...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 4. SIMULATOR & FAILOVER LAB               -->
+    <!-- ========================================== -->
+    <section id="view-simulator" class="view-section">
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <div class="card-header">
+          <h2 class="card-title">🛰️ APSRTC Multi-Bus GPS Telemetry Simulator Lab</h2>
+          <span class="brand-badge">Dev / Demo Mode</span>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 0.9rem; color: #475569; margin-bottom: 1.25rem;">
+            This prototype incorporates an automated multi-bus GPS simulator that pushes realistic telemetry along the Araku-Visakhapatnam ghat corridor with speeds, headings, and distinct sources.
+          </p>
+
+          <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.5rem;">
+            <h4 style="color: #004d40; font-weight: 800; margin-bottom: 0.5rem;">In-Browser Quick Simulation Controls</h4>
+            <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 1rem;">
+              You can trigger telemetry pings directly from your browser to keep signals fresh and watch real-time WebSocket pulses on the Passenger Portal and Map.
+            </p>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+              <button type="button" class="btn-primary" id="simLoopToggleBtn" style="flex: 1;">
+                ▶️ Start In-Browser Pings (3s)
+              </button>
+              <button type="button" class="btn-secondary" id="simTriggerTickBtn" style="flex: 1;">
+                ⚡ Trigger Immediate Telemetry Tick
+              </button>
+            </div>
+          </div>
+
+          <div style="background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 1.25rem; font-family: monospace; font-size: 0.85rem; line-height: 1.6;">
+            <div style="color: #38bdf8; font-weight: 800; margin-bottom: 0.5rem;"># Standalone Background Simulator Command</div>
+            <div>To run the continuous multi-bus background simulator in a separate terminal:</div>
+            <div style="background: #1e293b; padding: 0.5rem 0.75rem; border-radius: 6px; margin: 0.5rem 0; color: #4ade80;">
+              cd backend<br>
+              npm run simulate
+            </div>
+            <div style="color: #94a3b8; font-size: 0.78rem;">Simulates 7 buses across Eastern Ghats corridors via HTTP REST endpoints (/api/v1/tracking/*).</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- MODAL: PASSENGER COMPLAINT FORM           -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="complaintModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>⚠️ Report Issue / Passenger Grievance</h3>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('complaintModal')">&times;</button>
+      </div>
+      <form id="complaintForm">
+        <div class="modal-body">
+          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 1rem;">
+            Your report is routed directly to the APSRTC Depot Operations Control Center. An official reference ID will be generated.
+          </p>
+
+          <input type="hidden" id="complaintTripId">
+
+          <div class="search-form-group">
+            <label class="search-label" for="complaintBusNumber">Bus Number</label>
+            <input type="text" id="complaintBusNumber" class="search-input" style="padding-left: 0.85rem;" readonly>
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="complaintCategory">Issue Category</label>
+            <select id="complaintCategory" class="search-select" style="padding-left: 0.85rem;" required>
+              <option value="Bus did not stop">Bus did not stop at designated stand</option>
+              <option value="Overcrowding">Severe Overcrowding / Seat Unavailability</option>
+              <option value="Delay">Unscheduled Delay / Breakdown</option>
+              <option value="Driver behaviour">Driver Rash Driving / Behaviour</option>
+              <option value="Conductor issue">Conductor Issue / Overcharging</option>
+              <option value="Safety">Safety & Mechanical Issue</option>
+              <option value="Cleanliness">Cleanliness & Hygiene</option>
+              <option value="Other">Other Operational Concern</option>
+            </select>
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="complaintDescription">Description of Incident</label>
+            <textarea id="complaintDescription" rows="3" class="search-input" style="padding-left: 0.85rem; height: auto;" placeholder="Please describe what happened..." required></textarea>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="search-form-group">
+              <label class="search-label" for="complaintName">Your Name (Optional)</label>
+              <input type="text" id="complaintName" class="search-input" style="padding-left: 0.85rem;" placeholder="Passenger Name">
+            </div>
+            <div class="search-form-group">
+              <label class="search-label" for="complaintPhone">Phone (Optional)</label>
+              <input type="tel" id="complaintPhone" class="search-input" style="padding-left: 0.85rem;" placeholder="Mobile Number">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('complaintModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="background: #c62828;">Submit Grievance</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: BUS DETAILS                        -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="busDetailsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>📋 Bus Asset & Corridor Profile</h3>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('busDetailsModal')">&times;</button>
+      </div>
+      <div class="modal-body" id="busDetailsModalBody">
+        <!-- Content injected dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('busDetailsModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Footer -->
+  <footer class="official-footer">
+    <div class="footer-inner">
+      <div>
+        <strong>Andhra Pradesh State Road Transport Corporation (APSRTC)</strong><br>
+        <span style="font-size: 0.75rem; color: #94a3b8;">SmartTrack Multi-Source Fleet Telemetry & Passenger Information Prototype</span>
+      </div>
+      <div style="font-size: 0.75rem; color: #94a3b8; text-align: right;">
+        Demonstration Prototype | Designed for scalable production integration<br>
+        Corridor: Araku &ndash; Ananthagiri &ndash; Paderu &ndash; G. Madugula &ndash; Chintapalli &ndash; Anakapalle &ndash; Visakhapatnam
+      </div>
+    </div>
+  </footer>
+
+  <!-- Socket.IO Client -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Fallback if local Socket.IO script fails to load
+    if (typeof io === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.8.1/dist/socket.io.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Modular Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/socket.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/passenger.js"></script>
+  <script src="js/crew.js"></script>
+  <script src="js/officer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
