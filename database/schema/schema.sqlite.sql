@@ -78,6 +78,8 @@ CREATE TABLE IF NOT EXISTS trips (
     conductor_staff_id INTEGER,
     from_stop TEXT NOT NULL,
     to_stop TEXT NOT NULL,
+    tracking_source TEXT CHECK(tracking_source IN ('HARDWARE_TRACKER', 'CREW_PHONE', 'ETM', 'DEMO')) DEFAULT 'CREW_PHONE',
+    device_id TEXT,
     start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     end_time DATETIME,
     status TEXT CHECK(status IN ('SCHEDULED', 'RUNNING', 'COMPLETED', 'CANCELLED')) DEFAULT 'RUNNING',

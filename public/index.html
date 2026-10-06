@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APSRTC SmartTrack - Real-Time Fleet & Corridor Tracking Prototype</title>
-  <meta name="description" content="APSRTC SmartTrack real-time bus tracking and journey matching system. Know where your bus is before you wait.">
+  <title>APSRTC SmartTrack - Official Corridor Tracking & Passenger Grievance Portal</title>
+  <meta name="description" content="Official APSRTC SmartTrack real-time bus tracking and journey matching system. Real-time Google Maps telemetry, passenger grievance lodging against staff and bus condition.">
   <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Leaflet Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -15,7 +20,36 @@
 </head>
 <body>
 
-  <!-- Official Government Header -->
+  <!-- ========================================== -->
+  <!-- 1. AP GOVERNMENT OFFICIAL TOP BAR          -->
+  <!-- ========================================== -->
+  <div class="gov-top-bar">
+    <div class="gov-top-bar-inner">
+      <div class="gov-brand-cell">
+        <span class="gov-flag-icon">🇮🇳</span>
+        <span class="gov-title">Government of Andhra Pradesh • ఆంధ్రప్రదేశ్ ప్రభుత్వం</span>
+        <span class="gov-badge-official">Official Transport Portal</span>
+      </div>
+      <div class="gov-contact-cell">
+        <span class="gov-phone">📞 24x7 Helpline: <strong>149</strong> / <strong>0866-2570005</strong></span>
+        <button type="button" class="gov-link-btn" onclick="passengerApp.openComplaintModal('', '', 'STAFF')">
+          🚨 Lodge Complaint
+        </button>
+        <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal()">
+          📋 Track Status
+        </button>
+        <div id="adminTopAuthBadge" style="display: inline-flex; align-items: center; gap: 0.4rem;">
+          <button type="button" class="gov-link-btn" onclick="adminApp.openLoginModal()" style="background: rgba(255, 255, 255, 0.12);">
+            🔒 Staff / Depot Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. APSRTC OFFICIAL BRAND HEADER            -->
+  <!-- ========================================== -->
   <header class="official-header">
     <div class="header-inner">
       <div class="brand-wrapper">
@@ -24,7 +58,7 @@
           <h1>APSRTC SmartTrack</h1>
           <div class="telugu-sub">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ • Corridor GPS Live</div>
         </div>
-        <span class="brand-badge">Official Prototype</span>
+        <span class="brand-badge">Official Portal</span>
       </div>
 
       <nav class="nav-tabs">
@@ -37,6 +71,9 @@
         <button class="tab-btn" data-tab="officer">
           <span>🛡️</span> Officer Fleet Ops
         </button>
+        <button class="tab-btn" id="navTabAdmin" data-tab="admin" style="display: none;">
+          <span>⚙️</span> Admin Control
+        </button>
         <button class="tab-btn" data-tab="simulator">
           <span>🛰️</span> Simulator & Failover
         </button>
@@ -48,15 +85,27 @@
     </div>
   </header>
 
-  <!-- Prototype Advisory Banner -->
-  <div class="demo-banner">
-    <span>⚠️ <strong>PROTOTYPE DEMONSTRATION SYSTEM:</strong> Displays multi-source GPS failover architecture (Hardware Tracker, Crew Mobile GPS, ETM, and Demo). Real operational deployment requires authorized APSRTC enterprise access.</span>
+  <!-- ========================================== -->
+  <!-- 3. OFFICIAL NEWS & ADVISORY TICKER         -->
+  <!-- ========================================== -->
+  <div class="news-ticker-bar">
+    <div class="ticker-label">
+      <span>📢</span> LATEST ALERTS
+    </div>
+    <div class="ticker-content">
+      <div class="ticker-track">
+        <span>🟢 <strong>LIVE CORRIDOR TELEMETRY:</strong> High-resolution GPS tracking active across Araku – Paderu – Chodavaram – S. Kota – Pendurthi – Chintapalli – Anakapalle – Visakhapatnam ghat routes.</span>
+        <span>⚡ <strong>MULTI-SOURCE FAILOVER:</strong> Bus locations continuously verified through onboard hardware trackers, crew GPS & ticketing terminals.</span>
+        <span>⚠️ <strong>CITIZEN GRIEVANCE SYSTEM:</strong> Passengers can lodge official complaints regarding Staff Conduct (Driver/Conductor) and Bus Condition directly via the portal.</span>
+        <span>📞 <strong>24/7 HELPLINE:</strong> Call 149 (Toll Free) or 0866-2570005 for immediate transport assistance.</span>
+      </div>
+    </div>
   </div>
 
   <main class="main-wrapper">
 
     <!-- ========================================== -->
-    <!-- 1. PASSENGER VIEW                         -->
+    <!-- 4. PASSENGER VIEW                         -->
     <!-- ========================================== -->
     <section id="view-passenger" class="view-section active">
       <div class="passenger-grid">
@@ -67,14 +116,17 @@
           <!-- Search Form Card -->
           <div class="card" style="margin-bottom: 1.25rem;">
             <div class="card-header">
-              <h2 class="card-title">🔍 Search Corridor Buses</h2>
-              <span style="font-size: 0.75rem; font-weight: 700; color: #00695c;">Eastern Ghats Corridor</span>
+              <div>
+                <h2 class="card-title">🔍 Search Corridor Buses</h2>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">రూట్ బస్సులను శోధించండి &bull; Eastern Ghats Corridor</div>
+              </div>
+              <span style="font-size: 0.72rem; font-weight: 700; color: #006045; background: #e6f6f0; padding: 4px 8px; border-radius: 6px;">Live GPS Matching</span>
             </div>
             <div class="card-body">
               <form id="journeySearchForm">
                 
                 <div class="search-form-group">
-                  <label class="search-label" for="searchFrom">From (Boarding Stop)</label>
+                  <label class="search-label" for="searchFrom">From (Boarding Stop / బయలుదేరు ప్రదేశం)</label>
                   <div class="input-with-icon">
                     <span class="input-icon">🟢</span>
                     <select id="searchFrom" class="search-select" required>
@@ -90,7 +142,7 @@
                 </div>
 
                 <div class="search-form-group">
-                  <label class="search-label" for="searchTo">To (Destination Stop)</label>
+                  <label class="search-label" for="searchTo">To (Destination Stop / గమ్యస్థానం)</label>
                   <div class="input-with-icon">
                     <span class="input-icon">🔴</span>
                     <select id="searchTo" class="search-select" required>
@@ -106,23 +158,39 @@
 
               <!-- Quick Corridor Chips -->
               <div class="quick-chips">
-                <div class="quick-chips-title">Frequent Corridor Routes:</div>
+                <div class="quick-chips-title">Frequent Corridor Routes (ప్రధాన మార్గాలు):</div>
                 <div class="chips-list">
                   <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Paderu', 'Visakhapatnam')">Paderu ➔ Visakhapatnam</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Araku', 'Paderu')">Araku ➔ Paderu</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Visakhapatnam', 'Araku')">Visakhapatnam ➔ Araku (Up)</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('G. Madugula', 'Chintapalli')">G. Madugula ➔ Chintapalli</button>
-                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chintapalli', 'Anakapalle')">Chintapalli ➔ Anakapalle</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chodavaram', 'Visakhapatnam')">Chodavaram ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('S. Kota', 'Visakhapatnam')">S. Kota ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Pendurthi', 'Visakhapatnam')">Pendurthi ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Araku', 'Visakhapatnam')">Araku ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('G. Madugula', 'Visakhapatnam')">G. Madugula ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chintapalli', 'Visakhapatnam')">Chintapalli ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Visakhapatnam', 'Paderu')">Visakhapatnam ➔ Paderu (Return)</button>
                 </div>
               </div>
 
               <!-- Bus Number Direct Lookup -->
               <div class="bus-number-search">
-                <label class="search-label" for="busNumberInput">Direct Bus Number Lookup:</label>
+                <label class="search-label" for="busNumberInput">Direct Bus Number Lookup (ప్రత్యక్ష బస్సు నంబర్):</label>
                 <div class="bus-search-bar">
                   <input type="text" id="busNumberInput" class="search-input" style="padding-left: 0.85rem;" placeholder="e.g. 415, 302, 518...">
                   <button type="button" id="busNumberSearchBtn" class="btn-secondary">Track</button>
                 </div>
+              </div>
+
+              <!-- Quick Action Grievance Bar -->
+              <div class="quick-grievance-bar">
+                <button type="button" class="quick-grievance-btn staff-btn" onclick="passengerApp.openComplaintModal('', '', 'STAFF')">
+                  👨‍✈️ Lodge Complaint Against Staff
+                </button>
+                <button type="button" class="quick-grievance-btn bus-btn" onclick="passengerApp.openComplaintModal('', '', 'BUS_CONDITION')">
+                  🚌 Report Bus Condition / AC / Defect
+                </button>
+                <button type="button" class="quick-grievance-btn track-btn" onclick="passengerApp.trackComplaintModal()">
+                  🔍 Track Grievance Status
+                </button>
               </div>
 
             </div>
@@ -144,15 +212,22 @@
         <div class="passenger-map-column">
           <div class="card map-card-wrapper">
             <div class="card-header">
-              <h2 class="card-title">🗺️ Live GPS Corridor Map</h2>
-              <span style="font-size: 0.75rem; color: #64748b;">Real-time Telemetry Updates</span>
+              <div>
+                <h2 class="card-title">🗺️ Live Google Maps Fleet Corridor</h2>
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 2px;">Google Roadmap &bull; Real-time GPS Telemetry Updates</div>
+              </div>
+              <div class="map-layer-selector">
+                <button type="button" class="map-layer-btn active" id="btnLayerRoadmap" onclick="fleetMap.setBaseLayer('roadmap')">Roadmap</button>
+                <button type="button" class="map-layer-btn" id="btnLayerSatellite" onclick="fleetMap.setBaseLayer('satellite')">Satellite</button>
+                <button type="button" class="map-layer-btn" id="btnLayerTerrain" onclick="fleetMap.setBaseLayer('terrain')">Terrain</button>
+              </div>
             </div>
             
             <div id="fleetMap"></div>
 
             <div class="map-controls-bar">
               <div class="legend-items">
-                <span style="font-weight: 800; color: #334155;">Freshness:</span>
+                <span style="font-weight: 800; color: #334155;">Signal Freshness:</span>
                 <div class="legend-item"><span class="legend-swatch" style="background: var(--status-live);"></span> Live (&le;10s)</div>
                 <div class="legend-item"><span class="legend-swatch" style="background: var(--status-recent);"></span> Recent (&le;60s)</div>
                 <div class="legend-item"><span class="legend-swatch" style="background: var(--status-stale);"></span> Stale (&le;5m)</div>
@@ -160,11 +235,18 @@
               </div>
 
               <div class="legend-items">
-                <span style="font-weight: 800; color: #334155;">Sources:</span>
-                <span class="source-pill HARDWARE_TRACKER">Tracker</span>
-                <span class="source-pill CREW_PHONE">Crew</span>
+                <span style="font-weight: 800; color: #334155;">Telemetry Sources:</span>
+                <span class="source-pill HARDWARE_TRACKER">GPS Tracker</span>
+                <span class="source-pill CREW_PHONE">Crew Phone</span>
                 <span class="source-pill ETM">ETM</span>
-                <span class="source-pill DEMO">Demo</span>
+                <span class="source-pill DEMO">Demo Fleet</span>
+              </div>
+
+              <div class="legend-items" style="margin-top: 0.35rem; width: 100%; border-top: 1px solid var(--border-light); padding-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+                <span style="font-weight: 800; color: #334155;">Active Corridors:</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;"><span style="display: inline-block; width: 18px; height: 4px; background: #ffb703; border: 1.5px solid #004d38; border-radius: 2px;"></span> Via Chintapalli - Anakapalle</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;"><span style="display: inline-block; width: 18px; height: 4px; background: #38bdf8; border: 1.5px solid #075985; border-radius: 2px;"></span> Via Chodavaram - Pendurthi (Direct SH-39)</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;"><span style="display: inline-block; width: 18px; height: 4px; background: #f43f5e; border: 1.5px solid #6b21a8; border-radius: 2px;"></span> Via Araku - S. Kota - Pendurthi</span>
               </div>
             </div>
           </div>
@@ -174,7 +256,7 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- 2. CREW MOBILE PORTAL                     -->
+    <!-- 5. CREW MOBILE PORTAL                     -->
     <!-- ========================================== -->
     <section id="view-crew" class="view-section">
       <div class="crew-layout">
@@ -193,9 +275,18 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
               <div class="search-form-group">
-                <label class="search-label" for="crewStaffSelect">Staff Identity (Crew ID)</label>
-                <select id="crewStaffSelect" class="search-select" style="padding-left: 0.85rem;">
+                <label class="search-label" for="crewStaffInput">Staff Identity (Crew ID / Employee ID)</label>
+                <input type="text" id="crewStaffInput" list="crewStaffDatalist" class="search-select" style="padding-left: 0.85rem;" placeholder="Enter Crew ID (e.g. EMP-4089)" value="EMP-4089" autocomplete="off">
+                <datalist id="crewStaffDatalist">
                   <option value="EMP-4089">EMP-4089 (K. Ramesh Babu - Driver)</option>
+                  <option value="EMP-4102">EMP-4102 (M. Venkateswarlu - Driver)</option>
+                  <option value="EMP-5011">EMP-5011 (T. Appa Rao - Driver)</option>
+                  <option value="CON-1120">CON-1120 (P. Satyanarayana - Conductor)</option>
+                  <option value="EMP-7230">EMP-7230 (S. Appala Naidu - Driver)</option>
+                  <option value="EMP-8104">EMP-8104 (B. Rama Rao - Driver)</option>
+                </datalist>
+                <select id="crewStaffSelect" style="display: none;">
+                  <option value="EMP-4089" selected>EMP-4089 (K. Ramesh Babu - Driver)</option>
                   <option value="EMP-4102">EMP-4102 (M. Venkateswarlu - Driver)</option>
                   <option value="EMP-5011">EMP-5011 (T. Appa Rao - Driver)</option>
                   <option value="CON-1120">CON-1120 (P. Satyanarayana - Conductor)</option>
@@ -207,12 +298,31 @@
                 <select id="crewBusSelect" class="search-select" style="padding-left: 0.85rem;">
                   <option value="415">Bus 415 (Araku Depot - Express)</option>
                   <option value="302">Bus 302 (Paderu Depot - Palle Velugu)</option>
+                  <option value="246">Bus 246 (Paderu Depot - Express via Chodavaram)</option>
+                  <option value="472">Bus 472 (Paderu Depot - Ultra Deluxe via S. Kota)</option>
+                  <option value="580">Bus 580 (Visakhapatnam - Super Luxury via S. Kota)</option>
                   <option value="518">Bus 518 (Chintapalli Depot - Ultra Deluxe)</option>
                   <option value="624">Bus 624 (Visakhapatnam - Super Luxury)</option>
                   <option value="731">Bus 731 (Anakapalle - Indra AC)</option>
                   <option value="842">Bus 842 (Araku Depot - Express)</option>
                   <option value="905">Bus 905 (Visakhapatnam - Palle Velugu)</option>
                 </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div class="search-form-group">
+                <label class="search-label" for="crewTrackingSourceSelect">Location Identification Means</label>
+                <select id="crewTrackingSourceSelect" class="search-select" style="padding-left: 0.85rem;">
+                  <option value="CREW_PHONE" selected>📱 Staff Mobile Phone GPS (Driver Device)</option>
+                  <option value="HARDWARE_TRACKER">🛰️ Onboard Bus Hardware GPS Tracker</option>
+                  <option value="ETM">📠 Electronic Ticketing Machine (ETM GPS)</option>
+                </select>
+              </div>
+
+              <div class="search-form-group">
+                <label class="search-label" for="crewDeviceIdInput">Terminal / Hardware Device ID</label>
+                <input type="text" id="crewDeviceIdInput" class="search-select" style="padding-left: 0.85rem;" placeholder="e.g. DRIVER-EMP-4089-PHONE" value="DRIVER-EMP-4089-PHONE">
               </div>
             </div>
 
@@ -223,6 +333,9 @@
                   <option value="Araku">Araku</option>
                   <option value="Ananthagiri">Ananthagiri</option>
                   <option value="Paderu" selected>Paderu</option>
+                  <option value="Chodavaram">Chodavaram</option>
+                  <option value="S. Kota">S. Kota</option>
+                  <option value="Pendurthi">Pendurthi</option>
                   <option value="G. Madugula">G. Madugula</option>
                   <option value="Chintapalli">Chintapalli</option>
                   <option value="Anakapalle">Anakapalle</option>
@@ -234,6 +347,9 @@
                 <label class="search-label" for="crewToSelect">Trip Destination (To)</label>
                 <select id="crewToSelect" class="search-select" style="padding-left: 0.85rem;">
                   <option value="Visakhapatnam" selected>Visakhapatnam</option>
+                  <option value="Pendurthi">Pendurthi</option>
+                  <option value="S. Kota">S. Kota</option>
+                  <option value="Chodavaram">Chodavaram</option>
                   <option value="Anakapalle">Anakapalle</option>
                   <option value="Chintapalli">Chintapalli</option>
                   <option value="G. Madugula">G. Madugula</option>
@@ -283,7 +399,7 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- 3. OFFICER OPERATIONS DASHBOARD           -->
+    <!-- 6. OFFICER OPERATIONS DASHBOARD           -->
     <!-- ========================================== -->
     <section id="view-officer" class="view-section">
       
@@ -361,6 +477,9 @@
                 <option value="624">Bus 624 (Currently Hardware Tracker)</option>
                 <option value="731">Bus 731 (Currently ETM)</option>
                 <option value="302">Bus 302 (Currently Demo GPS)</option>
+                <option value="246">Bus 246 (Currently Hardware Tracker - Chodavaram)</option>
+                <option value="472">Bus 472 (Currently Hardware Tracker - S. Kota)</option>
+                <option value="580">Bus 580 (Currently ETM - Pendurthi)</option>
               </select>
             </div>
 
@@ -430,8 +549,18 @@
       <!-- Passenger Grievances & Complaints Table -->
       <div class="card">
         <div class="card-header">
-          <h3 class="card-title">📋 Passenger Grievance Resolution Desk</h3>
-          <span style="font-size: 0.75rem; color: #64748b;">Grievance Workflow: NEW ➔ ACKNOWLEDGED ➔ INVESTIGATING ➔ RESOLVED ➔ CLOSED</span>
+          <div>
+            <h3 class="card-title">📋 Passenger Grievance Resolution Desk (సిబ్బంది & బస్సు ఫిర్యాదులు)</h3>
+            <span style="font-size: 0.75rem; color: #64748b;">Target: Staff Conduct | Bus Condition & Defects | Service Delays</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <select id="officerGrievanceFilter" onchange="officerApp.applyGrievanceFilter(this.value)" style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem;">
+              <option value="">All Targets</option>
+              <option value="STAFF">Staff Misconduct</option>
+              <option value="BUS_CONDITION">Bus Condition & Defect</option>
+              <option value="SERVICE">Service & Route</option>
+            </select>
+          </div>
         </div>
 
         <div class="table-container">
@@ -439,9 +568,9 @@
             <thead>
               <tr>
                 <th>Ref ID</th>
-                <th>Bus</th>
+                <th>Target & Bus</th>
                 <th>Category</th>
-                <th>Description</th>
+                <th>Description & Location</th>
                 <th>Current Status</th>
                 <th>Filed At</th>
                 <th>Update Status</th>
@@ -457,7 +586,250 @@
     </section>
 
     <!-- ========================================== -->
-    <!-- 4. SIMULATOR & FAILOVER LAB               -->
+    <!-- 7. ADMIN FLEET & DEPOT CONTROL CONSOLE     -->
+    <!-- ========================================== -->
+    <section id="view-admin" class="view-section">
+      <!-- 7A. SECURITY GATE LOCK CARD (Shown to unauthorized users) -->
+      <div id="adminAuthGateLock" style="max-width: 480px; margin: 3rem auto;">
+        <div class="card" style="box-shadow: 0 10px 30px rgba(0, 66, 48, 0.2); border: 2px solid #004230;">
+          <div class="card-header" style="background: #003325; color: #ffffff; text-align: center; flex-direction: column; gap: 0.5rem; padding: 1.5rem;">
+            <img src="assets/logo.svg" alt="APSRTC Emblem" style="width: 58px; height: 58px; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));">
+            <h3 style="color: #ffb703; font-size: 1.15rem; font-weight: 800;">🔒 Restricted Administrative Area</h3>
+            <div style="font-size: 0.78rem; color: #cbd5e1;">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ &bull; డిపో అడ్మిన్ లాగిన్</div>
+          </div>
+          <div class="card-body" style="padding: 1.5rem;">
+            <p style="font-size: 0.85rem; color: #475569; margin-bottom: 1.25rem; text-align: center; line-height: 1.5;">
+              This console is reserved exclusively for authorized <strong>APSRTC Regional Operations Officers & Depot Managers</strong>.
+            </p>
+
+            <!-- Builder / Developer Quick Access Banner -->
+            <div style="margin-bottom: 1.25rem; padding: 0.85rem; background: #ecfdf5; border: 1.5px solid #10b981; border-radius: 8px; text-align: center;">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: #065f46; margin-bottom: 0.4rem;">
+                <span>🛠️ Developer / Builder Mode Active</span>
+              </div>
+              <button type="button" class="btn-primary" onclick="adminApp.quickDevLogin()" style="background: #059669; padding: 0.65rem 1rem; width: 100%; font-size: 0.9rem; font-weight: 800; cursor: pointer; border: none; box-shadow: 0 4px 12px rgba(5,150,105,0.3); transition: all 0.2s;">
+                ⚡ 1-Click Developer Auto-Login (PIN: 2026)
+              </button>
+              <div style="font-size: 0.72rem; color: #047857; margin-top: 0.4rem;">
+                Auto-authorizes your session and keeps you logged in across page refreshes.
+              </div>
+            </div>
+
+            <form id="adminGateLoginForm">
+              <div class="search-form-group">
+                <label class="search-label" for="adminGatePin">Depot Security PIN (ఆఫీసర్ పిన్)</label>
+                <input type="password" id="adminGatePin" class="search-input" placeholder="Enter 4-digit Depot PIN (e.g. 2026)" value="2026" autofocus>
+              </div>
+
+              <div style="text-align: center; margin: 0.75rem 0; font-size: 0.75rem; color: #94a3b8; font-weight: 700;">— OR SIGN IN WITH CREDENTIALS —</div>
+
+              <div class="search-form-group">
+                <label class="search-label" for="adminGateUser">Admin Username</label>
+                <input type="text" id="adminGateUser" class="search-input" placeholder="admin" value="admin">
+              </div>
+
+              <div class="search-form-group">
+                <label class="search-label" for="adminGatePass">Password</label>
+                <input type="password" id="adminGatePass" class="search-input" placeholder="••••••••" value="apsrtc@admin2026">
+              </div>
+
+              <button type="submit" class="btn-primary" style="background: #006045; margin-top: 0.5rem;">
+                🔓 Authorize Login
+              </button>
+            </form>
+
+            <div style="font-size: 0.75rem; color: #334155; margin-top: 1rem; background: #f1f5f9; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid #cbd5e1; line-height: 1.4;">
+              <strong style="color: #004230;">🔑 Admin Credentials for Development:</strong><br>
+              &bull; <strong>Master PIN:</strong> <code>2026</code> (instant 1-field login)<br>
+              &bull; <strong>Account:</strong> <code>admin</code> / Password: <code>apsrtc@admin2026</code><br>
+              <span style="font-size: 0.7rem; color: #64748b;">(Configured in <code>backend/config/config.js</code> under <code>ADMIN_PIN</code> & <code>ADMIN_KEY</code>)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7B. SECURE CONSOLE CONTENT (Visible only after authentication) -->
+      <div id="adminConsoleContent" style="display: none;">
+        <!-- Admin Top Metrics Row -->
+        <div class="metrics-summary-row">
+          <div class="summary-metric-card">
+            <span class="label">Total Fleet Registered</span>
+            <span class="number" id="adminTotalAssetsCount">0</span>
+            <span class="sub-detail">APSRTC Assets</span>
+          </div>
+          <div class="summary-metric-card">
+            <span class="label">Active Running Trips</span>
+            <span class="number" id="adminActiveTripsCount" style="color: #0284c7;">0</span>
+            <span class="sub-detail">On Corridor Duty</span>
+          </div>
+          <div class="summary-metric-card">
+            <span class="label">Pending Grievances</span>
+            <span class="number" id="adminPendingGrievancesCount" style="color: #b91c1c;">0</span>
+            <span class="sub-detail">Citizen Reports</span>
+          </div>
+          <div class="summary-metric-card">
+            <span class="label">Depot Regions</span>
+            <span class="number" style="color: #006045;">5</span>
+            <span class="sub-detail">Paderu &bull; Araku &bull; VSKP</span>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+          <!-- Register New Bus Card -->
+          <div class="card">
+            <div class="card-header" style="background: #004230; color: #ffffff;">
+              <div>
+                <h3 class="card-title" style="color: #ffffff;">➕ Register New Corridor Bus Asset</h3>
+                <div style="font-size: 0.72rem; color: #ffb703; margin-top: 2px;">కొత్త బస్సు రిజిస్ట్రేషన్ &bull; APSRTC Asset Master</div>
+              </div>
+              <span class="brand-badge" style="background: #ffb703; color: #003325;">Depot Master</span>
+            </div>
+            <div class="card-body">
+              <form id="adminRegisterBusForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div class="search-form-group">
+                    <label class="search-label" for="regBusNumber">Bus Number (బస్సు నంబర్)</label>
+                    <input type="text" id="regBusNumber" class="search-input" placeholder="e.g. 950" required>
+                  </div>
+                  <div class="search-form-group">
+                    <label class="search-label" for="regRegistrationNumber">AP Registration No</label>
+                    <input type="text" id="regRegistrationNumber" class="search-input" placeholder="e.g. AP-39-Z-9501" required>
+                  </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                  <div class="search-form-group">
+                    <label class="search-label" for="regDepot">Operating RTC Depot</label>
+                    <select id="regDepot" class="search-select">
+                      <option value="Paderu" selected>Paderu Depot</option>
+                      <option value="Araku">Araku Depot</option>
+                      <option value="Chintapalli">Chintapalli Depot</option>
+                      <option value="Anakapalle">Anakapalle Depot</option>
+                      <option value="Visakhapatnam">Visakhapatnam Depot</option>
+                    </select>
+                  </div>
+                  <div class="search-form-group">
+                    <label class="search-label" for="regServiceType">Service Classification</label>
+                    <select id="regServiceType" class="search-select">
+                      <option value="PALLE_VELUGU">Palle Velugu (పల్లె వెలుగు)</option>
+                      <option value="EXPRESS" selected>Express (ఎక్స్‌ప్రెస్)</option>
+                      <option value="ULTRA_DELUXE">Ultra Deluxe (అల్ట్రా డీలక్స్)</option>
+                      <option value="SUPER_LUXURY">Super Luxury (సూపర్ లగ్జరీ)</option>
+                      <option value="INDRA_AC">Indra AC (ఇంద్ర ఏసీ)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="search-form-group">
+                  <label class="search-label" for="regTotalSeats">Passenger Seating Capacity</label>
+                  <input type="number" id="regTotalSeats" class="search-input" value="48" min="20" max="65">
+                </div>
+
+                <button type="submit" class="btn-primary" style="background: #006045;">
+                  ➕ Register Bus to Active Fleet
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Depot Broadcast Control Card -->
+          <div class="card">
+            <div class="card-header" style="background: #004230; color: #ffffff;">
+              <div>
+                <h3 class="card-title" style="color: #ffffff;">📢 Dispatch Live Corridor Broadcast</h3>
+                <div style="font-size: 0.72rem; color: #ffb703; margin-top: 2px;">ప్రత్యక్ష ప్రసార హెచ్చరిక &bull; Streams to Passenger News Marquee</div>
+              </div>
+              <span class="brand-badge" style="background: #ef4444; color: #ffffff;">Live Push</span>
+            </div>
+            <div class="card-body">
+              <form id="adminBroadcastForm">
+                <div class="search-form-group">
+                  <label class="search-label" for="adminBroadcastSeverity">Notice Urgency / Category</label>
+                  <select id="adminBroadcastSeverity" class="search-select">
+                    <option value="INFO">ℹ️ General Advisory / Special Bus Announcement</option>
+                    <option value="WARNING">⚠️ Weather / Ghat Road Caution / Heavy Mist</option>
+                    <option value="CRITICAL">🚨 Critical Service Alert / Landslide Clearance</option>
+                  </select>
+                </div>
+
+                <div class="search-form-group">
+                  <label class="search-label" for="adminBroadcastMsg">Announcement Text (Telugu / English)</label>
+                  <textarea id="adminBroadcastMsg" rows="3" class="search-input" placeholder="e.g. Heavy rainfall reported between Bowdara and Ananthagiri ghat sections. All buses operating with 30 km/h advisory speed." required></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary" style="background: #b91c1c;">
+                  📡 Dispatch Live Ticker Broadcast
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fleet Asset Master Table -->
+        <div class="card" style="margin-bottom: 1.5rem;">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">🚍 APSRTC Fleet Assets Master Directory</h3>
+              <div style="font-size: 0.75rem; color: #64748b;">Manage bus registration, depot allocation, and status toggle (ACTIVE / MAINTENANCE / STANDBY)</div>
+            </div>
+            <input type="text" id="adminFleetSearch" placeholder="Search by Bus, Reg, Depot..." style="padding: 0.4rem 0.75rem; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 0.8rem; width: 240px;">
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Bus No</th>
+                  <th>Registration</th>
+                  <th>Depot</th>
+                  <th>Service Class</th>
+                  <th>Seats</th>
+                  <th>Current Status</th>
+                  <th>Administrative Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminFleetTableBody">
+                <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading fleet assets...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Hardware & ETM Device Registry Table -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title">📡 Hardware GPS & ETM Devices Inventory</h3>
+              <div style="font-size: 0.75rem; color: #64748b;">GPS telematics boxes, electronic ticketing machines, and firmware status</div>
+            </div>
+            <button type="button" class="btn-secondary" onclick="adminApp.loadFleetAssets();" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+              🔄 Refresh Devices
+            </button>
+          </div>
+
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Device ID</th>
+                  <th>Device Type</th>
+                  <th>Assigned Bus</th>
+                  <th>Depot / Sector</th>
+                  <th>Network Status</th>
+                  <th>Firmware & Diagnostics</th>
+                </tr>
+              </thead>
+              <tbody id="adminDevicesTableBody">
+                <tr><td colspan="6" style="text-align: center; padding: 2rem;">Loading devices inventory...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- 8. SIMULATOR & FAILOVER LAB               -->
     <!-- ========================================== -->
     <section id="view-simulator" class="view-section">
       <div class="card" style="max-width: 800px; margin: 0 auto;">
@@ -501,68 +873,262 @@
   </main>
 
   <!-- ========================================== -->
-  <!-- MODAL: PASSENGER COMPLAINT FORM           -->
+  <!-- 8. MODAL: PASSENGER COMPLAINT FORM        -->
   <!-- ========================================== -->
   <div class="modal-backdrop" id="complaintModal">
     <div class="modal-dialog">
       <div class="modal-header">
-        <h3>⚠️ Report Issue / Passenger Grievance</h3>
+        <div>
+          <h3>⚠️ APSRTC Passenger Grievance Redressal Portal</h3>
+          <div style="font-size: 0.75rem; color: rgba(255,255,255,0.85); font-weight: 500;">ఆంధ్రప్రదేశ్ రాష్ట్ర రోడ్డు రవాణా సంస్థ &bull; ప్రయాణీకుల ఫిర్యాదుల విభాగం</div>
+        </div>
         <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('complaintModal')">&times;</button>
       </div>
       <form id="complaintForm">
         <div class="modal-body">
-          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 1rem;">
-            Your report is routed directly to the APSRTC Depot Operations Control Center. An official reference ID will be generated.
+          <p style="font-size: 0.8rem; color: #475569; margin-bottom: 1rem; line-height: 1.5; background: #f8fafc; padding: 0.6rem 0.85rem; border-left: 3px solid #006045; border-radius: 4px;">
+            Grievances filed here are automatically assigned to the Regional Depot Manager & Vigilance Officer under the <strong>APSRTC Citizen Charter</strong>. An SMS confirmation reference ID will be generated.
           </p>
 
+          <!-- Grievance Target Selection Tabs -->
+          <label class="search-label">Grievance Category / ఫిర్యాదు రకం</label>
+          <div class="complaint-target-tabs">
+            <button type="button" class="target-tab-btn staff-active active" id="tabStaffGrievance" onclick="passengerApp.selectComplaintTarget('STAFF')">
+              👨‍✈️ Staff Misconduct (సిబ్బంది)
+            </button>
+            <button type="button" class="target-tab-btn" id="tabBusCondition" onclick="passengerApp.selectComplaintTarget('BUS_CONDITION')">
+              🚌 Bus Condition & Defect (బస్సు పరిస్థితి)
+            </button>
+            <button type="button" class="target-tab-btn" id="tabServiceIssue" onclick="passengerApp.selectComplaintTarget('SERVICE')">
+              ⏱️ Route / Delays (సేవలు)
+            </button>
+          </div>
+
+          <input type="hidden" id="complaintTargetType" value="STAFF">
           <input type="hidden" id="complaintTripId">
 
-          <div class="search-form-group">
-            <label class="search-label" for="complaintBusNumber">Bus Number</label>
-            <input type="text" id="complaintBusNumber" class="search-input" style="padding-left: 0.85rem;" readonly>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="search-form-group">
+              <label class="search-label" for="complaintBusNumber">Bus Number (బస్సు నంబర్)</label>
+              <input type="text" id="complaintBusNumber" class="search-input" style="padding-left: 0.85rem;" placeholder="e.g. 415, 302, 518..." required>
+            </div>
+            <div class="search-form-group">
+              <label class="search-label" for="complaintLocation">Location / Bus Stop (ప్రదేశం)</label>
+              <input type="text" id="complaintLocation" class="search-input" style="padding-left: 0.85rem;" placeholder="e.g. Paderu Stand, Bowdara">
+            </div>
           </div>
 
           <div class="search-form-group">
-            <label class="search-label" for="complaintCategory">Issue Category</label>
+            <label class="search-label" for="complaintCategory">Specific Grievance Reason</label>
             <select id="complaintCategory" class="search-select" style="padding-left: 0.85rem;" required>
-              <option value="Bus did not stop">Bus did not stop at designated stand</option>
-              <option value="Overcrowding">Severe Overcrowding / Seat Unavailability</option>
-              <option value="Delay">Unscheduled Delay / Breakdown</option>
-              <option value="Driver behaviour">Driver Rash Driving / Behaviour</option>
-              <option value="Conductor issue">Conductor Issue / Overcharging</option>
-              <option value="Safety">Safety & Mechanical Issue</option>
-              <option value="Cleanliness">Cleanliness & Hygiene</option>
-              <option value="Other">Other Operational Concern</option>
+              <!-- Populated dynamically based on Target Tab -->
             </select>
           </div>
 
           <div class="search-form-group">
-            <label class="search-label" for="complaintDescription">Description of Incident</label>
-            <textarea id="complaintDescription" rows="3" class="search-input" style="padding-left: 0.85rem; height: auto;" placeholder="Please describe what happened..." required></textarea>
+            <label class="search-label" for="complaintDescription">Detailed Incident Description (వివరణ)</label>
+            <textarea id="complaintDescription" rows="3" class="search-input" style="padding-left: 0.85rem; height: auto;" placeholder="Please give specific details regarding the incident, driver/conductor behaviour or damaged bus condition..." required></textarea>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
             <div class="search-form-group">
-              <label class="search-label" for="complaintName">Your Name (Optional)</label>
-              <input type="text" id="complaintName" class="search-input" style="padding-left: 0.85rem;" placeholder="Passenger Name">
+              <label class="search-label" for="complaintName">Passenger Name (పేరు)</label>
+              <input type="text" id="complaintName" class="search-input" style="padding-left: 0.85rem;" placeholder="Your Name" required>
             </div>
             <div class="search-form-group">
-              <label class="search-label" for="complaintPhone">Phone (Optional)</label>
-              <input type="tel" id="complaintPhone" class="search-input" style="padding-left: 0.85rem;" placeholder="Mobile Number">
+              <label class="search-label" for="complaintPhone">Mobile Number (మొబైల్ నంబర్)</label>
+              <input type="tel" id="complaintPhone" class="search-input" style="padding-left: 0.85rem;" placeholder="10-digit mobile number" required pattern="[0-9]{10}">
             </div>
           </div>
         </div>
 
         <div class="modal-footer">
           <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('complaintModal')">Cancel</button>
-          <button type="submit" class="btn-primary" style="background: #c62828;">Submit Grievance</button>
+          <button type="submit" class="btn-primary" style="background: #b91c1c;">🚨 Submit Grievance / ఫిర్యాదు సమర్పించండి</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- ========================================== -->
-  <!-- MODAL: BUS DETAILS                        -->
+  <!-- 8B. MODAL: PASSENGER GRIEVANCE STATUS & ACTION TAKEN -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="complaintStatusModal">
+    <div class="modal-dialog" style="max-width: 760px; max-height: 90vh;">
+      <div class="modal-header" style="background: #003325; color: #ffffff;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <span style="font-size: 1.5rem;">📋</span>
+          <div>
+            <h3 style="color: #ffb703; margin: 0; font-size: 1.15rem;">APSRTC Grievance Tracking & Action Taken Portal</h3>
+            <div style="font-size: 0.72rem; color: #cbd5e1;">ప్రయాణీకుల ఫిర్యాదు స్థితి & అధికారులు తీసుకున్న చర్యల నివేదిక</div>
+          </div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('complaintStatusModal')">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.25rem; max-height: calc(85vh - 120px); overflow-y: auto;">
+        <!-- Search & Quick Selection Row -->
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 8px; padding: 0.85rem; margin-bottom: 1.25rem;">
+          <form id="trackComplaintSearchForm" onsubmit="passengerApp.handleTrackSubmit(event)" style="display: flex; gap: 0.5rem; margin-bottom: 0.6rem;">
+            <input type="text" id="trackComplaintInput" class="search-input" placeholder="Enter Ref ID e.g. APSRTC-G-2026-9083" style="font-weight: 700; text-transform: uppercase;" required>
+            <button type="submit" class="btn-primary" style="background: #006045; white-space: nowrap; padding: 0.6rem 1.25rem;">
+              🔍 Track Status
+            </button>
+          </form>
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; font-size: 0.75rem; color: #64748b;">
+            <span style="font-weight: 700; color: #004230;">Quick Check:</span>
+            <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-9083')" style="color: #0369a1; background: #e0f2fe; padding: 2px 8px; font-size: 0.72rem;">Bus 518 (Broken Seats)</button>
+            <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-1011')" style="color: #991b1b; background: #fee2e2; padding: 2px 8px; font-size: 0.72rem;">Bus 415 (Rash Driving)</button>
+            <button type="button" class="gov-link-btn" onclick="passengerApp.trackComplaintModal('APSRTC-G-2026-1049')" style="color: #166534; background: #dcfce7; padding: 2px 8px; font-size: 0.72rem;">Bus 415 (Delay)</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Container for Result -->
+        <div id="complaintStatusResult">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-size: 0.72rem; color: #64748b;">
+          APSRTC Citizen Grievance Redressal Cell &bull; 24x7 Helpline: <strong>149</strong>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="btn-secondary" onclick="passengerApp.printGrievanceReceipt()">🖨️ Print Slip</button>
+          <button type="button" class="btn-primary" style="background: #006045;" onclick="passengerApp.closeModal('complaintStatusModal')">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 8C. MODAL: OFFICER RECORD ACTION TAKEN     -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="officerActionModal">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header" style="background: #004230; color: #ffffff;">
+        <div>
+          <h3 style="color: #ffb703; margin: 0; font-size: 1.1rem;">📝 Record Official Action Taken & Resolution</h3>
+          <div style="font-size: 0.72rem; color: #cbd5e1;">డిపో మేనేజర్ అధికారిక చర్య & పరిష్కార నివేదిక</div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('officerActionModal')">&times;</button>
+      </div>
+
+      <form id="officerActionForm" onsubmit="officerApp.submitActionTaken(event)">
+        <div class="modal-body">
+          <input type="hidden" id="actionComplaintId">
+
+          <!-- Summary banner of selected complaint -->
+          <div id="actionComplaintSummary" style="background: #f8fafc; border-left: 3.5px solid #006045; padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.82rem;">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="actionStatusSelect">Updated Grievance Status / ప్రస్తుత స్థితి</label>
+            <select id="actionStatusSelect" class="search-select" required>
+              <option value="ACKNOWLEDGED">🔵 ACKNOWLEDGED - Depot Officer Assigned</option>
+              <option value="INVESTIGATING">🟠 INVESTIGATING - Mechanical / Vigilance Inquiry Active</option>
+              <option value="ACTION_TAKEN" selected>🟢 ACTION TAKEN - Remedial / Disciplinary Action Executed</option>
+              <option value="RESOLVED">✅ RESOLVED - Problem Rectified & Fitness Certified</option>
+              <option value="CLOSED">🔒 CLOSED - Case Formally Closed</option>
+            </select>
+          </div>
+
+          <!-- Quick Action Templates / Presets -->
+          <label class="search-label">1-Click Official Action Presets (సిద్ధంగా ఉన్న చర్యలు)</label>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.85rem;">
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('workshop')" style="background: #e0f2fe; color: #0369a1; font-size: 0.72rem; padding: 3px 8px;">🛠️ Workshop Repair Done</button>
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('crew_warning')" style="background: #fee2e2; color: #991b1b; font-size: 0.72rem; padding: 3px 8px;">👨‍✈️ Crew Warning Memo</button>
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('standby_bus')" style="background: #fef3c7; color: #92400e; font-size: 0.72rem; padding: 3px 8px;">🚌 Standby Bus Deployed</button>
+            <button type="button" class="gov-link-btn" onclick="officerApp.fillActionPreset('inspection_active')" style="background: #f1f5f9; color: #334155; font-size: 0.72rem; padding: 3px 8px;">🔍 Bay Inspection Active</button>
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="actionNotesText">Action Taken Details / తీసుకున్న చర్య వివరాలు</label>
+            <textarea id="actionNotesText" rows="4" class="search-input" style="height: auto; font-size: 0.85rem;" placeholder="Specify exact mechanical repairs done, spare parts replaced, crew disciplinary memo number, or route adjustment details..." required></textarea>
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="actionOfficerName">Authorized Officer Name & Title</label>
+            <input type="text" id="actionOfficerName" class="search-input" value="K. Satyanarayana, Senior Depot Manager & Vigilance Officer, Paderu" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('officerActionModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="background: #006045;">
+            💾 Save & Dispatch Official Action
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADMIN AUTHENTICATION GATE           -->
+  <!-- ========================================== -->
+  <div class="modal-backdrop" id="adminAuthModal">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header" style="background: #003325;">
+        <div>
+          <h3 style="color: #ffb703;">🔒 APSRTC Depot Officer Verification</h3>
+          <div style="font-size: 0.75rem; color: #e2e8f0;">డిపో అడ్మినిస్ట్రేటర్ అధికారిక లాగిన్</div>
+        </div>
+        <button type="button" class="modal-close-btn" onclick="passengerApp.closeModal('adminAuthModal')">&times;</button>
+      </div>
+      <form id="adminModalLoginForm">
+        <div class="modal-body">
+          <p style="font-size: 0.8rem; color: #64748b; margin-bottom: 1rem;">
+            Enter your APSRTC Depot Officer Security PIN or credentials to unlock administrative fleet controls.
+          </p>
+
+          <!-- Builder / Developer Quick Access Banner -->
+          <div style="margin-bottom: 1.25rem; padding: 0.85rem; background: #ecfdf5; border: 1.5px solid #10b981; border-radius: 8px; text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.8rem; font-weight: 700; color: #065f46; margin-bottom: 0.4rem;">
+              <span>🛠️ Developer / Builder Mode Active</span>
+            </div>
+            <button type="button" class="btn-primary" onclick="adminApp.quickDevLogin()" style="background: #059669; padding: 0.65rem 1rem; width: 100%; font-size: 0.9rem; font-weight: 800; cursor: pointer; border: none; box-shadow: 0 4px 12px rgba(5,150,105,0.3); transition: all 0.2s;">
+              ⚡ 1-Click Developer Auto-Login (PIN: 2026)
+            </button>
+            <div style="font-size: 0.72rem; color: #047857; margin-top: 0.4rem;">
+              Auto-authorizes your session and keeps you logged in across page refreshes.
+            </div>
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="adminModalPin">Security PIN (క్విక్ పిన్)</label>
+            <input type="password" id="adminModalPin" class="search-input" placeholder="e.g. 2026" value="2026">
+          </div>
+
+          <div style="text-align: center; margin: 0.5rem 0; font-size: 0.72rem; color: #94a3b8; font-weight: 700;">— OR USERNAME & PASSWORD —</div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="adminModalUser">Username</label>
+            <input type="text" id="adminModalUser" class="search-input" placeholder="admin" value="admin">
+          </div>
+
+          <div class="search-form-group">
+            <label class="search-label" for="adminModalPass">Password</label>
+            <input type="password" id="adminModalPass" class="search-input" placeholder="••••••••" value="apsrtc@admin2026">
+          </div>
+
+          <div style="font-size: 0.75rem; color: #334155; margin-top: 0.75rem; background: #f1f5f9; padding: 0.65rem 0.85rem; border-radius: 6px; border: 1px solid #cbd5e1; line-height: 1.4;">
+            <strong style="color: #004230;">🔑 Admin Credentials for Development:</strong><br>
+            &bull; <strong>Master PIN:</strong> <code>2026</code> (instant 1-field login)<br>
+            &bull; <strong>Account:</strong> <code>admin</code> / Password: <code>apsrtc@admin2026</code><br>
+            <span style="font-size: 0.7rem; color: #64748b;">(Configured in <code>backend/config/config.js</code> under <code>ADMIN_PIN</code> & <code>ADMIN_KEY</code>)</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="passengerApp.closeModal('adminAuthModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="background: #006045;">Authorize Login</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 9. MODAL: BUS DETAILS PROFILE              -->
   <!-- ========================================== -->
   <div class="modal-backdrop" id="busDetailsModal">
     <div class="modal-dialog">
@@ -579,16 +1145,18 @@
     </div>
   </div>
 
-  <!-- Official Footer -->
+  <!-- ========================================== -->
+  <!-- 10. OFFICIAL FOOTER                        -->
+  <!-- ========================================== -->
   <footer class="official-footer">
     <div class="footer-inner">
       <div>
         <strong>Andhra Pradesh State Road Transport Corporation (APSRTC)</strong><br>
-        <span style="font-size: 0.75rem; color: #94a3b8;">SmartTrack Multi-Source Fleet Telemetry & Passenger Information Prototype</span>
+        <span style="font-size: 0.75rem; color: #94a3b8;">RTC House, PNBS, Vijayawada - 520013, Andhra Pradesh, India</span>
       </div>
       <div style="font-size: 0.75rem; color: #94a3b8; text-align: right;">
-        Demonstration Prototype | Designed for scalable production integration<br>
-        Corridor: Araku &ndash; Ananthagiri &ndash; Paderu &ndash; G. Madugula &ndash; Chintapalli &ndash; Anakapalle &ndash; Visakhapatnam
+        Citizen Services Portal &bull; Real-Time Corridor GPS Telemetry &bull; Passenger Grievance Redressal<br>
+        Corridors: Araku &ndash; Paderu &ndash; Chodavaram &ndash; S. Kota &ndash; Pendurthi &ndash; Chintapalli &ndash; Anakapalle &ndash; Visakhapatnam
       </div>
     </div>
   </footer>
@@ -612,6 +1180,7 @@
   <script src="js/passenger.js"></script>
   <script src="js/crew.js"></script>
   <script src="js/officer.js"></script>
+  <script src="js/admin.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

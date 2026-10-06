@@ -18,7 +18,8 @@ function initSocketConnection() {
     return;
   }
 
-  socket = io(window.location.origin, {
+  const socketUrl = (window.api && window.api.getBaseUrl) ? window.api.getBaseUrl() : 'http://localhost:5000';
+  socket = io(socketUrl, {
     reconnection: true,
     reconnectionAttempts: Infinity,
     reconnectionDelay: 1000,

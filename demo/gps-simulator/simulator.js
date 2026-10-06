@@ -13,8 +13,8 @@ const SERVER_HOST = process.env.SERVER_HOST || 'localhost';
 const SERVER_PORT = process.env.PORT || 5000;
 const TICK_INTERVAL_MS = parseInt(process.env.SIMULATOR_TICK_MS || '3000', 10);
 
-// Key Route Waypoints (Araku to Visakhapatnam Ghat Corridor)
-const DOWN_WAYPOINTS = [
+// 1. Chintapalli Corridor Waypoints (Araku to Visakhapatnam via Chintapalli)
+const CHINTAPALLI_WAYPOINTS = [
   { name: 'Araku Valley Bus Stand', lat: 18.3273, lon: 82.8775 },
   { name: 'Araku Valley Viewpoint', lat: 18.2820, lon: 82.9450 },
   { name: 'Ananthagiri Hills Coffee Plantations', lat: 18.2372, lon: 83.0117 },
@@ -32,17 +32,51 @@ const DOWN_WAYPOINTS = [
   { name: 'Visakhapatnam Dwaraka RTC Complex', lat: 17.7215, lon: 83.3032 }
 ];
 
-const UP_WAYPOINTS = [...DOWN_WAYPOINTS].reverse();
+const CHINTAPALLI_UP_WAYPOINTS = [...CHINTAPALLI_WAYPOINTS].reverse();
 
-// Simulated Fleet Configuration
+// 2. Chodavaram Corridor Waypoints (Paderu to Visakhapatnam via Chodavaram & Pendurthi - Direct SH-39)
+const CHODAVARAM_WAYPOINTS = [
+  { name: 'Paderu RTC Depot Junction', lat: 18.0816, lon: 82.6700 },
+  { name: 'Minumuluru Ghat Viewpoint', lat: 18.0350, lon: 82.7450 },
+  { name: 'Vaddadi Ghat Junction', lat: 17.8400, lon: 82.9000 },
+  { name: 'Chodavaram RTC Bus Stand', lat: 17.8288, lon: 82.9328 },
+  { name: 'Sabbavaram Junction', lat: 17.7850, lon: 83.1300 },
+  { name: 'Pendurthi RTC Bus Stop', lat: 17.8239, lon: 83.2014 },
+  { name: 'NAD Kotha Road Flyover', lat: 17.7380, lon: 83.2450 },
+  { name: 'Visakhapatnam Dwaraka RTC Complex', lat: 17.7215, lon: 83.3032 }
+];
+
+const CHODAVARAM_UP_WAYPOINTS = [...CHODAVARAM_WAYPOINTS].reverse();
+
+// 3. S. Kota Corridor Waypoints (Paderu to Visakhapatnam via Araku Valley, S. Kota & Pendurthi)
+const SKOTA_WAYPOINTS = [
+  { name: 'Paderu RTC Depot Junction', lat: 18.0816, lon: 82.6700 },
+  { name: 'Dumbriguda Agency Valley', lat: 18.2300, lon: 82.7600 },
+  { name: 'Araku Valley Bus Stand', lat: 18.3273, lon: 82.8775 },
+  { name: 'Ananthagiri Coffee Estates', lat: 18.2372, lon: 83.0117 },
+  { name: 'Tyda Eastern Ghat Pass', lat: 18.1500, lon: 83.0500 },
+  { name: 'Srungavarapukota (S. Kota) RTC Stand', lat: 18.1150, lon: 83.1450 },
+  { name: 'Kothavalasa Railway Junction', lat: 17.8967, lon: 83.1900 },
+  { name: 'Pendurthi RTC Bus Stop', lat: 17.8239, lon: 83.2014 },
+  { name: 'NAD Kotha Road Flyover', lat: 17.7380, lon: 83.2450 },
+  { name: 'Visakhapatnam Dwaraka RTC Complex', lat: 17.7215, lon: 83.3032 }
+];
+
+const SKOTA_UP_WAYPOINTS = [...SKOTA_WAYPOINTS].reverse();
+
+// Backwards compatibility alias
+const DOWN_WAYPOINTS = CHINTAPALLI_WAYPOINTS;
+const UP_WAYPOINTS = CHINTAPALLI_UP_WAYPOINTS;
+
+// Simulated Fleet Configuration across all 3 Corridors
 const simulatedBuses = [
   {
     busNumber: '302',
     source: 'DEMO',
     endpoint: 'demo',
     deviceId: 'DEMO-SIM-302',
-    waypoints: DOWN_WAYPOINTS,
-    currentIdx: 4, // Starts at Paderu
+    waypoints: CHODAVARAM_WAYPOINTS,
+    currentIdx: 0, // Starts at Paderu (via Chodavaram & Pendurthi)
     progress: 0.1,
     speedKph: 42,
     accuracyMeters: 14,
@@ -50,12 +84,51 @@ const simulatedBuses = [
     altitude: 850
   },
   {
+    busNumber: '246',
+    source: 'HARDWARE_TRACKER',
+    endpoint: 'device',
+    deviceId: 'HW-TRK-246-01',
+    waypoints: CHODAVARAM_WAYPOINTS,
+    currentIdx: 3, // At Chodavaram (via Pendurthi to Vizag)
+    progress: 0.25,
+    speedKph: 46,
+    accuracyMeters: 7,
+    heading: 110,
+    altitude: 120
+  },
+  {
+    busNumber: '472',
+    source: 'HARDWARE_TRACKER',
+    endpoint: 'device',
+    deviceId: 'HW-TRK-472-01',
+    waypoints: SKOTA_WAYPOINTS,
+    currentIdx: 5, // Near S. Kota (via Pendurthi to Vizag)
+    progress: 0.2,
+    speedKph: 45,
+    accuracyMeters: 8,
+    heading: 135,
+    altitude: 95
+  },
+  {
+    busNumber: '580',
+    source: 'ETM',
+    endpoint: 'etm',
+    deviceId: 'ETM-VIZAG-580',
+    waypoints: SKOTA_UP_WAYPOINTS,
+    currentIdx: 2, // Near Pendurthi heading Up to S. Kota & Paderu
+    progress: 0.15,
+    speedKph: 40,
+    accuracyMeters: 12,
+    heading: 315,
+    altitude: 40
+  },
+  {
     busNumber: '415',
     source: 'CREW_PHONE',
     endpoint: 'crew',
     deviceId: 'DRIVER-415-01',
-    waypoints: DOWN_WAYPOINTS,
-    currentIdx: 6, // Starts at G. Madugula
+    waypoints: CHINTAPALLI_WAYPOINTS,
+    currentIdx: 6, // Starts at G. Madugula (via Chintapalli)
     progress: 0.2,
     speedKph: 44,
     accuracyMeters: 9,
@@ -67,7 +140,7 @@ const simulatedBuses = [
     source: 'HARDWARE_TRACKER',
     endpoint: 'device',
     deviceId: 'HW-TRK-518-01',
-    waypoints: DOWN_WAYPOINTS,
+    waypoints: CHINTAPALLI_WAYPOINTS,
     currentIdx: 8, // Starts at Chintapalli
     progress: 0.0,
     speedKph: 48,
@@ -80,8 +153,8 @@ const simulatedBuses = [
     source: 'HARDWARE_TRACKER',
     endpoint: 'device',
     deviceId: 'HW-TRK-624-01',
-    waypoints: UP_WAYPOINTS,
-    currentIdx: 3, // Starts near Anakapalle heading UP
+    waypoints: CHINTAPALLI_UP_WAYPOINTS,
+    currentIdx: 3, // Near Anakapalle heading UP via Chintapalli
     progress: 0.4,
     speedKph: 52,
     accuracyMeters: 7,
@@ -93,7 +166,7 @@ const simulatedBuses = [
     source: 'ETM',
     endpoint: 'etm',
     deviceId: 'ETM-VIZAG-731',
-    waypoints: DOWN_WAYPOINTS,
+    waypoints: CHINTAPALLI_WAYPOINTS,
     currentIdx: 5, // Between Paderu and G. Madugula
     progress: 0.6,
     speedKph: 39,
@@ -106,7 +179,7 @@ const simulatedBuses = [
     source: 'HARDWARE_TRACKER',
     endpoint: 'device',
     deviceId: 'HW-TRK-842-01',
-    waypoints: DOWN_WAYPOINTS,
+    waypoints: CHINTAPALLI_WAYPOINTS,
     currentIdx: 1, // Near Ananthagiri
     progress: 0.3,
     speedKph: 35,
@@ -119,8 +192,8 @@ const simulatedBuses = [
     source: 'CREW_PHONE',
     endpoint: 'crew',
     deviceId: 'DRIVER-905-01',
-    waypoints: UP_WAYPOINTS,
-    currentIdx: 0, // Visakhapatnam RTC complex departing UP
+    waypoints: CHODAVARAM_UP_WAYPOINTS,
+    currentIdx: 0, // Visakhapatnam RTC complex departing UP via Chodavaram
     progress: 0.05,
     speedKph: 25,
     accuracyMeters: 11,

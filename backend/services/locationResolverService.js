@@ -295,9 +295,29 @@ function resolveActiveSourceForBus(busNumber) {
     };
   }
 
+  // Check if bus has an active running trip with a staff-designated tracking source
+  // e.g. ETM, CREW_PHONE, HARDWARE_TRACKER
+  let priorityList = config.LOCATION_PRIORITY;
+  try {
+    const runningTrip = queryOne(
+      `SELECT t.tracking_source, t.device_id
+       FROM trips t
+       JOIN buses b ON b.id = t.bus_id
+       WHERE b.bus_number = ? AND t.status = 'RUNNING'
+       ORDER BY t.start_time DESC LIMIT 1`,
+      [busNumber]
+    );
+
+    if (runningTrip && runningTrip.tracking_source && config.LOCATION_PRIORITY.includes(runningTrip.tracking_source)) {
+      const preferred = runningTrip.tracking_source;
+      priorityList = [preferred, ...config.LOCATION_PRIORITY.filter(s => s !== preferred)];
+    }
+  } catch (e) {
+    logger.warn(`Could not check trip tracking source for bus ${busNumber}: ${e.message}`);
+  }
+
   // Iterate strictly by Priority:
-  // 1: HARDWARE_TRACKER, 2: CREW_PHONE, 3: ETM, 4: DEMO
-  for (const candidateSource of config.LOCATION_PRIORITY) {
+  for (const candidateSource of priorityList) {
     if (sourcesMap.has(candidateSource)) {
       const update = sourcesMap.get(candidateSource);
       const ageSeconds = Math.max(0, Math.floor((now - update.receivedAt) / 1000));

@@ -7,7 +7,7 @@ const { queryAll, queryOne, run } = require('../config/db');
 
 function startTrip(req, res, next) {
   try {
-    const { busNumber, employeeId, fromStop, toStop, routeCode } = req.body;
+    const { busNumber, employeeId, staffName, fromStop, toStop, routeCode, trackingSource = 'CREW_PHONE', deviceId } = req.body;
 
     if (!busNumber || !fromStop || !toStop) {
       return res.status(400).json({
@@ -25,11 +25,33 @@ function startTrip(req, res, next) {
       });
     }
 
-    // Find staff
+    // Find or register staff
     let staff = null;
-    if (employeeId) {
-      staff = queryOne('SELECT * FROM staff WHERE employee_id = ?', [employeeId]);
+    const cleanEmpId = employeeId ? String(employeeId).trim() : '';
+    if (cleanEmpId) {
+      staff = queryOne('SELECT * FROM staff WHERE employee_id = ?', [cleanEmpId]);
+      if (!staff) {
+        // Auto-register staff member with entered ID
+        const cleanName = staffName || `APSRTC Staff (${cleanEmpId})`;
+        const insertStaff = run(`
+          INSERT INTO staff (employee_id, full_name, designation, depot, phone, status)
+          VALUES (?, ?, 'DRIVER', ?, '9440100000', 'ACTIVE')
+        `, [cleanEmpId, cleanName, bus.depot || 'Visakhapatnam']);
+        staff = queryOne('SELECT * FROM staff WHERE id = ?', [insertStaff.lastInsertRowid]);
+      }
     }
+
+    // Validate and resolve tracking source
+    const validSources = ['CREW_PHONE', 'HARDWARE_TRACKER', 'ETM', 'DEMO'];
+    const activeSource = validSources.includes(trackingSource) ? trackingSource : 'CREW_PHONE';
+
+    // Resolve device ID
+    const resolvedDeviceId = (deviceId && String(deviceId).trim()) ? String(deviceId).trim() : (
+      activeSource === 'CREW_PHONE' ? `DRIVER-${cleanEmpId || bus.bus_number}-PHONE` :
+      activeSource === 'HARDWARE_TRACKER' ? `HW-TRK-${bus.bus_number}-01` :
+      activeSource === 'ETM' ? `ETM-VIZAG-${bus.bus_number}` :
+      `DEMO-SIM-${bus.bus_number}`
+    );
 
     // Find or deduce route
     let route = null;
@@ -59,19 +81,36 @@ function startTrip(req, res, next) {
     // End any existing running trip for this bus
     run(`UPDATE trips SET status = 'COMPLETED', end_time = datetime('now') WHERE bus_id = ? AND status = 'RUNNING'`, [bus.id]);
 
-    // Insert new trip
+    // Insert new trip with chosen tracking source and device ID
     run(`
       INSERT INTO trips (
-        trip_id, bus_id, route_id, driver_staff_id, from_stop, to_stop, status, start_time
-      ) VALUES (?, ?, ?, ?, ?, ?, 'RUNNING', datetime('now'))
+        trip_id, bus_id, route_id, driver_staff_id, from_stop, to_stop, tracking_source, device_id, status, start_time
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'RUNNING', datetime('now'))
     `, [
       tripId,
       bus.id,
       route.id,
       staff ? staff.id : null,
       fromStop,
-      toStop
+      toStop,
+      activeSource,
+      resolvedDeviceId
     ]);
+
+    // Immediately update current_bus_locations with the chosen tracking source and device
+    run(`
+      UPDATE current_bus_locations
+      SET 
+        active_source = ?,
+        device_id = ?,
+        trip_id = ?,
+        route_id = ?,
+        from_stop = ?,
+        to_stop = ?,
+        status = 'LIVE',
+        last_updated_at = datetime('now')
+      WHERE bus_id = ?
+    `, [activeSource, resolvedDeviceId, tripId, route.id, fromStop, toStop, bus.id]);
 
     res.status(201).json({
       success: true,
@@ -83,7 +122,10 @@ function startTrip(req, res, next) {
         routeName: route.route_name,
         fromStop,
         toStop,
-        driverName: staff ? staff.full_name : 'Assigned Crew',
+        employeeId: cleanEmpId || (staff ? staff.employee_id : 'EMP-4089'),
+        driverName: staff ? staff.full_name : (cleanEmpId ? `Crew ${cleanEmpId}` : 'Assigned Crew'),
+        trackingSource: activeSource,
+        deviceId: resolvedDeviceId,
         status: 'RUNNING',
         startTime: new Date().toISOString()
       }

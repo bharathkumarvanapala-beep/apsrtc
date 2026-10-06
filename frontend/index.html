@@ -94,7 +94,7 @@
     </div>
     <div class="ticker-content">
       <div class="ticker-track">
-        <span>🟢 <strong>LIVE CORRIDOR TELEMETRY:</strong> High-resolution GPS tracking active across Araku – Ananthagiri – Paderu – G. Madugula – Chintapalli – Anakapalle – Visakhapatnam ghat routes.</span>
+        <span>🟢 <strong>LIVE CORRIDOR TELEMETRY:</strong> High-resolution GPS tracking active across Araku – Paderu – Chodavaram – S. Kota – Pendurthi – Chintapalli – Anakapalle – Visakhapatnam ghat routes.</span>
         <span>⚡ <strong>MULTI-SOURCE FAILOVER:</strong> Bus locations continuously verified through onboard hardware trackers, crew GPS & ticketing terminals.</span>
         <span>⚠️ <strong>CITIZEN GRIEVANCE SYSTEM:</strong> Passengers can lodge official complaints regarding Staff Conduct (Driver/Conductor) and Bus Condition directly via the portal.</span>
         <span>📞 <strong>24/7 HELPLINE:</strong> Call 149 (Toll Free) or 0866-2570005 for immediate transport assistance.</span>
@@ -161,6 +161,9 @@
                 <div class="quick-chips-title">Frequent Corridor Routes (ప్రధాన మార్గాలు):</div>
                 <div class="chips-list">
                   <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Paderu', 'Visakhapatnam')">Paderu ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chodavaram', 'Visakhapatnam')">Chodavaram ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('S. Kota', 'Visakhapatnam')">S. Kota ➔ Visakhapatnam</button>
+                  <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Pendurthi', 'Visakhapatnam')">Pendurthi ➔ Visakhapatnam</button>
                   <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Araku', 'Visakhapatnam')">Araku ➔ Visakhapatnam</button>
                   <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('G. Madugula', 'Visakhapatnam')">G. Madugula ➔ Visakhapatnam</button>
                   <button type="button" class="chip-btn" onclick="passengerApp.setQuickSearch('Chintapalli', 'Visakhapatnam')">Chintapalli ➔ Visakhapatnam</button>
@@ -238,6 +241,13 @@
                 <span class="source-pill ETM">ETM</span>
                 <span class="source-pill DEMO">Demo Fleet</span>
               </div>
+
+              <div class="legend-items" style="margin-top: 0.35rem; width: 100%; border-top: 1px solid var(--border-light); padding-top: 0.35rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
+                <span style="font-weight: 800; color: #334155;">Active Corridors:</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;"><span style="display: inline-block; width: 18px; height: 4px; background: #ffb703; border: 1.5px solid #004d38; border-radius: 2px;"></span> Via Chintapalli - Anakapalle</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;"><span style="display: inline-block; width: 18px; height: 4px; background: #38bdf8; border: 1.5px solid #075985; border-radius: 2px;"></span> Via Chodavaram - Pendurthi (Direct SH-39)</span>
+                <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem;"><span style="display: inline-block; width: 18px; height: 4px; background: #f43f5e; border: 1.5px solid #6b21a8; border-radius: 2px;"></span> Via Araku - S. Kota - Pendurthi</span>
+              </div>
             </div>
           </div>
         </div>
@@ -265,9 +275,18 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
               <div class="search-form-group">
-                <label class="search-label" for="crewStaffSelect">Staff Identity (Crew ID)</label>
-                <select id="crewStaffSelect" class="search-select" style="padding-left: 0.85rem;">
+                <label class="search-label" for="crewStaffInput">Staff Identity (Crew ID / Employee ID)</label>
+                <input type="text" id="crewStaffInput" list="crewStaffDatalist" class="search-select" style="padding-left: 0.85rem;" placeholder="Enter Crew ID (e.g. EMP-4089)" value="EMP-4089" autocomplete="off">
+                <datalist id="crewStaffDatalist">
                   <option value="EMP-4089">EMP-4089 (K. Ramesh Babu - Driver)</option>
+                  <option value="EMP-4102">EMP-4102 (M. Venkateswarlu - Driver)</option>
+                  <option value="EMP-5011">EMP-5011 (T. Appa Rao - Driver)</option>
+                  <option value="CON-1120">CON-1120 (P. Satyanarayana - Conductor)</option>
+                  <option value="EMP-7230">EMP-7230 (S. Appala Naidu - Driver)</option>
+                  <option value="EMP-8104">EMP-8104 (B. Rama Rao - Driver)</option>
+                </datalist>
+                <select id="crewStaffSelect" style="display: none;">
+                  <option value="EMP-4089" selected>EMP-4089 (K. Ramesh Babu - Driver)</option>
                   <option value="EMP-4102">EMP-4102 (M. Venkateswarlu - Driver)</option>
                   <option value="EMP-5011">EMP-5011 (T. Appa Rao - Driver)</option>
                   <option value="CON-1120">CON-1120 (P. Satyanarayana - Conductor)</option>
@@ -279,12 +298,31 @@
                 <select id="crewBusSelect" class="search-select" style="padding-left: 0.85rem;">
                   <option value="415">Bus 415 (Araku Depot - Express)</option>
                   <option value="302">Bus 302 (Paderu Depot - Palle Velugu)</option>
+                  <option value="246">Bus 246 (Paderu Depot - Express via Chodavaram)</option>
+                  <option value="472">Bus 472 (Paderu Depot - Ultra Deluxe via S. Kota)</option>
+                  <option value="580">Bus 580 (Visakhapatnam - Super Luxury via S. Kota)</option>
                   <option value="518">Bus 518 (Chintapalli Depot - Ultra Deluxe)</option>
                   <option value="624">Bus 624 (Visakhapatnam - Super Luxury)</option>
                   <option value="731">Bus 731 (Anakapalle - Indra AC)</option>
                   <option value="842">Bus 842 (Araku Depot - Express)</option>
                   <option value="905">Bus 905 (Visakhapatnam - Palle Velugu)</option>
                 </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div class="search-form-group">
+                <label class="search-label" for="crewTrackingSourceSelect">Location Identification Means</label>
+                <select id="crewTrackingSourceSelect" class="search-select" style="padding-left: 0.85rem;">
+                  <option value="CREW_PHONE" selected>📱 Staff Mobile Phone GPS (Driver Device)</option>
+                  <option value="HARDWARE_TRACKER">🛰️ Onboard Bus Hardware GPS Tracker</option>
+                  <option value="ETM">📠 Electronic Ticketing Machine (ETM GPS)</option>
+                </select>
+              </div>
+
+              <div class="search-form-group">
+                <label class="search-label" for="crewDeviceIdInput">Terminal / Hardware Device ID</label>
+                <input type="text" id="crewDeviceIdInput" class="search-select" style="padding-left: 0.85rem;" placeholder="e.g. DRIVER-EMP-4089-PHONE" value="DRIVER-EMP-4089-PHONE">
               </div>
             </div>
 
@@ -295,6 +333,9 @@
                   <option value="Araku">Araku</option>
                   <option value="Ananthagiri">Ananthagiri</option>
                   <option value="Paderu" selected>Paderu</option>
+                  <option value="Chodavaram">Chodavaram</option>
+                  <option value="S. Kota">S. Kota</option>
+                  <option value="Pendurthi">Pendurthi</option>
                   <option value="G. Madugula">G. Madugula</option>
                   <option value="Chintapalli">Chintapalli</option>
                   <option value="Anakapalle">Anakapalle</option>
@@ -306,6 +347,9 @@
                 <label class="search-label" for="crewToSelect">Trip Destination (To)</label>
                 <select id="crewToSelect" class="search-select" style="padding-left: 0.85rem;">
                   <option value="Visakhapatnam" selected>Visakhapatnam</option>
+                  <option value="Pendurthi">Pendurthi</option>
+                  <option value="S. Kota">S. Kota</option>
+                  <option value="Chodavaram">Chodavaram</option>
                   <option value="Anakapalle">Anakapalle</option>
                   <option value="Chintapalli">Chintapalli</option>
                   <option value="G. Madugula">G. Madugula</option>
@@ -433,6 +477,9 @@
                 <option value="624">Bus 624 (Currently Hardware Tracker)</option>
                 <option value="731">Bus 731 (Currently ETM)</option>
                 <option value="302">Bus 302 (Currently Demo GPS)</option>
+                <option value="246">Bus 246 (Currently Hardware Tracker - Chodavaram)</option>
+                <option value="472">Bus 472 (Currently Hardware Tracker - S. Kota)</option>
+                <option value="580">Bus 580 (Currently ETM - Pendurthi)</option>
               </select>
             </div>
 
@@ -1109,7 +1156,7 @@
       </div>
       <div style="font-size: 0.75rem; color: #94a3b8; text-align: right;">
         Citizen Services Portal &bull; Real-Time Corridor GPS Telemetry &bull; Passenger Grievance Redressal<br>
-        Corridor: Araku &ndash; Ananthagiri &ndash; Paderu &ndash; G. Madugula &ndash; Chintapalli &ndash; Anakapalle &ndash; Visakhapatnam
+        Corridors: Araku &ndash; Paderu &ndash; Chodavaram &ndash; S. Kota &ndash; Pendurthi &ndash; Chintapalli &ndash; Anakapalle &ndash; Visakhapatnam
       </div>
     </div>
   </footer>

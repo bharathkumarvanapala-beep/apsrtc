@@ -212,6 +212,58 @@ async function runTests() {
     assert(res.success === true);
   });
 
+  it('Journey 8: Paderu → Chodavaram (Direct Ghat Route)', () => {
+    const res = findRelevantBuses('Paderu', 'Chodavaram');
+    assert(res.success === true);
+    assert(res.buses.length >= 1, 'Should find buses from Paderu to Chodavaram');
+  });
+
+  it('Journey 9: Chodavaram → Visakhapatnam', () => {
+    const res = findRelevantBuses('Chodavaram', 'Visakhapatnam');
+    assert(res.success === true);
+    assert(res.buses.length >= 1, 'Should find buses from Chodavaram to Visakhapatnam');
+  });
+
+  it('Journey 10: Chodavaram → Pendurthi', () => {
+    const res = findRelevantBuses('Chodavaram', 'Pendurthi');
+    assert(res.success === true);
+    assert(res.buses.length >= 1, 'Should find buses from Chodavaram to Pendurthi');
+  });
+
+  it('Journey 11: Pendurthi → Visakhapatnam', () => {
+    const res = findRelevantBuses('Pendurthi', 'Visakhapatnam');
+    assert(res.success === true);
+  });
+
+  it('Journey 12: Paderu → S. Kota (via Araku)', () => {
+    // Send fresh ping for Bus 472 at Paderu
+    processLocationUpdate({
+      busNumber: '472',
+      source: 'HARDWARE_TRACKER',
+      latitude: 18.0816,
+      longitude: 82.6700
+    });
+    const res = findRelevantBuses('Paderu', 'S. Kota');
+    assert(res.success === true);
+    assert(res.buses.length >= 1, 'Should find buses from Paderu to S. Kota');
+  });
+
+  it('Journey 13: S. Kota → Visakhapatnam', () => {
+    const res = findRelevantBuses('S. Kota', 'Visakhapatnam');
+    assert(res.success === true);
+    assert(res.buses.length >= 1, 'Should find buses from S. Kota to Visakhapatnam');
+  });
+
+  it('Journey 14: S. Kota → Pendurthi', () => {
+    const res = findRelevantBuses('S. Kota', 'Pendurthi');
+    assert(res.success === true);
+  });
+
+  it('Journey 15: Araku → S. Kota', () => {
+    const res = findRelevantBuses('Araku', 'S. Kota');
+    assert(res.success === true);
+  });
+
   it('Rejects identical From and To stops', () => {
     assert.throws(() => {
       findRelevantBuses('Paderu', 'Paderu');

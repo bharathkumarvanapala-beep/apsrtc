@@ -5,9 +5,12 @@
  */
 
 let allKnownStops = [
+  { stop_name: 'Paderu', stop_code: 'PDR', latitude: 18.0816, longitude: 82.6700 },
+  { stop_name: 'Chodavaram', stop_code: 'CDV', latitude: 17.8288, longitude: 82.9328 },
+  { stop_name: 'S. Kota', stop_code: 'SKT', latitude: 18.1150, longitude: 83.1450 },
+  { stop_name: 'Pendurthi', stop_code: 'PDT', latitude: 17.8239, longitude: 83.2014 },
   { stop_name: 'Araku', stop_code: 'ARK', latitude: 18.3273, longitude: 82.8775 },
   { stop_name: 'Ananthagiri', stop_code: 'ATG', latitude: 18.2372, longitude: 83.0117 },
-  { stop_name: 'Paderu', stop_code: 'PDR', latitude: 18.0816, longitude: 82.6700 },
   { stop_name: 'G. Madugula', stop_code: 'GMD', latitude: 17.9500, longitude: 82.5167 },
   { stop_name: 'Chintapalli', stop_code: 'CTP', latitude: 17.8700, longitude: 82.3500 },
   { stop_name: 'Anakapalle', stop_code: 'AKP', latitude: 17.6913, longitude: 83.0039 },
@@ -21,9 +24,13 @@ let currentBuses = [];
 const CORRIDOR_ORDER = {
   'araku': 0,
   'ananthagiri': 16,
-  'paderu': 36,
-  'g. madugula': 54,
-  'chintapalli': 72,
+  'paderu': 30,
+  'chodavaram': 55,
+  's. kota': 50,
+  'srungavarapukota': 50,
+  'g. madugula': 52,
+  'chintapalli': 68,
+  'pendurthi': 80,
   'anakapalle': 86,
   'visakhapatnam': 100
 };
@@ -371,6 +378,7 @@ function renderBusCards(buses, passedBuses) {
           <div style="font-size: 0.82rem; color: #006045; font-weight: 800;">
             ➔ Route Direction: Towards ${bus.towards || currentSearch.to || 'Visakhapatnam'}
           </div>
+          ${bus.routeName ? `<div style="font-size: 0.74rem; color: #0284c7; font-weight: 700; margin-top: 3px;">🛣️ Corridor: ${bus.routeName}</div>` : ''}
         </div>
 
         <!-- Visual Corridor Route Progress Bar -->

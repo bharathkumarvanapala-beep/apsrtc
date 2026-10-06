@@ -21,9 +21,12 @@ console.log('📡 APSRTC SmartTrack API Base configured to:', API_BASE);
 
 // Pre-seeded fallback corridor stops to guarantee zero UI lockup
 const FALLBACK_STOPS = [
+  { stop_name: 'Paderu', stop_code: 'PDR', latitude: 18.0816, longitude: 82.6700 },
+  { stop_name: 'Chodavaram', stop_code: 'CDV', latitude: 17.8288, longitude: 82.9328 },
+  { stop_name: 'S. Kota', stop_code: 'SKT', latitude: 18.1150, longitude: 83.1450 },
+  { stop_name: 'Pendurthi', stop_code: 'PDT', latitude: 17.8239, longitude: 83.2014 },
   { stop_name: 'Araku', stop_code: 'ARK', latitude: 18.3273, longitude: 82.8775 },
   { stop_name: 'Ananthagiri', stop_code: 'ATG', latitude: 18.2372, longitude: 83.0117 },
-  { stop_name: 'Paderu', stop_code: 'PDR', latitude: 18.0816, longitude: 82.6700 },
   { stop_name: 'G. Madugula', stop_code: 'GMD', latitude: 17.9500, longitude: 82.5167 },
   { stop_name: 'Chintapalli', stop_code: 'CTP', latitude: 17.8700, longitude: 82.3500 },
   { stop_name: 'Anakapalle', stop_code: 'AKP', latitude: 17.6913, longitude: 83.0039 },
